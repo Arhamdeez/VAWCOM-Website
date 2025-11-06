@@ -54,14 +54,10 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
   }, [botHistory, isTyping, type]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.8, delay, type: 'spring', stiffness: 100 }}
+    <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative group cursor-pointer h-full"
+      className="relative group cursor-pointer h-full w-full"
     >
       {/* Simple glow effect */}
       <div
@@ -660,6 +656,6 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
         {/* Bottom accent line */}
         <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${gradient}`} />
       </div>
-    </motion.div>
+    </div>
   );
 }

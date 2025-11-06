@@ -38,16 +38,17 @@ export default function Contact() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden">
+        {/* Animated background - Optimized */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-1/2 left-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.5, 1],
+            className="absolute top-1/2 left-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl will-change-transform"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ 
               opacity: [0.3, 0.6, 0.3],
+              scale: [1, 1.5, 1],
             }}
             transition={{
-              duration: 4,
+              duration: 6,
               repeat: Infinity,
               ease: "easeInOut"
             }}
@@ -136,33 +137,24 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+      {/* Animated background elements - Optimized */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-20 right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"
+          className="absolute top-20 right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl will-change-transform"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           animate={{
             scale: [1, 1.2, 1],
             x: [0, 50, 0],
             y: [0, 30, 0],
           }}
           transition={{
-            duration: 10,
+            duration: 15,
             repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            x: [0, -50, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            opacity: { duration: 1 }
           }}
         />
       </div>

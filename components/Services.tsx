@@ -74,17 +74,20 @@ export default function Services() {
 
 				{/* Stacked Card Container */}
 				<div className="relative max-w-4xl mx-auto">
-					<div className="relative h-[500px] mb-20">
+					<div className="relative h-[500px] mb-20 min-h-[500px]">
 						{services.map((service, index) => (
 							<div
 								key={service.title}
-								className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+								className={`absolute inset-0 w-full transition-all duration-500 ease-in-out ${
 									index === currentCardIndex
-										? 'opacity-100 z-20 transform translate-y-0'
+										? 'opacity-100 z-20 transform translate-y-0 scale-100'
 										: index === (currentCardIndex + 1) % services.length
 										? 'opacity-40 z-10 scale-95 transform translate-y-8'
-										: 'opacity-0 z-0 scale-90 transform translate-y-16'
+										: 'opacity-0 z-0 scale-90 transform translate-y-16 pointer-events-none'
 								}`}
+								style={{ 
+									visibility: index === currentCardIndex || index === (currentCardIndex + 1) % services.length ? 'visible' : 'hidden'
+								}}
 							>
 								<ServiceCard
 									{...service}
