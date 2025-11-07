@@ -380,11 +380,13 @@ export default function About() {
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-green-500/0 group-hover:from-emerald-600/10 group-hover:to-green-500/10 transition-all duration-300" />
                 <div className="relative z-10">
                   <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
                     className="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center mb-4"
                   >
                     <motion.svg
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
                       className="w-6 h-6 text-white"
                       fill="none"
                       stroke="currentColor"
@@ -502,7 +504,7 @@ export default function About() {
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                       <Link
-                        href="https://github.com/"
+                        href="https://github.com/Arhamdeez"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
@@ -565,7 +567,7 @@ export default function About() {
                   >
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                       <Link
-                        href="https://linkedin.com/in/shahbakhtkhurram"
+                        href="https://www.linkedin.com/in/shahbakht-khurram-b322a8329"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-10 h-10 bg-slate-700 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
@@ -575,7 +577,7 @@ export default function About() {
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
                       <Link
-                        href="https://github.com/shahbakhtkhurram"
+                        href="https://github.com/shahbakht11"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"

@@ -6,7 +6,7 @@ const technologies = [
   'Vapi', 'MERN Stack', 'Flutter', 'React Native', 'Kotlin', 'n8n Automations',
   'OpenAI', 'Claude', 'AWS', 'Docker', 'Python', 'Django', '.NET',
   'Google Cloud', 'Twilio', 'Anthropic', 'TypeScript', 'JavaScript', 'Node.js',
-  'Firebase', 'Java', 'Dart', 'MySQL'
+  'Firebase', 'Java', 'Dart', 'MySQL', 'Next.js'
 ];
 
 // Pre-calculate the animation distance for seamless looping

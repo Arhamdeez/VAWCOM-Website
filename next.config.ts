@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Performance optimizations
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   // Webpack configuration
   webpack: (config: WebpackConfig, { isServer }: { isServer: boolean }) => {
     // Handle path aliases

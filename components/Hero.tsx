@@ -91,7 +91,7 @@ export default function Hero() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-400 hover:text-emerald-200 backdrop-blur-sm transition-all duration-300"
+              className="border-emerald-700/70 text-emerald-500 hover:bg-emerald-700/20 hover:border-emerald-600 hover:text-emerald-400 backdrop-blur-sm transition-all duration-300"
             >
               What we Offer
             </Button>

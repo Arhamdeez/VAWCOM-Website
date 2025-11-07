@@ -1,4 +1,5 @@
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -6,7 +7,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="md:col-span-2">
-            <h3 className="text-white mb-4">VAWcom</h3>
+            <h3 className="text-white mb-4">VAWCOM</h3>
             <p className="text-slate-400 max-w-md">Voice. Automation. Web. Communication. We connect your systems, so your business runs on autopilot.</p>
           </div>
 
@@ -14,9 +15,8 @@ export default function Footer() {
             <h4 className="text-white mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><a href="#services" className="text-slate-400 hover:text-emerald-400 transition-colors">Services</a></li>
-              <li><a href="#about" className="text-slate-400 hover:text-emerald-400 transition-colors">About Us</a></li>
-              <li><a href="#portfolio" className="text-slate-400 hover:text-emerald-400 transition-colors">Portfolio</a></li>
-              <li><a href="#contact" className="text-slate-400 hover:text-emerald-400 transition-colors">Contact</a></li>
+              <li><Link href="/about" className="text-slate-400 hover:text-emerald-400 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="text-slate-400 hover:text-emerald-400 transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -32,7 +32,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-800 text-center text-slate-400">
-          <p>© {new Date().getFullYear()} VAWcom. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} VAWCOM. All rights reserved.</p>
         </div>
       </div>
     </footer>
