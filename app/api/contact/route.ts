@@ -99,6 +99,13 @@ Timestamp: ${new Date().toISOString()}
         });
       } catch (error) {
         console.error('❌ Error sending email via SMTP:', error);
+        console.error('Error details:', {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          smtpHost: process.env.SMTP_HOST,
+          smtpUser: process.env.SMTP_USER ? '***' : 'NOT SET',
+          smtpPass: process.env.SMTP_PASS ? '***' : 'NOT SET',
+        });
         // Fall through to alternative methods
       }
     }
@@ -172,23 +179,20 @@ Timestamp: ${new Date().toISOString()}
     console.log('Message:', message);
     console.log('Timestamp:', new Date().toISOString());
     console.log('============================================\n');
-    console.log('⚠️  NOTE: No email service configured. To receive emails:');
-    console.log('   1. Enable 2-Factor Authentication on your Gmail account');
-    console.log('   2. Generate an App Password: https://myaccount.google.com/apppasswords');
-    console.log('   3. Add to .env.local:');
-    console.log('      SMTP_HOST=smtp.gmail.com');
-    console.log('      SMTP_PORT=587');
-    console.log('      SMTP_USER=vawcomtechnologies@gmail.com');
-    console.log('      SMTP_PASS=your-app-password-here');
-    console.log('      CONTACT_EMAIL=vawcomtechnologies@gmail.com');
+    console.log('⚠️  NOTE: No email service configured.');
+    console.log('Environment check:');
+    console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'NOT SET');
+    console.log('  SMTP_USER:', process.env.SMTP_USER || 'NOT SET');
+    console.log('  SMTP_PASS:', process.env.SMTP_PASS ? 'SET (hidden)' : 'NOT SET');
     console.log('============================================\n');
 
-    // In development, still return success even if email isn't configured
+    // Return error response so user knows email wasn't sent
     return NextResponse.json({ 
-      success: true, 
-      message: 'Message received (logged to console - configure email service to receive emails)',
-      note: `To receive emails at ${recipientEmail}, configure SMTP settings in your .env.local file. See console for details.`
-    });
+      success: false, 
+      error: 'Email service not configured',
+      message: 'Message received but email could not be sent. Please check server configuration.',
+      note: `SMTP settings missing. Check Vercel environment variables.`
+    }, { status: 500 });
 
   } catch (error) {
     console.error('Error processing contact form:', error);
