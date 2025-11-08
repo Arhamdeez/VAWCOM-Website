@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Fix warning about multiple lockfiles
+  outputFileTracingRoot: process.cwd(),
 };
 
 export default nextConfig;

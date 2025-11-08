@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
     const VAPI_PHONE_NUMBER_ID = process.env.VAPI_PHONE_NUMBER_ID?.trim();
     const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID; // Optional: if Twilio is configured
     const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN; // Optional: if Twilio is configured
+    const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER?.trim() || '+18783329775'; // Your Twilio number to use as caller ID
     
     // Try private key first, fallback to public key
     const VAPI_KEY = VAPI_PRIVATE_KEY || VAPI_PUBLIC_KEY;
@@ -183,6 +184,11 @@ export async function POST(request: NextRequest) {
         console.log('   📞 FROM (caller ID - Phone number ID):', VAPI_PHONE_NUMBER_ID);
         console.log('   💡 Using your phone number as caller ID (Twilio or Vapi)');
       }
+    } else if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
+      console.log('   🔵 Twilio Mode: ENABLED (Direct)');
+      console.log('   📞 FROM (caller ID - Twilio number):', TWILIO_PHONE_NUMBER);
+      console.log('   💡 Using Twilio credentials directly');
+      console.log('   💡 Twilio Account SID:', TWILIO_ACCOUNT_SID.substring(0, 10) + '...');
     } else {
       console.log('   📞 FROM (caller ID): Vapi default FREE US number (10 calls/day limit)');
       console.log('   💡 Using Vapi\'s default free phone numbers - no paid account needed!');
@@ -230,21 +236,29 @@ export async function POST(request: NextRequest) {
     // PRIORITY 2: If Twilio credentials are provided but no phoneNumberId, use Twilio directly
     else if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
       // Direct Twilio phone number object (without importing to Vapi)
+      // phoneNumber.number/twilioPhoneNumber = YOUR Twilio number (caller ID)
+      // customer.number = destination number to call
       requestBodies.push(
         {
           assistantId: VAPI_AGENT_ID,
           phoneNumber: {
-            number: formattedNumber,
+            number: TWILIO_PHONE_NUMBER, // Your Twilio number as caller ID
             twilioAccountSid: TWILIO_ACCOUNT_SID,
             twilioAuthToken: TWILIO_AUTH_TOKEN,
+          },
+          customer: {
+            number: formattedNumber, // Destination number to call
           },
         },
         {
           assistantId: VAPI_AGENT_ID,
           phoneNumber: {
-            twilioPhoneNumber: formattedNumber,
+            twilioPhoneNumber: TWILIO_PHONE_NUMBER, // Your Twilio number as caller ID
             twilioAccountSid: TWILIO_ACCOUNT_SID,
             twilioAuthToken: TWILIO_AUTH_TOKEN,
+          },
+          customer: {
+            number: formattedNumber, // Destination number to call
           },
         }
       );
