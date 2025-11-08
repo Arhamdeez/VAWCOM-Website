@@ -65,9 +65,9 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
       />
 
       {/* Main card */}
-      <div className={`relative w-full h-full min-h-[400px] p-8 rounded-2xl overflow-hidden bg-slate-900/95 backdrop-blur-xl`}>
+      <div className={`relative w-full h-full min-h-[400px] p-4 md:p-8 rounded-xl md:rounded-2xl overflow-hidden bg-slate-900/95 backdrop-blur-xl`}>
         {/* Glass morphism background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/80 to-slate-900/95 backdrop-blur-xl border border-emerald-500/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/80 to-slate-900/95 backdrop-blur-xl border border-emerald-500/10 rounded-xl md:rounded-2xl" />
 
         {/* Simple background gradient */}
         <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-500 to-teal-500" />
@@ -75,19 +75,19 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
         {/* Content */}
         <div className="relative z-10">
           {/* Simple Icon */}
-          <div className="relative mb-6">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-              {Icon ? <Icon className="w-8 h-8 text-white" /> : null}
+          <div className="relative mb-4 md:mb-6">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+              {Icon ? <Icon className="w-6 h-6 md:w-8 md:h-8 text-white" /> : null}
             </div>
           </div>
 
-          <h3 className={`text-white mb-3 ${interactive ? 'text-2xl' : 'text-lg'} font-semibold`}>{title}</h3>
+          <h3 className={`text-white mb-2 md:mb-3 ${interactive ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-semibold`}>{title}</h3>
 
-          <p className={`text-slate-400 leading-relaxed ${interactive ? 'text-base' : 'text-sm'} mb-4`}>{description}</p>
+          <p className={`text-slate-400 leading-relaxed ${interactive ? 'text-sm md:text-base' : 'text-xs md:text-sm'} mb-3 md:mb-4`}>{description}</p>
 
           {/* Interactive Demo Section */}
           {interactive && isActive && (
-            <div className="mt-6 p-4 bg-slate-800/50 rounded-xl border border-emerald-500/20 h-[250px] flex flex-col">
+            <div className="mt-4 md:mt-6 p-3 md:p-4 bg-slate-800/50 rounded-lg md:rounded-xl border border-emerald-500/20 min-h-[250px] md:h-[250px] flex flex-col">
               {type === 'ai-agent' && (
                 <div className="flex flex-col h-full">
                   <div className="flex items-center gap-2 mb-4">
@@ -145,13 +145,13 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               )}
 
               {type === 'voice-agent' && (
-                <div className="space-y-5 flex-1 flex flex-col justify-center">
-                  <div className="text-center space-y-3">
-                    <h4 className="text-white text-xl font-semibold">Try Our Voice Agent</h4>
-                    <p className="text-slate-400 text-sm">Enter your phone number to receive a demo call from our AI voice agent</p>
+                <div className="space-y-3 md:space-y-5 flex-1 flex flex-col justify-center">
+                  <div className="text-center space-y-2 md:space-y-3">
+                    <h4 className="text-white text-lg md:text-xl font-semibold">Try Our Voice Agent</h4>
+                    <p className="text-slate-400 text-xs md:text-sm px-2">Enter your phone number to receive a demo call from our AI voice agent</p>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 md:space-y-4">
                     <input
                       type="tel"
                       value={phoneNumber}
@@ -160,15 +160,15 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         setCallStatus({ type: null, message: '' });
                       }}
                       placeholder="+1 (217) 555-1234"
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none text-center text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-center text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isCalling}
                     />
-                    <p className="text-xs text-slate-500 text-center">
+                    <p className="text-xs text-slate-500 text-center px-2">
                       Enter a US phone number (+1) to receive the call
                     </p>
                     
                     {callStatus.type && (
-                      <div className={`p-3 rounded-lg text-sm whitespace-pre-line ${
+                      <div className={`p-2.5 md:p-3 rounded-lg text-xs md:text-sm whitespace-pre-line ${
                         callStatus.type === 'success' 
                           ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
                           : 'bg-red-500/20 border border-red-500/30 text-red-300'
@@ -241,16 +241,16 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isCalling}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm md:text-base rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-95"
                     >
                       {isCalling ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           <span>Initiating Call...</span>
                         </>
                       ) : (
                         <>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
                           <span>Start Demo Call</span>
@@ -263,8 +263,8 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
 
               {type === 'chatbot' && (
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="text-center mb-3">
-                    <h4 className="text-white text-xl font-semibold mb-1">AI Chatbot with Document Q&A</h4>
+                  <div className="text-center mb-2 md:mb-3">
+                    <h4 className="text-white text-lg md:text-xl font-semibold mb-1">AI Chatbot with Document Q&A</h4>
                     <p className="text-slate-400 text-xs">Upload documents and ask questions about them</p>
                   </div>
 
@@ -476,51 +476,51 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               )}
 
               {type === 'n8n-automations' && (
-                <div className="flex flex-col h-full">
-                  <div className="text-center mb-4">
-                    <h4 className="text-white text-xl font-semibold mb-2">n8n Workflow Demo</h4>
-                    <p className="text-slate-400 text-sm">Watch how we connect your apps with visual workflows</p>
+                <div className="flex flex-col h-full min-h-0">
+                  <div className="text-center mb-3 md:mb-4 flex-shrink-0">
+                    <h4 className="text-white text-lg md:text-xl font-semibold mb-1 md:mb-2">n8n Workflow Demo</h4>
+                    <p className="text-slate-400 text-xs md:text-sm px-2">Watch how we connect your apps with visual workflows</p>
                   </div>
                   
                   {/* Visual Workflow Diagram */}
-                  <div className="flex-1 bg-slate-900/70 rounded-lg p-4 relative overflow-hidden">
-                    <svg viewBox="0 0 400 200" className="w-full h-full">
+                  <div className="flex-1 bg-slate-900/70 rounded-lg p-2 md:p-4 relative overflow-hidden min-h-[180px] md:min-h-0">
+                    <svg viewBox="0 0 300 160" className="w-full h-full max-h-[180px] md:max-h-none" preserveAspectRatio="xMidYMid meet">
                       {/* Connection lines */}
                       {/* Gmail -> n8n */}
                       <motion.line
-                        x1={50}
-                        y1={100}
-                        x2={150}
-                        y2={60}
+                        x1={40}
+                        y1={80}
+                        x2={120}
+                        y2={50}
                         stroke={activeNode >= 1 ? '#10b981' : '#4a5568'}
-                        strokeWidth="2"
-                        strokeDasharray={activeNode >= 1 ? '0' : '5,5'}
+                        strokeWidth="1.5"
+                        strokeDasharray={activeNode >= 1 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 1 ? 1 : 0.3 }}
                         transition={{ duration: 0.5 }}
                       />
                       {/* n8n -> Slack */}
                       <motion.line
-                        x1={150}
-                        y1={60}
-                        x2={250}
-                        y2={100}
+                        x1={120}
+                        y1={50}
+                        x2={200}
+                        y2={80}
                         stroke={activeNode >= 2 ? '#10b981' : '#4a5568'}
-                        strokeWidth="2"
-                        strokeDasharray={activeNode >= 2 ? '0' : '5,5'}
+                        strokeWidth="1.5"
+                        strokeDasharray={activeNode >= 2 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 2 ? 1 : 0.3 }}
                         transition={{ duration: 0.5 }}
                       />
                       {/* n8n -> Notion */}
                       <motion.line
-                        x1={150}
-                        y1={60}
-                        x2={150}
-                        y2={140}
+                        x1={120}
+                        y1={50}
+                        x2={120}
+                        y2={110}
                         stroke={activeNode >= 3 ? '#10b981' : '#4a5568'}
-                        strokeWidth="2"
-                        strokeDasharray={activeNode >= 3 ? '0' : '5,5'}
+                        strokeWidth="1.5"
+                        strokeDasharray={activeNode >= 3 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 3 ? 1 : 0.3 }}
                         transition={{ duration: 0.5 }}
@@ -528,20 +528,20 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                       
                       {/* Workflow Nodes */}
                       {[
-                        { id: 0, x: 50, y: 100, label: 'Gmail', color: '#ea4335' },
-                        { id: 1, x: 150, y: 60, label: 'n8n', color: '#10b981' },
-                        { id: 2, x: 250, y: 100, label: 'Slack', color: '#4a154b' },
-                        { id: 3, x: 150, y: 140, label: 'Notion', color: '#000000' },
+                        { id: 0, x: 40, y: 80, label: 'Gmail', color: '#ea4335' },
+                        { id: 1, x: 120, y: 50, label: 'n8n', color: '#10b981' },
+                        { id: 2, x: 200, y: 80, label: 'Slack', color: '#4a154b' },
+                        { id: 3, x: 120, y: 110, label: 'Notion', color: '#000000' },
                       ].map((node, idx) => (
                         <g key={node.id}>
                           {/* Node circle */}
                           <motion.circle
                             cx={node.x}
                             cy={node.y}
-                            r="25"
+                            r="15"
                             fill={activeNode === idx ? node.color : '#374151'}
                             stroke={activeNode === idx ? '#10b981' : '#4a5568'}
-                            strokeWidth={activeNode === idx ? '3' : '2'}
+                            strokeWidth={activeNode === idx ? '2' : '1.5'}
                             initial={{ scale: 1 }}
                             animate={{ scale: activeNode === idx ? 1.1 : 1 }}
                             transition={{ duration: 0.3 }}
@@ -549,11 +549,12 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                           {/* Node label */}
                           <text
                             x={node.x}
-                            y={node.y + 40}
+                            y={node.y + 25}
                             textAnchor="middle"
                             fill="#e5e7eb"
-                            fontSize="12"
+                            fontSize="9"
                             fontWeight="500"
+                            className="select-none"
                           >
                             {node.label}
                           </text>
@@ -562,11 +563,11 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                             <motion.circle
                               cx={node.x}
                               cy={node.y}
-                              r="25"
+                              r="15"
                               fill={node.color}
                               opacity="0.3"
                               initial={{ scale: 1, opacity: 0.5 }}
-                              animate={{ scale: 1.5, opacity: 0 }}
+                              animate={{ scale: 1.4, opacity: 0 }}
                               transition={{ duration: 1, repeat: Infinity }}
                             />
                           )}
@@ -575,15 +576,16 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                     </svg>
 
                     {/* Auto-play animation indicator */}
-                    <div className="absolute bottom-2 right-2 flex items-center gap-2 text-xs text-emerald-400">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                      <span>Workflow Active</span>
+                    <div className="absolute bottom-1.5 md:bottom-2 right-1.5 md:right-2 flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-emerald-400">
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                      <span className="hidden sm:inline">Workflow Active</span>
+                      <span className="sm:hidden">Active</span>
                     </div>
                   </div>
 
                   {/* Workflow Description */}
-                  <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                    <p className="text-emerald-300 text-xs text-center">
+                  <div className="mt-3 md:mt-4 p-2.5 md:p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full">
+                    <p className="text-emerald-300 text-[10px] md:text-xs text-center leading-relaxed break-words">
                       Email triggers → n8n processes → Updates Slack & Notion automatically
                     </p>
                   </div>
