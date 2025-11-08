@@ -2,9 +2,8 @@
 
 ## What You Already Have ✅
 
-1. **Private Key**: `23a89221-364f-44b5-8e68-e2a5c35117f1` ✓
-2. **API Route**: Created and working ✓
-3. **Frontend Demo**: Connected to API ✓
+1. **API Route**: Created and working ✓
+2. **Frontend Demo**: Connected to API ✓
 
 ## What You Need 🔑
 
@@ -43,10 +42,10 @@
 
 2. **Add these lines**:
    ```env
-   VAPI_PRIVATE_KEY=23a89221-364f-44b5-8e68-e2a5c35117f1
+   VAPI_PRIVATE_KEY=your-vapi-private-key-here
    VAPI_AGENT_ID=your-agent-id-here
    ```
-   Replace `your-agent-id-here` with the actual Agent ID you copied.
+   Replace `your-vapi-private-key-here` with your actual Vapi private key, and `your-agent-id-here` with the actual Agent ID you copied.
 
 ### 3. Restart Your Dev Server
 

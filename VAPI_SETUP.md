@@ -5,9 +5,10 @@
 Create a `.env.local` file in your project root with the following variables:
 
 ```env
-VAPI_PRIVATE_KEY=23a89221-364f-44b5-8e68-e2a5c35117f1
-VAPI_PUBLIC_KEY=568b2e0f-ee5b-47d1-8feb-6a9cf7cdc001
-VAPI_AGENT_ID=f0802519-a745-4453-8ee6-35d237f14164
+VAPI_PRIVATE_KEY=your-vapi-private-key-here
+# OR use public key instead:
+# VAPI_PUBLIC_KEY=your-vapi-public-key-here
+VAPI_AGENT_ID=your-vapi-agent-id-here
 ```
 
 **Optional (if using Twilio for outbound calls):**
@@ -18,7 +19,7 @@ TWILIO_AUTH_TOKEN=your-twilio-auth-token
 
 **Required for outbound calls:**
 ```env
-VAPI_PHONE_NUMBER_ID=a7b3d738-a5ed-4a2e-938f-b9a424e73c97
+VAPI_PHONE_NUMBER_ID=your-vapi-phone-number-id-here
 ```
 
 ## Setting Up Your Agent ID
@@ -83,4 +84,7 @@ The system automatically formats phone numbers to E.164 format:
 - ✅ Private key is stored server-side only (never exposed to client)
 - ✅ API calls are made from server-side route handler
 - ✅ Phone numbers are validated before making API calls
+- ⚠️ **IMPORTANT**: Never commit your `.env.local` file to version control
+- ⚠️ **IMPORTANT**: Never hardcode API keys in your source code
+- ⚠️ **IMPORTANT**: Always use environment variables for sensitive credentials
 

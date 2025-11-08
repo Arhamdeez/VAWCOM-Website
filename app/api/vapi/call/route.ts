@@ -140,21 +140,33 @@ export async function POST(request: NextRequest) {
       console.log('✅ Validated Pakistan number:', formattedNumber);
     }
 
-    // Use your Vapi keys (keep these in environment variables)
-    const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY || '23a89221-364f-44b5-8e68-e2a5c35117f1';
-    const VAPI_PUBLIC_KEY = process.env.VAPI_PUBLIC_KEY || '568b2e0f-ee5b-47d1-8feb-6a9cf7cdc001';
-    const VAPI_AGENT_ID = process.env.VAPI_AGENT_ID || 'f0802519-a745-4453-8ee6-35d237f14164';
+    // Get Vapi keys from environment variables (REQUIRED - no hardcoded fallbacks)
+    const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY;
+    const VAPI_PUBLIC_KEY = process.env.VAPI_PUBLIC_KEY;
+    const VAPI_AGENT_ID = process.env.VAPI_AGENT_ID;
     // VAPI_PHONE_NUMBER_ID: This is the "FROM" number (caller ID) - the number that will appear on the recipient's phone
     // This can be:
     // 1. A Vapi free phone number ID (created in Vapi dashboard) - FREE, 10 calls/day, US/Canada only
     // 2. A Twilio number ID (imported to Vapi) - may require paid Twilio account for international
     // If not set, Vapi will use a default free number
-    const VAPI_PHONE_NUMBER_ID = process.env.VAPI_PHONE_NUMBER_ID?.trim() || '3095e66b-4884-42f2-a94a-ae33e71de9c4';
-    const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || ''; // Optional: if Twilio is configured
-    const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || ''; // Optional: if Twilio is configured
+    const VAPI_PHONE_NUMBER_ID = process.env.VAPI_PHONE_NUMBER_ID?.trim();
+    const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID; // Optional: if Twilio is configured
+    const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN; // Optional: if Twilio is configured
     
     // Try private key first, fallback to public key
     const VAPI_KEY = VAPI_PRIVATE_KEY || VAPI_PUBLIC_KEY;
+    
+    // Validate required API keys
+    if (!VAPI_KEY) {
+      console.error('❌ Missing VAPI API key. Please set VAPI_PRIVATE_KEY or VAPI_PUBLIC_KEY in .env.local');
+      return NextResponse.json(
+        {
+          error: 'Configuration error',
+          message: 'Vapi API key is required. Please add VAPI_PRIVATE_KEY or VAPI_PUBLIC_KEY to your .env.local file.',
+        },
+        { status: 500 }
+      );
+    }
     
     console.log('\n📋 Configuration:');
     console.log('   🔑 Using Vapi key:', VAPI_KEY.substring(0, 10) + '...', VAPI_PRIVATE_KEY ? '(private)' : '(public)');
