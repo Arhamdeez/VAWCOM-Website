@@ -25,6 +25,16 @@ export async function POST(request: NextRequest) {
     // Company email - messages will be sent here
     const recipientEmail = process.env.CONTACT_EMAIL || 'vawcomtechnologies@gmail.com';
     
+    // Debug: Log environment variables (without sensitive data)
+    console.log('🔍 Environment check:', {
+      SMTP_HOST: process.env.SMTP_HOST ? 'SET' : 'NOT SET',
+      SMTP_PORT: process.env.SMTP_PORT ? 'SET' : 'NOT SET',
+      SMTP_USER: process.env.SMTP_USER ? 'SET' : 'NOT SET',
+      SMTP_PASS: process.env.SMTP_PASS ? 'SET' : 'NOT SET',
+      SMTP_FROM: process.env.SMTP_FROM ? 'SET' : 'NOT SET',
+      CONTACT_EMAIL: process.env.CONTACT_EMAIL ? 'SET' : 'NOT SET',
+    });
+    
     // Prepare email content
     const emailSubject = `New Contact Form Submission${service ? ` - ${service}` : ''}`;
     const emailBody = `
