@@ -5,7 +5,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  adjustFontFallback: true,
+});
 
 export const metadata: Metadata = {
   title: 'VAWCOM | Voice. Automation. Web. Communication.',
