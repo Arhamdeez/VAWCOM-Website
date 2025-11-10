@@ -24,8 +24,8 @@ export default function Footer() {
             <h4 className="text-white mb-4">Connect</h4>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors"><Linkedin className="w-5 h-5" /></a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors"><Mail className="w-5 h-5" /></a>
+              <a href="https://github.com/vawcom-technologies" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
+              <a href="mailto:vawcomtechnologies@gmail.com" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-colors"><Mail className="w-5 h-5" /></a>
             </div>
           </div>
         </div>
