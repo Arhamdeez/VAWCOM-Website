@@ -29,6 +29,7 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageIdCounter = useRef(0);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -38,9 +39,10 @@ export default function Chatbot() {
   // Initial bot message
   useEffect(() => {
     if (isOpen && messages.length === 0) {
+      messageIdCounter.current = 1;
       setMessages([
         {
-          id: 1,
+          id: messageIdCounter.current,
           text: 'Hello! How can I help you today?',
           sender: 'bot'
         }
@@ -53,8 +55,9 @@ export default function Chatbot() {
     if (!input.trim()) return;
 
     // Add user message
+    messageIdCounter.current += 1;
     const userMessage: Message = {
-      id: Date.now(),
+      id: messageIdCounter.current,
       text: input,
       sender: 'user'
     };
@@ -64,9 +67,10 @@ export default function Chatbot() {
 
     // Get bot response
     setTimeout(() => {
+      messageIdCounter.current += 1;
       const botResponse = getBotResponse(input.toLowerCase());
       const botMessage: Message = {
-        id: Date.now() + 1,
+        id: messageIdCounter.current,
         text: botResponse,
         sender: 'bot'
       };
@@ -91,11 +95,11 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-50">
+    <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 w-[calc(100%-2rem)] sm:w-auto max-w-[calc(100vw-2rem)]">
       {isOpen ? (
-        <div className="w-[400px] flex flex-col bg-[#1E1E1E] rounded-lg shadow-xl border border-gray-700 overflow-hidden" style={{ height: '700px' }}>
+        <div className="w-full sm:w-[400px] md:w-[500px] flex flex-col bg-[#1E1E1E] rounded-lg shadow-xl border border-gray-700 overflow-hidden max-h-[85vh] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] h-[85vh] sm:h-[75vh] md:h-[800px]">
           {/* Header */}
-          <div className="bg-[#1E1E1E] p-4 border-b border-gray-700 flex justify-between items-center">
+          <div className="bg-[#1E1E1E] p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center shrink-0 flex-shrink-0" style={{ flexShrink: 0 }}>
             <button 
               className="text-white hover:bg-gray-700 p-1 rounded"
               onClick={() => setMessages([])}
@@ -118,7 +122,7 @@ export default function Chatbot() {
           </div>
           
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 bg-[#1E1E1E]">
+          <div className="overflow-y-auto overflow-x-hidden p-3 sm:p-4 bg-[#1E1E1E]" style={{ flex: '1 1 0', minHeight: 0, maxHeight: '100%' }}>
             <div className="space-y-4">
               {messages.map((message) => (
                 <div 
@@ -126,13 +130,13 @@ export default function Chatbot() {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div 
-                    className={`max-w-[80%] p-4 rounded-lg ${
+                    className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-lg ${
                       message.sender === 'user' 
                         ? 'bg-[#2D7FF9] text-white rounded-tr-none' 
                         : 'bg-[#2D2D2D] text-white rounded-tl-none'
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
                   </div>
                 </div>
               ))}
@@ -141,12 +145,12 @@ export default function Chatbot() {
           </div>
           
           {/* Footer */}
-          <div className="p-3 text-center text-xs text-gray-400 border-t border-gray-700">
+          <div className="p-2 sm:p-3 text-center text-xs text-gray-400 border-t border-gray-700 shrink-0 flex-shrink-0" style={{ flexShrink: 0 }}>
             AI can make mistakes. Consider checking important information.
           </div>
           
           {/* Input */}
-          <div className="p-4 bg-[#1E1E1E] border-t border-gray-700">
+          <div className="p-3 sm:p-4 bg-[#1E1E1E] border-t border-gray-700 shrink-0 flex-shrink-0" style={{ flexShrink: 0 }}>
             <form onSubmit={handleSendMessage} className="w-full">
               <div className="relative">
                 <input
@@ -175,7 +179,7 @@ export default function Chatbot() {
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-[#2D7FF9] text-white shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#2D7FF9] text-white shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
           aria-label="Open chat"
         >
           <svg
@@ -188,7 +192,7 @@ export default function Chatbot() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-6 h-6"
+            className="w-5 h-5 sm:w-6 sm:h-6"
           >
             <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"></path>
           </svg>

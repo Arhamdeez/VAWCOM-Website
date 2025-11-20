@@ -65,7 +65,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
       />
 
       {/* Main card */}
-      <div className={`relative w-full h-full min-h-[400px] p-4 md:p-8 rounded-xl md:rounded-2xl overflow-hidden bg-slate-900/95 backdrop-blur-xl`}>
+      <div className={`relative w-full h-full min-h-[400px] p-[3%] rounded-xl md:rounded-2xl overflow-hidden bg-slate-900/95 backdrop-blur-xl`}>
         {/* Glass morphism background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/80 to-slate-900/95 backdrop-blur-xl border border-emerald-500/10 rounded-xl md:rounded-2xl" />
 
@@ -73,37 +73,56 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
         <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-500 to-teal-500" />
 
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 h-full flex flex-col">
           {/* Simple Icon */}
-          <div className="relative mb-4 md:mb-6">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-              {Icon ? <Icon className="w-6 h-6 md:w-8 md:h-8 text-white" /> : null}
+          <div className="relative mb-[2%]" style={{ marginBottom: 'clamp(0.75rem, 2%, 1.5rem)' }}>
+            <div className="w-[12%] aspect-square max-w-[64px] min-w-[48px] rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center" style={{ width: 'clamp(48px, 12%, 64px)' }}>
+              {Icon ? <Icon className="text-white" style={{ width: 'clamp(24px, 50%, 32px)', height: 'clamp(24px, 50%, 32px)' }} /> : null}
             </div>
           </div>
 
-          <h3 className={`text-white mb-2 md:mb-3 ${interactive ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-semibold`}>{title}</h3>
+          <h3 className={`text-white mb-[1%] font-semibold`} style={{ 
+            fontSize: interactive ? 'clamp(1rem, 4vw, 1.5rem)' : 'clamp(0.875rem, 3vw, 1.125rem)',
+            marginBottom: 'clamp(0.5rem, 1%, 0.75rem)',
+            lineHeight: '1.2'
+          }}>{title}</h3>
 
-          <p className={`text-slate-400 leading-relaxed ${interactive ? 'text-sm md:text-base' : 'text-xs md:text-sm'} mb-3 md:mb-4`}>{description}</p>
+          <p className={`text-slate-400 leading-relaxed mb-[1.5%]`} style={{ 
+            fontSize: interactive ? 'clamp(0.75rem, 2.5vw, 1rem)' : 'clamp(0.625rem, 2vw, 0.875rem)',
+            marginBottom: 'clamp(0.75rem, 1.5%, 1rem)',
+            lineHeight: '1.5'
+          }}>{description}</p>
 
           {/* Interactive Demo Section */}
           {interactive && isActive && (
-            <div className="mt-4 md:mt-6 p-3 md:p-4 bg-slate-800/50 rounded-lg md:rounded-xl border border-emerald-500/20 min-h-[250px] md:h-[250px] flex flex-col">
+            <div className="mt-[2%] p-[2.5%] bg-slate-800/50 rounded-lg md:rounded-xl border border-emerald-500/20 flex flex-col flex-1 min-h-0" style={{ 
+              marginTop: 'clamp(0.75rem, 2%, 1.5rem)',
+              padding: 'clamp(0.75rem, 2.5%, 1rem)',
+              minHeight: 'clamp(200px, 40%, 250px)'
+            }}>
               {type === 'ai-agent' && (
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-emerald-400 font-medium">Live Demo</span>
+                <div className="flex flex-col h-full min-h-0">
+                  <div className="flex items-center gap-2 mb-[2%]" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)', marginBottom: 'clamp(0.5rem, 2%, 1rem)' }}>
+                    <div className="bg-emerald-500 rounded-full animate-pulse" style={{ width: 'clamp(6px, 1.5%, 8px)', height: 'clamp(6px, 1.5%, 8px)' }}></div>
+                    <span className="text-emerald-400 font-medium" style={{ fontSize: 'clamp(0.625rem, 2vw, 0.875rem)' }}>Live Demo</span>
                   </div>
                   
                   {/* Chat Interface */}
-                  <div className="bg-slate-900/50 rounded-lg p-4 flex-1 overflow-y-auto space-y-3" style={{ maxHeight: '120px' }}>
+                  <div className="bg-slate-900/50 rounded-lg flex-1 overflow-y-auto space-y-2 min-h-0" style={{ 
+                    padding: 'clamp(0.5rem, 2%, 1rem)',
+                    maxHeight: '60%',
+                    gap: 'clamp(0.5rem, 1.5%, 0.75rem)'
+                  }}>
                     {chatHistory.map((msg, idx) => (
                       <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] p-3 rounded-lg ${
+                        <div className={`max-w-[80%] rounded-lg ${
                           msg.type === 'user' 
                             ? 'bg-emerald-600 text-white' 
                             : 'bg-slate-700 text-slate-200'
-                        }`}>
+                        }`} style={{ 
+                          padding: 'clamp(0.5rem, 2%, 0.75rem)',
+                          fontSize: 'clamp(0.625rem, 2vw, 0.875rem)'
+                        }}>
                           {msg.message}
                         </div>
                       </div>
@@ -111,13 +130,17 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   </div>
                   
                   {/* Input */}
-                  <div className="flex gap-2 mt-4">
+                  <div className="flex gap-2 mt-[2%] flex-shrink-0" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)', marginTop: 'clamp(0.5rem, 2%, 1rem)' }}>
                     <input
                       type="text"
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
                       placeholder="Type your message..."
-                      className="flex-1 px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
+                      className="flex-1 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
+                      style={{ 
+                        padding: 'clamp(0.375rem, 2%, 0.5rem)',
+                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)'
+                      }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && chatMessage.trim()) {
                           setChatHistory(prev => [...prev, { type: 'user', message: chatMessage }]);
@@ -134,9 +157,13 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                           setChatMessage('');
                         }
                       }}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                      style={{ 
+                        padding: 'clamp(0.375rem, 2%, 0.5rem)',
+                        minWidth: 'clamp(2rem, 8%, 2.5rem)'
+                      }}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
                     </button>
@@ -145,13 +172,13 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               )}
 
               {type === 'voice-agent' && (
-                <div className="space-y-3 md:space-y-5 flex-1 flex flex-col justify-center">
-                  <div className="text-center space-y-2 md:space-y-3">
-                    <h4 className="text-white text-lg md:text-xl font-semibold">Try Our Voice Agent</h4>
-                    <p className="text-slate-400 text-xs md:text-sm px-2">Enter your phone number to receive a demo call from our AI voice agent</p>
+                <div className="flex-1 flex flex-col justify-center min-h-0" style={{ gap: 'clamp(0.75rem, 3%, 1.25rem)' }}>
+                  <div className="text-center" style={{ gap: 'clamp(0.5rem, 2%, 0.75rem)' }}>
+                    <h4 className="text-white font-semibold mb-[1%]" style={{ fontSize: 'clamp(0.875rem, 3.5vw, 1.25rem)', marginBottom: 'clamp(0.25rem, 1%, 0.5rem)' }}>Try Our Voice Agent</h4>
+                    <p className="text-slate-400 px-2" style={{ fontSize: 'clamp(0.625rem, 2vw, 0.875rem)', paddingLeft: 'clamp(0.25rem, 1%, 0.5rem)', paddingRight: 'clamp(0.25rem, 1%, 0.5rem)' }}>Enter your phone number to receive a demo call from our AI voice agent</p>
                   </div>
 
-                  <div className="space-y-3 md:space-y-4">
+                  <div style={{ gap: 'clamp(0.75rem, 3%, 1rem)' }}>
                     <input
                       type="tel"
                       value={phoneNumber}
@@ -160,19 +187,32 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         setCallStatus({ type: null, message: '' });
                       }}
                       placeholder="+1 (217) 555-1234"
-                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-center text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ 
+                        padding: 'clamp(0.5rem, 2.5%, 0.75rem)',
+                        fontSize: 'clamp(0.75rem, 3vw, 1.125rem)'
+                      }}
                       disabled={isCalling}
                     />
-                    <p className="text-xs text-slate-500 text-center px-2">
+                    <p className="text-slate-500 text-center px-2" style={{ 
+                      fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)',
+                      paddingLeft: 'clamp(0.25rem, 1%, 0.5rem)',
+                      paddingRight: 'clamp(0.25rem, 1%, 0.5rem)',
+                      marginTop: 'clamp(0.5rem, 2%, 0.75rem)'
+                    }}>
                       Enter a US phone number (+1) to receive the call
                     </p>
                     
                     {callStatus.type && (
-                      <div className={`p-2.5 md:p-3 rounded-lg text-xs md:text-sm whitespace-pre-line ${
+                      <div className={`rounded-lg whitespace-pre-line ${
                         callStatus.type === 'success' 
                           ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
                           : 'bg-red-500/20 border border-red-500/30 text-red-300'
-                      }`}>
+                      }`} style={{ 
+                        padding: 'clamp(0.5rem, 2%, 0.75rem)',
+                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
+                        marginTop: 'clamp(0.5rem, 2%, 0.75rem)'
+                      }}>
                         {callStatus.message}
                       </div>
                     )}
@@ -241,16 +281,22 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isCalling}
-                      className="w-full flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm md:text-base rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-95"
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-95"
+                      style={{ 
+                        padding: 'clamp(0.5rem, 2.5%, 0.75rem)',
+                        fontSize: 'clamp(0.75rem, 2.5vw, 1rem)',
+                        gap: 'clamp(0.25rem, 1%, 0.5rem)',
+                        marginTop: 'clamp(0.5rem, 2%, 0.75rem)'
+                      }}
                     >
                       {isCalling ? (
                         <>
-                          <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <div className="border-2 border-white border-t-transparent rounded-full animate-spin" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }}></div>
                           <span>Initiating Call...</span>
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }}>
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
                           <span>Start Demo Call</span>
@@ -263,13 +309,19 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
 
               {type === 'chatbot' && (
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="text-center mb-2 md:mb-3">
-                    <h4 className="text-white text-lg md:text-xl font-semibold mb-1">AI Chatbot with Document Q&A</h4>
-                    <p className="text-slate-400 text-xs">Upload documents and ask questions about them</p>
+                  <div className="text-center mb-[1.5%] flex-shrink-0" style={{ marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)' }}>
+                    <h4 className="text-white font-semibold mb-[0.5%]" style={{ 
+                      fontSize: 'clamp(0.875rem, 3.5vw, 1.25rem)',
+                      marginBottom: 'clamp(0.25rem, 0.5%, 0.5rem)'
+                    }}>AI Chatbot with Document Q&A</h4>
+                    <p className="text-slate-400" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>Upload documents and ask questions about them</p>
                   </div>
 
                   {/* Document Upload Section */}
-                  <div className="mb-3 flex gap-2 flex-shrink-0">
+                  <div className="mb-[1.5%] flex gap-2 flex-shrink-0" style={{ 
+                    marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
+                    gap: 'clamp(0.25rem, 1%, 0.5rem)'
+                  }}>
                     <label className="flex-1 block">
                       <input
                         type="file"
@@ -317,22 +369,25 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         className="hidden"
                         disabled={isUploading}
                       />
-                      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-dashed cursor-pointer transition-all ${
+                      <div className={`flex items-center rounded-lg border-2 border-dashed cursor-pointer transition-all ${
                         isUploading
                           ? 'border-emerald-500 bg-emerald-500/10 cursor-wait'
                           : 'border-slate-600 hover:border-emerald-500/50 bg-slate-800/50'
-                      }`}>
+                      }`} style={{ 
+                        gap: 'clamp(0.25rem, 1%, 0.5rem)',
+                        padding: 'clamp(0.375rem, 2%, 0.5rem)'
+                      }}>
                         {isUploading ? (
                           <>
-                            <div className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-xs text-emerald-400">Uploading...</span>
+                            <div className="border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" style={{ width: 'clamp(10px, 2.5vw, 12px)', height: 'clamp(10px, 2.5vw, 12px)' }}></div>
+                            <span className="text-emerald-400" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>Uploading...</span>
                           </>
                         ) : (
                           <>
-                            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(14px, 3.5vw, 16px)', height: 'clamp(14px, 3.5vw, 16px)' }}>
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
-                            <span className="text-xs text-slate-300 truncate">
+                            <span className="text-slate-300 truncate" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>
                               {uploadedFile ? `📄 ${uploadedFile.name.substring(0, 20)}${uploadedFile.name.length > 20 ? '...' : ''}` : 'Upload Document'}
                             </span>
                           </>
@@ -355,10 +410,14 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                           setUploadedFile(null);
                           setBotHistory([{ type: 'ai', message: "Document cleared. Upload a new document or ask me anything!" }]);
                         }}
-                        className="px-3 py-2 text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg border border-red-500/30 transition-colors flex-shrink-0"
+                        className="bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg border border-red-500/30 transition-colors flex-shrink-0 flex items-center justify-center"
+                        style={{ 
+                          padding: 'clamp(0.375rem, 2%, 0.5rem)',
+                          minWidth: 'clamp(2rem, 8%, 2.5rem)'
+                        }}
                         title="Clear document"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(14px, 3.5vw, 16px)', height: 'clamp(14px, 3.5vw, 16px)' }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
@@ -368,28 +427,35 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   {/* Chat History */}
                   <div 
                     ref={chatHistoryRef}
-                    className="bg-slate-900/50 rounded-lg p-3 flex-1 overflow-y-auto mb-3 min-h-0 scroll-smooth" 
-                    style={{ maxHeight: '350px' }}
+                    className="bg-slate-900/50 rounded-lg flex-1 overflow-y-auto mb-[1.5%] min-h-0 scroll-smooth" 
+                    style={{ 
+                      padding: 'clamp(0.5rem, 2%, 0.75rem)',
+                      marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
+                      maxHeight: '50%'
+                    }}
                   >
-                    <div className="space-y-2">
+                    <div style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)' }}>
                       {botHistory.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[85%] p-2 rounded-lg text-xs ${
+                        <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`} style={{ marginBottom: 'clamp(0.25rem, 1%, 0.5rem)' }}>
+                          <div className={`max-w-[85%] rounded-lg ${
                             msg.type === 'user' 
                               ? 'bg-emerald-600 text-white' 
                               : 'bg-slate-700 text-slate-200'
-                          }`}>
+                          }`} style={{ 
+                            padding: 'clamp(0.375rem, 1.5%, 0.5rem)',
+                            fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)'
+                          }}>
                             {msg.message}
                           </div>
                         </div>
                       ))}
                       {isTyping && (
                         <div className="flex justify-start">
-                          <div className="bg-slate-700 text-slate-200 p-2 rounded-lg">
-                            <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          <div className="bg-slate-700 text-slate-200 rounded-lg" style={{ padding: 'clamp(0.375rem, 1.5%, 0.5rem)' }}>
+                            <div className="flex" style={{ gap: 'clamp(2px, 0.5vw, 4px)' }}>
+                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '0ms' }}></div>
+                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '150ms' }}></div>
+                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '300ms' }}></div>
                             </div>
                           </div>
                         </div>
@@ -398,13 +464,17 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   </div>
 
                   {/* Input Area */}
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 flex-shrink-0" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)' }}>
                     <input
                       type="text"
                       value={botMessage}
                       onChange={(e) => setBotMessage(e.target.value)}
                       placeholder={uploadedFile ? "Ask about your document..." : "Ask me anything..."}
-                      className="flex-1 px-3 py-2.5 text-sm bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none disabled:opacity-50"
+                      className="flex-1 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none disabled:opacity-50"
+                      style={{ 
+                        padding: 'clamp(0.5rem, 2%, 0.625rem)',
+                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)'
+                      }}
                       onKeyPress={async (e) => {
                         if (e.key === 'Enter' && botMessage.trim() && !isTyping) {
                           const userMessage = botMessage;
@@ -467,7 +537,12 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isTyping || !botMessage.trim()}
-                      className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all text-sm font-medium flex-shrink-0"
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all font-medium flex-shrink-0 flex items-center justify-center"
+                      style={{ 
+                        padding: 'clamp(0.5rem, 2%, 0.625rem)',
+                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
+                        minWidth: 'clamp(3rem, 12%, 4rem)'
+                      }}
                     >
                       Send
                     </button>
@@ -477,14 +552,29 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
 
               {type === 'n8n-automations' && (
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="text-center mb-3 md:mb-4 flex-shrink-0">
-                    <h4 className="text-white text-lg md:text-xl font-semibold mb-1 md:mb-2">n8n Workflow Demo</h4>
-                    <p className="text-slate-400 text-xs md:text-sm px-2">Watch how we connect your apps with visual workflows</p>
+                  <div className="text-center flex-shrink-0" style={{ 
+                    marginBottom: 'clamp(0.5rem, 2%, 0.75rem)'
+                  }}>
+                    <h4 className="text-white font-semibold mb-[0.5%]" style={{ 
+                      fontSize: 'clamp(0.875rem, 3.5vw, 1.25rem)',
+                      marginBottom: 'clamp(0.25rem, 0.5%, 0.5rem)'
+                    }}>n8n Workflow Demo</h4>
+                    <p className="text-slate-400 px-2" style={{ 
+                      fontSize: 'clamp(0.5rem, 1.5vw, 0.875rem)',
+                      paddingLeft: 'clamp(0.25rem, 1%, 0.5rem)',
+                      paddingRight: 'clamp(0.25rem, 1%, 0.5rem)'
+                    }}>Watch how we connect your apps with visual workflows</p>
                   </div>
                   
                   {/* Visual Workflow Diagram */}
-                  <div className="flex-1 bg-slate-900/70 rounded-lg p-2 md:p-4 relative overflow-hidden min-h-[180px] md:min-h-0">
-                    <svg viewBox="0 0 300 160" className="w-full h-full max-h-[180px] md:max-h-none" preserveAspectRatio="xMidYMid meet">
+                  <div className="bg-slate-900/70 rounded-lg relative overflow-hidden flex-shrink" style={{ 
+                    padding: 'clamp(0.5rem, 2%, 1rem)',
+                    minHeight: 'clamp(120px, 30%, 160px)',
+                    maxHeight: 'clamp(120px, 50%, 180px)',
+                    marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
+                    flex: '1 1 auto'
+                  }}>
+                    <svg viewBox="0 0 300 160" className="w-full h-full" style={{ maxHeight: '100%' }} preserveAspectRatio="xMidYMid meet">
                       {/* Connection lines */}
                       {/* Gmail -> n8n */}
                       <motion.line
@@ -584,8 +674,15 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   </div>
 
                   {/* Workflow Description */}
-                  <div className="mt-3 md:mt-4 p-2.5 md:p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full">
-                    <p className="text-emerald-300 text-[10px] md:text-xs text-center leading-relaxed break-words">
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full" style={{ 
+                    padding: 'clamp(0.375rem, 1.5%, 0.625rem)',
+                    marginTop: 'auto',
+                    marginBottom: 'clamp(0.5rem, 2%, 0.75rem)'
+                  }}>
+                    <p className="text-emerald-300 text-center leading-relaxed break-words" style={{ 
+                      fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)',
+                      lineHeight: '1.3'
+                    }}>
                       Email triggers → n8n processes → Updates Slack & Notion automatically
                     </p>
                   </div>
