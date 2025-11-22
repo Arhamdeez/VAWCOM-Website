@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
+import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -23,12 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <BackgroundEffectWrapper />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+    <html lang="en" className="bg-black">
+      <body className={`${inter.className} bg-black`}>
+        <SplashScreenWrapper>
+          <BackgroundEffectWrapper />
+          <Navbar />
+          <main className="bg-black">{children}</main>
+          <Footer />
+        </SplashScreenWrapper>
       </body>
     </html>
   );

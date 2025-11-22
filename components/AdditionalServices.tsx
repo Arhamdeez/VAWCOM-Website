@@ -69,7 +69,7 @@ export default function AdditionalServices() {
           </h2>
           
           <p className="text-slate-300 text-lg max-w-3xl mx-auto leading-relaxed">
-            Custom workflows tailored to your exact process. Connect all your apps with n8n—Slack, Gmail, Notion, and more.
+            Beyond integrations, we offer a complete suite of services—from web and app development to e-commerce solutions, maintenance, bug fixing, and code optimization. Whatever your business needs, we've got you covered.
           </p>
         </motion.div>
 
