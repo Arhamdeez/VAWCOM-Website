@@ -21,6 +21,32 @@ export const metadata: Metadata = {
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
+  openGraph: {
+    title: 'VAWCOM | Voice. Automation. Web. Communication.',
+    description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+    url: 'https://www.vawcom.com',
+    siteName: 'VAWCOM',
+    images: [
+      {
+        url: '/logo.png',
+        width: 200,
+        height: 200,
+        alt: 'VAWCOM Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'VAWCOM | Voice. Automation. Web. Communication.',
+    description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+    images: ['/logo.png'],
+  },
+  metadataBase: new URL('https://www.vawcom.com'),
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({
