@@ -7,6 +7,11 @@ html {
   background-color: #000000;
 }
 
+/* Prevent flash of content before splash screen */
+body:not(.splash-complete) {
+  overflow: hidden !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

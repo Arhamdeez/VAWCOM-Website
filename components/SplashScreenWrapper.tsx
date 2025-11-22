@@ -28,31 +28,45 @@ export default function SplashScreenWrapper({ children }: SplashScreenWrapperPro
     setTimeout(() => {
       setShowSplash(false);
       sessionStorage.setItem('hasSeenSplash', 'true');
+      // Add class to body to allow scrolling
+      document.body.classList.add('splash-complete');
     }, 100);
   };
 
+  useEffect(() => {
+    // Remove splash-complete class if showing splash
+    if (showSplash && isClient) {
+      document.body.classList.remove('splash-complete');
+    }
+  }, [showSplash, isClient]);
+
   if (!isClient) {
-    return <>{children}</>;
+    // Show black screen while checking client-side state
+    return (
+      <div className="fixed inset-0 z-[9999] bg-black" />
+    );
   }
 
   return (
     <div className="relative min-h-screen bg-black">
-      {/* Content - always rendered, fades in when splash is done */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showSplash ? 0 : 1 }}
-        transition={{ duration: 0.6, ease: 'linear' }}
-        className="relative"
-      >
-        {children}
-      </motion.div>
-      
-      {/* Splash screen - fades out */}
+      {/* Splash screen - shows first, highest z-index */}
       <AnimatePresence>
         {showSplash && (
           <SplashScreen key="splash" onComplete={handleSplashComplete} />
         )}
       </AnimatePresence>
+      
+      {/* Content - only renders after splash is done, fades in */}
+      {!showSplash && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: 'linear' }}
+          className="relative"
+        >
+          {children}
+        </motion.div>
+      )}
       
       {/* Transition overlay - ensures smooth linear color transition from black to dark slate */}
       {isTransitioning && (

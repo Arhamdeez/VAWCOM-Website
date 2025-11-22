@@ -16,6 +16,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'VAWCOM | Voice. Automation. Web. Communication.',
   description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
