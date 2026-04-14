@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from './SplashScreen';
+
+const clientSubscribe = () => () => {};
+const isClientSnapshot = () => true;
+const isServerSnapshot = () => false;
 
 interface SplashScreenWrapperProps {
   children: React.ReactNode;
@@ -10,16 +14,18 @@ interface SplashScreenWrapperProps {
 
 export default function SplashScreenWrapper({ children }: SplashScreenWrapperProps) {
   const [showSplash, setShowSplash] = useState(true);
-  const [isClient, setIsClient] = useState(false);
+  const isClient = useSyncExternalStore(clientSubscribe, isClientSnapshot, isServerSnapshot);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    // Check if splash screen has been shown before (using sessionStorage)
-    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
-    if (hasSeenSplash) {
-      setShowSplash(false);
-    }
+    // Session storage is read after paint to avoid sync setState in the effect body (see react-hooks plugin).
+    const id = requestAnimationFrame(() => {
+      if (sessionStorage.getItem('hasSeenSplash')) {
+        setShowSplash(false);
+        document.body.classList.add('splash-complete');
+      }
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const handleSplashComplete = () => {
@@ -61,7 +67,7 @@ export default function SplashScreenWrapper({ children }: SplashScreenWrapperPro
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: 'linear' }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
           className="relative"
         >
           {children}
@@ -73,7 +79,7 @@ export default function SplashScreenWrapper({ children }: SplashScreenWrapperPro
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'linear' }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
           className="fixed inset-0 z-[9998] bg-black pointer-events-none"
           onAnimationComplete={() => setIsTransitioning(false)}
         />

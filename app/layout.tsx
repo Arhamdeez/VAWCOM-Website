@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
+import PageTransition from '@/components/PageTransition';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -13,17 +14,25 @@ const inter = Inter({
   adjustFontFallback: true,
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
+};
+
 export const metadata: Metadata = {
-  title: 'VAWCOM | Voice. Automation. Web. Communication.',
-  description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+  title: 'VAWCOM | Web, Mobile, Voice & AI Services',
+  description:
+    'Full-service digital studio: web and mobile apps, voice experiences, AI chatbots, and integrations. We design, build, and ship what you need end to end.',
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
   openGraph: {
-    title: 'VAWCOM | Voice. Automation. Web. Communication.',
-    description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+    title: 'VAWCOM | Web, Mobile, Voice & AI Services',
+    description:
+      'Full-service digital studio: web and mobile apps, voice experiences, AI chatbots, and integrations. We design, build, and ship what you need end to end.',
     url: 'https://www.vawcom.com',
     siteName: 'VAWCOM',
     images: [
@@ -39,8 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'VAWCOM | Voice. Automation. Web. Communication.',
-    description: 'Automation-first digital solutions. We connect your systems, so your business runs on autopilot.',
+    title: 'VAWCOM | Web, Mobile, Voice & AI Services',
+    description:
+      'Full-service digital studio: web and mobile apps, voice experiences, AI chatbots, and integrations. We design, build, and ship what you need end to end.',
     images: ['/logo.png'],
   },
   metadataBase: new URL('https://www.vawcom.com'),
@@ -60,7 +70,9 @@ export default function RootLayout({
         <SplashScreenWrapper>
           <BackgroundEffectWrapper />
           <Navbar />
-          <main className="bg-black">{children}</main>
+          <main className="relative min-h-0 w-full overflow-x-hidden bg-black supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Footer />
         </SplashScreenWrapper>
       </body>

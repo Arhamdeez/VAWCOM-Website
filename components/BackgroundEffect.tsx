@@ -19,6 +19,7 @@ export default function BackgroundEffect() {
   const animationRef = useRef<number | undefined>(undefined);
   const dotsRef = useRef<Dot[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const spritesRef = useRef<Record<string, HTMLCanvasElement>>({});
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -29,10 +30,46 @@ export default function BackgroundEffect() {
     const c = canvas as HTMLCanvasElement;
     const context = ctx as CanvasRenderingContext2D;
 
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (prefersReducedMotion) {
+      // Don’t run heavy animations for users who prefer reduced motion.
+      return;
+    }
+
+    const getSprite = (color: string) => {
+      const cached = spritesRef.current[color];
+      if (cached) return cached;
+
+      const sprite = document.createElement('canvas');
+      // Small sprite; scaled up/down with drawImage.
+      sprite.width = 64;
+      sprite.height = 64;
+      const sctx = sprite.getContext('2d');
+      if (!sctx) return sprite;
+
+      const cx = sprite.width / 2;
+      const cy = sprite.height / 2;
+      const r = sprite.width / 2;
+      const g = sctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, color);
+      g.addColorStop(0.4, `${color}55`);
+      g.addColorStop(1, `${color}00`);
+      sctx.fillStyle = g;
+      sctx.beginPath();
+      sctx.arc(cx, cy, r, 0, Math.PI * 2);
+      sctx.fill();
+
+      spritesRef.current[color] = sprite;
+      return sprite;
+    };
+
     // Create animated dots
     function createDots(width: number, height: number) {
       const dots: Dot[] = [];
-      const dotCount = Math.floor((width * height) / 15000); // Adaptive dot count
+      // Render in CSS pixels; keep density reasonable to avoid jank.
+      const dotCount = Math.min(72, Math.floor((width * height) / 32000));
       
       for (let i = 0; i < dotCount; i++) {
         dots.push({
@@ -55,7 +92,7 @@ export default function BackgroundEffect() {
     let targetMouseY = 0;
     
     // Smooth mouse position interpolation
-    function updateMousePosition(deltaTime: number) {
+    function updateMousePosition() {
       const smoothing = 0.1;
       mouseRef.current.x += (targetMouseX - mouseRef.current.x) * smoothing;
       mouseRef.current.y += (targetMouseY - mouseRef.current.y) * smoothing;
@@ -64,7 +101,7 @@ export default function BackgroundEffect() {
     // Animate dots
     function animateDots(width: number, height: number, time: number, deltaTime: number) {
       // Update smooth mouse position
-      updateMousePosition(deltaTime);
+      updateMousePosition();
       
       context.clearRect(0, 0, width, height);
       
@@ -76,8 +113,8 @@ export default function BackgroundEffect() {
       const smoothMouseX = mouseRef.current.x;
       const smoothMouseY = mouseRef.current.y;
 
-      // Draw dots
-      dotsRef.current.forEach((dot, index) => {
+      // Draw dots (sprite-based to avoid per-dot gradients each frame)
+      dotsRef.current.forEach((dot) => {
         // Smooth velocity damping for more fluid movement
         const damping = 0.99; // Higher damping for slower, calmer movement
         dot.vx *= damping;
@@ -107,13 +144,13 @@ export default function BackgroundEffect() {
         // Smooth mouse interaction with easing
         const dx = smoothMouseX - dot.x;
         const dy = smoothMouseY - dot.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 150) {
-          const force = Math.pow((150 - distance) / 150, 2); // Quadratic easing
+        const distSq = dx * dx + dy * dy;
+        if (distSq < 22500) {
+          const distance = Math.sqrt(distSq);
+          const force = Math.pow((150 - distance) / 150, 2);
           const angle = Math.atan2(dy, dx);
-          dot.vx += Math.cos(angle) * force * 0.025 * deltaTime * 60; // Slower force application
-          dot.vy += Math.sin(angle) * force * 0.025 * deltaTime * 60;
+          dot.vx += Math.cos(angle) * force * 0.02 * deltaTime * 60;
+          dot.vy += Math.sin(angle) * force * 0.02 * deltaTime * 60;
         }
         
         // Smooth pulsing effect with eased sine wave
@@ -121,36 +158,15 @@ export default function BackgroundEffect() {
         const currentOpacity = dot.opacity * pulse;
         const currentSize = dot.size * pulse;
         
-        // Draw dot with glow
-        context.save();
+        const sprite = getSprite(dot.color);
+        const drawSize = currentSize * 10; // sprite is soft/glowy; keep slightly larger than dot
         context.globalAlpha = currentOpacity;
-        
-        // Outer glow
-        const gradient = context.createRadialGradient(
-          dot.x, dot.y, 0,
-          dot.x, dot.y, currentSize * 3
-        );
-        gradient.addColorStop(0, dot.color);
-        gradient.addColorStop(0.5, dot.color + '40');
-        gradient.addColorStop(1, dot.color + '00');
-        
-        context.fillStyle = gradient;
-        context.beginPath();
-        context.arc(dot.x, dot.y, currentSize * 3, 0, Math.PI * 2);
-        context.fill();
-        
-        // Inner dot
-        context.fillStyle = dot.color;
-        context.beginPath();
-        context.arc(dot.x, dot.y, currentSize, 0, Math.PI * 2);
-        context.fill();
-        
-        context.restore();
+        context.drawImage(sprite, dot.x - drawSize / 2, dot.y - drawSize / 2, drawSize, drawSize);
       });
 
       // Draw connections between nearby dots with smooth gradient
       // Optimize: limit connections per dot to reduce O(n²) complexity
-      const maxConnections = 5;
+      const maxConnections = isScrolling ? 0 : 3;
       for (let i = 0; i < dotsRef.current.length; i++) {
         const dot1 = dotsRef.current[i];
         let connectionCount = 0;
@@ -163,17 +179,11 @@ export default function BackgroundEffect() {
           
           if (distanceSquared < 19600) { // 140^2 = 19600
             const distance = Math.sqrt(distanceSquared);
-            // Smooth opacity transition with easing
             const normalizedDistance = distance / 140;
-            const opacity = Math.pow(1 - normalizedDistance, 2) * 0.25; // Quadratic easing for smoother fade
-            
-            // Create gradient line for smoother appearance
-            const gradient = context.createLinearGradient(dot1.x, dot1.y, dot2.x, dot2.y);
-            gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity})`);
-            gradient.addColorStop(0.5, `rgba(20, 184, 166, ${opacity * 0.8})`);
-            gradient.addColorStop(1, `rgba(16, 185, 129, ${opacity})`);
-            
-            context.strokeStyle = gradient;
+            const opacity = Math.pow(1 - normalizedDistance, 2) * 0.18;
+
+            // Keep this cheap: no per-line gradients.
+            context.strokeStyle = `rgba(16, 185, 129, ${opacity})`;
             context.lineWidth = 0.5;
             context.globalAlpha = 1;
             context.beginPath();
@@ -189,10 +199,11 @@ export default function BackgroundEffect() {
     }
 
     // Animation loop with delta time for smooth frame-independent animation
-    let startTime = Date.now();
+    const startTime = Date.now();
     let lastFrameTime = Date.now();
     let isScrolling = false;
     let scrollTimeout: number | undefined;
+    let isVisible = true;
     
     // Detect scrolling to reduce animation intensity
     function handleScroll() {
@@ -204,27 +215,41 @@ export default function BackgroundEffect() {
     }
     
     window.addEventListener('scroll', handleScroll, { passive: true });
+
+    const handleVisibility = () => {
+      isVisible = document.visibilityState === 'visible';
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
     
+    let frameIndex = 0;
     function animate() {
+      if (!isVisible) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      frameIndex += 1;
+      // Cap ~30fps to reduce main-thread load (canvas + page blur layers)
+      if (frameIndex % 2 !== 0) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
       const currentTime = Date.now();
       const time = (currentTime - startTime) / 1000;
-      const deltaTime = Math.min((currentTime - lastFrameTime) / 1000, 0.033); // Cap at ~30fps minimum
+      const deltaTime = Math.min((currentTime - lastFrameTime) / 1000, 0.05);
       lastFrameTime = currentTime;
-      
-      const width = c.width;
-      const height = c.height;
-      
-      // Skip animation frame if scrolling to prioritize scroll performance
-      if (!isScrolling) {
-        animateDots(width, height, time, deltaTime);
-      }
+
+      const width = Math.max(1, window.innerWidth);
+      const height = Math.max(1, window.innerHeight);
+
+      animateDots(width, height, time, deltaTime);
       animationRef.current = requestAnimationFrame(animate);
     }
 
     function handleMouseMove(e: MouseEvent) {
       const rect = c.getBoundingClientRect();
-      targetMouseX = (e.clientX - rect.left) * (c.width / rect.width);
-      targetMouseY = (e.clientY - rect.top) * (c.height / rect.height);
+      // Dots live in CSS pixel space (same as innerWidth/innerHeight)
+      targetMouseX = e.clientX - rect.left;
+      targetMouseY = e.clientY - rect.top;
     }
 
     let resizeTimeout: number | undefined;
@@ -232,10 +257,12 @@ export default function BackgroundEffect() {
       if (resizeTimeout) window.clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(() => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const w = Math.max(1, window.innerWidth) * dpr;
-        const h = Math.max(1, window.innerHeight) * dpr;
-        c.width = w;
-        c.height = h;
+        const w = Math.max(1, window.innerWidth);
+        const h = Math.max(1, window.innerHeight);
+
+        c.width = Math.floor(w * dpr);
+        c.height = Math.floor(h * dpr);
+        // Scale so we can draw using CSS pixel units (w/h).
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         
         // Recreate dots for new dimensions
@@ -258,6 +285,7 @@ export default function BackgroundEffect() {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('visibilitychange', handleVisibility);
       if (resizeTimeout) window.clearTimeout(resizeTimeout);
       if (scrollTimeout) window.clearTimeout(scrollTimeout);
     };
@@ -266,11 +294,10 @@ export default function BackgroundEffect() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[-1] w-full h-full will-change-transform"
+      className="pointer-events-none fixed inset-0 z-[-1] w-full h-full"
       style={{ 
-        transform: 'translateZ(0)', // Force GPU acceleration
+        transform: 'translateZ(0)',
         backfaceVisibility: 'hidden',
-        perspective: '1000px'
       }}
       aria-hidden
     />

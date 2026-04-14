@@ -1,597 +1,182 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, Zap, Rocket, Users, Linkedin, Github } from 'lucide-react';
+import { Zap, Link2, Layers, Linkedin, Github, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import PremiumPageBackdrop from '@/components/PremiumPageBackdrop';
+import { easeSnappy, ui } from '@/lib/motion';
+
+const pillars = [
+  {
+    icon: Zap,
+    title: 'Product & delivery',
+    line: 'We own outcomes: UX, engineering, and launch—not just scripts or one-off tools.',
+  },
+  {
+    icon: Link2,
+    title: 'Integrations & APIs',
+    line: 'Connect Slack, CRMs, payments, and data pipelines when your product needs to talk to the rest of the stack.',
+  },
+  {
+    icon: Layers,
+    title: 'Built to last',
+    line: 'Clear architecture and maintainable code so what we ship can grow with you.',
+  },
+];
+
+const team = [
+  {
+    initials: 'AB',
+    name: 'Arham Babar',
+    role: 'Co-founder',
+    gradient: 'from-emerald-500 to-teal-600',
+    linkedin: 'https://www.linkedin.com/in/arham-babar-a9510630a/',
+    github: 'https://github.com/Arhamdeez',
+  },
+  {
+    initials: 'SK',
+    name: 'Shahbakht Khurram',
+    role: 'Co-founder',
+    gradient: 'from-teal-500 to-cyan-600',
+    linkedin: 'https://www.linkedin.com/in/shahbakht-khurram-b322a8329',
+    github: 'https://github.com/shahbakht11',
+  },
+];
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-b from-slate-950 to-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              About
-              <span className="block bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                VAWCOM
+    <div className="relative min-h-screen overflow-hidden">
+      <PremiumPageBackdrop />
+      <div className="relative z-10">
+      <section className="pb-12 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-16">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/18 bg-slate-950/35 px-3 py-1.5 text-xs text-emerald-200/90 backdrop-blur-sm sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+              <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
+              <span>About</span>
+            </div>
+            <h1 className="mb-4 text-3xl font-semibold tracking-tight text-balance text-white sm:mb-5 sm:text-4xl md:text-5xl">
+              A full-service{' '}
+              <span className="bg-gradient-to-r from-emerald-400/95 to-teal-400/95 bg-clip-text text-transparent">
+                digital studio
               </span>
             </h1>
-            <p className="text-xl text-slate-300 leading-relaxed">
-              We&apos;re passionate about automation-first solutions that connect web, voice, and automation to transform how businesses operate.
+            <p className="text-sm leading-relaxed text-slate-400 sm:text-base md:text-lg">
+              Web and mobile apps, voice experiences, AI assistants, and integrations—designed and built as one coherent service.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Company Story */}
-      <section className="py-16 bg-slate-900 relative overflow-hidden">
-        {/* Animated background elements - Optimized */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <section className="pb-16 md:pb-20">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
           <motion.div
-            className="absolute top-20 right-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl will-change-transform"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            animate={{
-              scale: [1, 1.2, 1],
-              x: [0, 30, 0],
-              y: [0, 20, 0],
-            }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
+            transition={{ duration: ui.reveal, ease: easeSnappy }}
+            className="max-w-2xl mx-auto rounded-2xl glass px-6 py-8 md:px-10 md:py-10"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4">Why we exist</h2>
+            <p className="text-slate-300 leading-relaxed mb-4">
+              Teams need a partner who can ship whole products—not only point tools. VAWCOM exists to take ideas
+              from concept through production: interfaces, backends, voice and chat surfaces, and the glue between systems.
+            </p>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              We use modern web and mobile stacks, voice platforms like Vapi, AI where it fits, and tools like n8n when
+              orchestration is part of the solution—always in service of the product, not the other way around.
+            </p>
+          </motion.div>
         </div>
+      </section>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
-              {/* Story Content */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.8 }}
-              >
+      <section className="border-t border-emerald-500/[0.08] pb-20">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-center text-sm font-medium text-slate-500 uppercase tracking-wider mb-10">
+              How we work
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+              {pillars.map((item, i) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  key={item.title}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 mb-6"
+                  transition={{ duration: 0.24, delay: i * 0.04, ease: easeSnappy }}
+                  className="rounded-xl glass-sm px-5 py-6"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-medium">Our Journey</span>
-                </motion.div>
-                <h2 className="text-3xl font-bold text-white mb-6">Our Story</h2>
-                <div className="space-y-6">
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                    className="text-slate-300 leading-relaxed"
-                  >
-                    Every startup begins with a spark — ours was the frustration of watching great ideas slow down because of manual work.
-                  </motion.p>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="text-slate-300 leading-relaxed"
-                  >
-                    We&apos;re two friends who believed that technology should do the heavy lifting so people can focus on what really matters — creating, growing, and dreaming bigger. That&apos;s how VAWCOM was born.
-                  </motion.p>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="text-slate-300 leading-relaxed"
-                  >
-                    At VAWCOM, we&apos;re building an automation-first future — connecting web, mobile, voice, and AI technologies through smart workflows powered by n8n and cutting-edge automation tools.
-                  </motion.p>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="text-slate-300 leading-relaxed"
-                  >
-                    From scrappy startups to growing businesses, we help teams turn chaos into clarity by designing systems that talk to each other, automate the boring stuff, and scale effortlessly.
-                  </motion.p>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
-                    className="text-slate-300 leading-relaxed"
-                  >
-                    We&apos;re not just building automations — we&apos;re building momentum. 🚀
-                  </motion.p>
-                </div>
-              </motion.div>
-
-              {/* Animated Stats Boxes */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.8 }}
-                className="grid grid-cols-2 gap-6"
-              >
-                {/* Box 1 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl p-6 border border-emerald-500/30 backdrop-blur-sm relative overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
-                  <div className="relative z-10">
-                    <motion.div
-                      animate={{ rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                      className="w-12 h-12 bg-emerald-500/30 rounded-xl flex items-center justify-center mb-4"
-                    >
-                      <Zap className="w-6 h-6 text-emerald-400" />
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.4 }}
-                      className="text-4xl font-bold text-emerald-400 mb-2"
-                    >
-                      100%
-                    </motion.div>
-                    <div className="text-slate-300 text-sm font-medium">Automation-First</div>
-                    <div className="text-slate-400 text-xs mt-1">Every solution we build</div>
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-4">
+                    <item.icon className="w-5 h-5 text-emerald-400" strokeWidth={1.75} />
                   </div>
+                  <h3 className="text-white font-semibold mb-2">{item.title}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">{item.line}</p>
                 </motion.div>
-
-                {/* Box 2 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-2xl p-6 border border-teal-500/30 backdrop-blur-sm relative overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-cyan-500/0 group-hover:from-teal-500/10 group-hover:to-cyan-500/10 transition-all duration-300" />
-                  <div className="relative z-10">
-                    <motion.div
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
-                      className="w-12 h-12 bg-teal-500/30 rounded-xl flex items-center justify-center mb-4"
-                    >
-                      <Rocket className="w-6 h-6 text-teal-400" />
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.5 }}
-                      className="text-4xl font-bold text-teal-400 mb-2"
-                    >
-                      24/7
-                    </motion.div>
-                    <div className="text-slate-300 text-sm font-medium">Always Running</div>
-                    <div className="text-slate-400 text-xs mt-1">Your workflows never sleep</div>
-                  </div>
-                </motion.div>
-
-                {/* Box 3 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-gradient-to-br from-emerald-600/20 to-green-500/20 rounded-2xl p-6 border border-emerald-600/30 backdrop-blur-sm relative overflow-hidden group col-span-2"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-green-500/0 group-hover:from-emerald-600/10 group-hover:to-green-500/10 transition-all duration-300" />
-                  <div className="relative z-10 flex items-center gap-6">
-                    <motion.div
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 2.5 }}
-                      className="w-16 h-16 bg-emerald-600/30 rounded-xl flex items-center justify-center flex-shrink-0"
-                    >
-                      <Users className="w-8 h-8 text-emerald-400" />
-                    </motion.div>
-                    <div className="flex-1">
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
-                        className="text-3xl font-bold text-emerald-400 mb-1"
-                      >
-                        Infinite Scale
-                      </motion.div>
-                      <div className="text-slate-300 text-sm font-medium">From startups to enterprises</div>
-                      <div className="text-slate-400 text-xs mt-1">Solutions that grow with your business</div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Box 4 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 border border-slate-700/50 backdrop-blur-sm relative overflow-hidden group col-span-2"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-teal-500/0 to-cyan-500/0 group-hover:from-emerald-500/5 group-hover:via-teal-500/5 group-hover:to-cyan-500/5 transition-all duration-300" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold">Powered by Innovation</div>
-                        <div className="text-slate-400 text-xs">n8n • Vapi • OpenAI • Cutting-edge tools</div>
-                      </div>
-              </div>
-                    <div className="flex gap-2">
-                      {['n8n', 'Vapi', 'OpenAI', 'AI'].map((tech, idx) => (
-                        <motion.span
-                          key={tech}
-                          initial={{ opacity: 0, scale: 0 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.3, delay: 0.7 + idx * 0.1 }}
-                          className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-300 text-xs font-medium"
-                        >
-                          {tech}
-                        </motion.span>
-                      ))}
-                </div>
-              </div>
-                </motion.div>
-              </motion.div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Mission & Values */}
-      <section className="py-16 bg-slate-950 relative overflow-hidden">
-        {/* Animated background elements - Optimized */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute top-1/4 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl will-change-transform"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            animate={{
-              scale: [1, 1.2, 1],
-              x: [0, 40, 0],
-              y: [0, 30, 0],
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
+      <section className="pb-20 sm:pb-24">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-center text-2xl font-bold text-white mb-2">Founders</h2>
+            <p className="text-center text-slate-500 text-sm mb-10">People behind VAWCOM</p>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-3xl font-bold text-white mb-4">Our Mission & Values</h2>
-              <p className="text-slate-300 text-lg">What drives us forward every day</p>
-            </motion.div>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Card 1: Automation First */}
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-emerald-500/50 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
-                <div className="relative z-10">
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                    className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center mb-4"
+            <div className="grid sm:grid-cols-2 gap-6">
+              {team.map((person) => (
+                <motion.div
+                  key={person.name}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.26, ease: easeSnappy }}
+                  className="rounded-xl glass-sm p-6 flex flex-col items-center text-center"
+                >
+                  <div
+                    className={`w-16 h-16 rounded-full bg-gradient-to-br ${person.gradient} flex items-center justify-center text-lg font-bold text-white mb-4 shadow-lg`}
                   >
-                    <motion.svg
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    {person.initials}
+                  </div>
+                  <h3 className="text-white font-semibold">{person.name}</h3>
+                  <p className="text-emerald-400/90 text-sm mb-5">{person.role}</p>
+                  <div className="flex gap-3">
+                    <Link
+                      href={person.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-colors duration-150"
+                      aria-label={`${person.name} on LinkedIn`}
                     >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </motion.svg>
-                  </motion.div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Automation First</h3>
-                  <p className="text-slate-400">
-                    Every solution we build prioritizes automation and seamless integration, connecting your tools so workflows run effortlessly.
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Card 2: Seamless Integrations */}
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-teal-500/50 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-cyan-500/0 group-hover:from-teal-500/10 group-hover:to-cyan-500/10 transition-all duration-300" />
-                <div className="relative z-10">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
-                    className="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mb-4"
-                  >
-                    <motion.svg
-                      animate={{ scale: [1, 1.15, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      <Linkedin className="w-5 h-5" />
+                    </Link>
+                    <Link
+                      href={person.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-colors duration-150"
+                      aria-label={`${person.name} on GitHub`}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </motion.svg>
-                  </motion.div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Seamless Integrations</h3>
-                <p className="text-slate-400">
-                    We connect all your apps with n8n—Slack, Gmail, Notion, and more. Every workflow is designed to work together effortlessly.
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Card 3: Future-Ready */}
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-emerald-600/50 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-green-500/0 group-hover:from-emerald-600/10 group-hover:to-green-500/10 transition-all duration-300" />
-                <div className="relative z-10">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
-                    className="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center mb-4"
-                  >
-                    <motion.svg
-                      animate={{ scale: [1, 1.15, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </motion.svg>
-                  </motion.div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Future-Ready</h3>
-                <p className="text-slate-400">
-                    Scalable, secure, and open-source powered. We build solutions that grow with your business and adapt to changing needs.
-                  </p>
-                </div>
-              </motion.div>
+                      <Github className="w-5 h-5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
             </div>
+
+            <p className="text-center mt-12">
+              <Link
+                href="/contact"
+                className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors duration-150"
+              >
+                Work with us →
+              </Link>
+            </p>
           </div>
         </div>
       </section>
-
-      {/* Team Section */}
-      <section className="py-16 bg-slate-900 relative overflow-hidden">
-        {/* Animated background elements - Optimized */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl will-change-transform"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            animate={{
-              scale: [1, 1.3, 1],
-              x: [0, -40, 0],
-              y: [0, -30, 0],
-            }}
-            transition={{
-              duration: 18,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-3xl font-bold text-white mb-6">Meet Us</h2>
-            <p className="text-slate-300 text-lg mb-12">
-                The brilliant minds behind VAWCOM&apos;s automation-first solutions
-              </p>
-            </motion.div>
-            
-            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-              {/* Arham Babar */}
-              <motion.div
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-emerald-500/50 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
-                <div className="relative z-10">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                    className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg shadow-emerald-500/20"
-                  >
-                    <motion.span
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                      className="text-2xl font-bold text-white"
-                    >
-                      AB
-                    </motion.span>
-                  </motion.div>
-                  <motion.h3
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="text-xl font-semibold text-white mb-2"
-                  >
-                    Arham Babar
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="text-emerald-400 mb-4"
-                  >
-                    Co-Founder
-                  </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="flex justify-center gap-4"
-                  >
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                      <Link
-                        href="https://www.linkedin.com/in/arham-babar-a9510630a/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-slate-700 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
-                      >
-                        <Linkedin className="w-5 h-5 text-slate-300 group-hover:text-white" />
-                      </Link>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                      <Link
-                        href="https://github.com/Arhamdeez"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
-                      >
-                        <Github className="w-5 h-5 text-slate-300 group-hover:text-white" />
-                      </Link>
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </motion.div>
-
-              {/* Shahbakht Khurram */}
-              <motion.div
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-teal-500/50 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-cyan-500/0 group-hover:from-teal-500/10 group-hover:to-cyan-500/10 transition-all duration-300" />
-                <div className="relative z-10">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
-                    className="w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg shadow-teal-500/20"
-                  >
-                    <motion.span
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
-                      className="text-2xl font-bold text-white"
-                    >
-                      SK
-                    </motion.span>
-                  </motion.div>
-                  <motion.h3
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="text-xl font-semibold text-white mb-2"
-                  >
-                    Shahbakht Khurram
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="text-emerald-400 mb-4"
-                  >
-                    Co-Founder
-                  </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
-                    className="flex justify-center gap-4"
-                  >
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                      <Link
-                        href="https://www.linkedin.com/in/shahbakht-khurram-b322a8329"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-slate-700 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
-                      >
-                        <Linkedin className="w-5 h-5 text-slate-300 group-hover:text-white" />
-                      </Link>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                      <Link
-                        href="https://github.com/shahbakht11"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors duration-300 group"
-                      >
-                        <Github className="w-5 h-5 text-slate-300 group-hover:text-white" />
-                      </Link>
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

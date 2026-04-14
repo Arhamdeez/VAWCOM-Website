@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Send, CheckCircle2, Sparkles, Zap, Rocket } from 'lucide-react';
+import { Instagram, Mail, Send, CheckCircle2, Sparkles } from 'lucide-react';
+import PremiumPageBackdrop from '@/components/PremiumPageBackdrop';
+import { easeSnappy } from '@/lib/motion';
+import { CONTACT_EMAIL, getGmailComposeUrl, SOCIAL } from '@/lib/site';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -55,82 +58,69 @@ export default function Contact() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-        {/* Animated background - Optimized */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute top-1/2 left-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl will-change-transform"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ 
-              opacity: [0.3, 0.6, 0.3],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
+      <div className="relative min-h-screen overflow-hidden">
+        <PremiumPageBackdrop />
 
-        <div className="relative z-10 pt-24 pb-16 min-h-screen flex items-center">
-          <div className="container mx-auto px-4">
+        <div className="relative z-10 flex min-h-screen items-center pb-16 pt-[max(6rem,env(safe-area-inset-top,0px)+5rem)]">
+          <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.3, ease: easeSnappy }}
               className="max-w-2xl mx-auto text-center"
             >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-sm border border-emerald-500/25 text-emerald-300 mb-8">
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>Thank you</span>
+              </div>
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ 
                   type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                  delay: 0.2
+                  stiffness: 380,
+                  damping: 22,
+                  delay: 0.08
                 }}
                 className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-emerald-500/50"
               >
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                  transition={{ delay: 0.14, type: "spring", stiffness: 380, damping: 24 }}
                 >
                   <CheckCircle2 className="w-12 h-12 text-white" />
                 </motion.div>
               </motion.div>
               
               <motion.h1
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-5xl md:text-6xl font-bold text-white mb-6"
+                transition={{ delay: 0.12, duration: 0.26, ease: easeSnappy }}
+                className="text-3xl md:text-4xl font-semibold text-white mb-4"
               >
-                Message
-                <span className="block bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                  Received!
-                </span>
+                Thanks — we got it.
               </motion.h1>
               
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-xl text-slate-300 mb-10 leading-relaxed"
+                transition={{ delay: 0.18, duration: 0.26, ease: easeSnappy }}
+                className="text-slate-400 mb-10"
               >
-                Thank you for reaching out! We&apos;ve received your message and our team will get back to you within 24 hours.
+                We&apos;ll reply within a business day.
               </motion.p>
               
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
+                transition={{ delay: 0.24, duration: 0.26, ease: easeSnappy }}
                 className="flex flex-col sm:flex-row gap-4 justify-center"
               >
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 30 }}
                   onClick={() => {
                     setIsSubmitted(false);
                     setFormData({
@@ -142,7 +132,7 @@ export default function Contact() {
                       message: ''
                     });
                   }}
-                  className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-xl shadow-emerald-500/25"
+                  className="btn-glass-primary rounded-xl px-8 py-4 text-[15px] font-semibold text-white"
                 >
                   Send Another Message
                 </motion.button>
@@ -155,181 +145,88 @@ export default function Contact() {
   }
 
   return (
-      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-      {/* Animated background elements - Optimized */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl will-change-transform"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-            opacity: { duration: 1 }
-          }}
-        />
-      </div>
+      <div className="relative min-h-screen overflow-hidden">
+      <PremiumPageBackdrop />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 relative z-10">
-        <div className="container mx-auto px-4">
+      <section className="relative z-10 pb-12 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-14">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto text-center"
+            transition={{ duration: 0.3, ease: easeSnappy }}
+            className="mx-auto max-w-xl text-center"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 mb-8"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">Let&apos;s Build Something Amazing</span>
-            </motion.div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Get In
-              <span className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                Touch
-              </span>
+            <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/18 bg-slate-950/35 px-3 py-1.5 text-xs text-emerald-200/90 backdrop-blur-sm sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+              <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
+              <span>Contact</span>
+            </div>
+            <h1 className="mb-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
+              Let&apos;s talk
             </h1>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl md:text-2xl text-slate-300 leading-relaxed max-w-3xl mx-auto"
-            >
-              Ready to automate your business? Let&apos;s discuss how we can connect your systems and make your workflows run on autopilot.
-            </motion.p>
+            <p className="text-sm leading-relaxed text-slate-500 sm:text-[15px] md:text-base">
+              Send a note—we&apos;ll get back shortly.
+            </p>
           </motion.div>
         </div>
       </section>
 
       {/* Contact Form */}
-      <section className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+      <section className="relative z-10 pb-20 pt-2">
+        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+          <div className="mx-auto max-w-5xl">
+            <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
               {/* Contact Information */}
               <motion.div
-                initial={{ opacity: 0, x: -50 }}
+                initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.8 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.24, ease: easeSnappy }}
+                className="rounded-2xl glass-sm p-6 md:p-7"
               >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 mb-6"
+                <h2 className="text-lg font-medium text-white mb-2">Direct email</h2>
+                <p className="text-slate-500 text-sm mb-6">Prefer email? Reach us here.</p>
+                <a
+                  href={getGmailComposeUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-4 py-3 rounded-xl glass-field border border-white/12 text-emerald-400/90 hover:text-emerald-300 hover:border-emerald-500/25 transition-colors text-[15px] break-all"
                 >
-                  <Zap className="w-4 h-4" />
-                  <span className="text-sm font-medium">Quick Response</span>
-                </motion.div>
-                
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                  Let&apos;s Start a
-                  <span className="block bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                    Conversation
-                  </span>
-                </h2>
-                
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="text-lg text-slate-300 mb-10 leading-relaxed"
+                  <Mail className="w-5 h-5 shrink-0 text-emerald-500/80" />
+                  {CONTACT_EMAIL}
+                </a>
+                <a
+                  href={SOCIAL.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-3 px-4 py-3 rounded-xl glass-field border border-white/12 text-emerald-400/90 hover:text-emerald-300 hover:border-emerald-500/25 transition-colors text-[15px]"
                 >
-                  Whether you&apos;re looking to automate workflows, connect your apps with n8n, build web/mobile solutions, 
-                  or implement voice and chatbot integrations, we&apos;re here to help.
-                </motion.p>
-                
-                <div className="space-y-6">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    whileHover={{ x: 5 }}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 group"
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl flex items-center justify-center border border-emerald-500/30 group-hover:border-emerald-500/60 transition-all duration-300"
-                    >
-                      <Mail className="w-6 h-6 text-emerald-400" />
-                    </motion.div>
-                    <div>
-                      <h3 className="text-white font-semibold mb-1">Email</h3>
-                      <a href="mailto:vawcomtechnologies@gmail.com" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                        vawcomtechnologies@gmail.com
-                      </a>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Premium Stats */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="mt-10 grid grid-cols-2 gap-4"
-                >
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
-                    <div className="text-3xl font-bold text-emerald-400 mb-1">24h</div>
-                    <div className="text-sm text-slate-400">Response Time</div>
-                  </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/10 to-cyan-500/10 border border-teal-500/20">
-                    <div className="text-3xl font-bold text-teal-400 mb-1">100%</div>
-                    <div className="text-sm text-slate-400">Satisfaction</div>
-                  </div>
-                </motion.div>
+                  <Instagram className="w-5 h-5 shrink-0 text-emerald-500/80" />
+                  Instagram
+                </a>
+                <p className="text-slate-600 text-xs mt-6">Typical reply: within one business day.</p>
               </motion.div>
 
               {/* Contact Form */}
               <motion.div
-                initial={{ opacity: 0, x: 50 }}
+                initial={{ opacity: 0, x: 24 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.8 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.24, ease: easeSnappy }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 rounded-3xl blur-2xl"></div>
-                <div className="relative bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-slate-700/50 shadow-2xl">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-8"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Rocket className="w-5 h-5 text-emerald-400" />
-                      <h3 className="text-2xl font-bold text-white">Start Your Project</h3>
-                    </div>
-                    <p className="text-slate-400">Fill out the form below and we&apos;ll get back to you ASAP</p>
-                  </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-cyan-500/8 rounded-2xl blur-2xl" />
+                <div className="relative glass rounded-2xl p-6 md:p-8">
+                  <h3 className="text-lg font-semibold text-white mb-1">Message</h3>
+                  <p className="text-slate-500 text-sm mb-6">Required fields marked *</p>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-4">
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
+                        transition={{ duration: 0.26, delay: 0.04, ease: easeSnappy }}
                       >
                         <label htmlFor="name" className="block text-white font-medium mb-2">
                           Name <span className="text-emerald-400">*</span>
@@ -341,15 +238,15 @@ export default function Contact() {
                           value={formData.name}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-[border-color,box-shadow] duration-150"
                           placeholder="John Doe"
                         />
                       </motion.div>
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
+                        transition={{ duration: 0.26, delay: 0.08, ease: easeSnappy }}
                       >
                         <label htmlFor="email" className="block text-white font-medium mb-2">
                           Email <span className="text-emerald-400">*</span>
@@ -361,7 +258,7 @@ export default function Contact() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-[border-color,box-shadow] duration-150"
                           placeholder="john@company.com"
                         />
                       </motion.div>
@@ -369,10 +266,10 @@ export default function Contact() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
+                        transition={{ duration: 0.26, delay: 0.12, ease: easeSnappy }}
                       >
                         <label htmlFor="company" className="block text-white font-medium mb-2">Company</label>
                         <input
@@ -381,15 +278,15 @@ export default function Contact() {
                           name="company"
                           value={formData.company}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-[border-color,box-shadow] duration-150"
                           placeholder="Company Inc."
                         />
                       </motion.div>
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
+                        transition={{ duration: 0.26, delay: 0.16, ease: easeSnappy }}
                       >
                         <label htmlFor="phone" className="block text-white font-medium mb-2">Phone</label>
                         <input
@@ -398,17 +295,17 @@ export default function Contact() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-[border-color,box-shadow] duration-150"
                           placeholder="+1 (555) 123-4567"
                         />
                       </motion.div>
                     </div>
 
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 12 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.5 }}
+                      transition={{ duration: 0.26, delay: 0.2, ease: easeSnappy }}
                     >
                       <label htmlFor="service" className="block text-white font-medium mb-2">Service Interest</label>
                       <select
@@ -416,14 +313,14 @@ export default function Contact() {
                         name="service"
                         value={formData.service}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+                        className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-[border-color,box-shadow] duration-150"
                       >
                         <option value="">Select a service</option>
                         <option value="web-development">Web Development</option>
                         <option value="mobile-apps">Mobile Apps</option>
                         <option value="voice-solutions">Voice Solutions</option>
                         <option value="chatbots">Chatbots</option>
-                        <option value="n8n-automations">n8n Automations</option>
+                        <option value="n8n-automations">n8n & integrations</option>
                         <option value="ai-integrations">AI Integrations</option>
                         <option value="consultation">Consultation</option>
                         <option value="other">Other</option>
@@ -431,10 +328,10 @@ export default function Contact() {
                     </motion.div>
 
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 12 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.6 }}
+                      transition={{ duration: 0.26, delay: 0.24, ease: easeSnappy }}
                     >
                       <label htmlFor="message" className="block text-white font-medium mb-2">
                         Message <span className="text-emerald-400">*</span>
@@ -445,9 +342,9 @@ export default function Contact() {
                         value={formData.message}
                         onChange={handleChange}
                         required
-                        rows={6}
-                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 resize-none"
-                        placeholder="Tell us about your project, goals, and how we can help transform your business..."
+                        rows={4}
+                        className="w-full px-4 py-3 glass-field rounded-xl border border-white/12 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-[border-color,box-shadow] duration-150 resize-none"
+                        placeholder="Briefly describe what you need…"
                       />
                     </motion.div>
 
@@ -456,13 +353,14 @@ export default function Contact() {
                       disabled={isSubmitting}
                       whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                       whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                      className="w-full px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-300 shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 flex items-center justify-center gap-2"
+                      transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+                      className="btn-glass-primary flex w-full items-center justify-center gap-2 rounded-xl px-8 py-4 text-[15px] font-semibold text-white disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 0.65, repeat: Infinity, ease: "linear" }}
                             className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                           />
                           <span>Sending Message...</span>

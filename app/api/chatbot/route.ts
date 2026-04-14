@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocumentText, setDocumentText } from '@/lib/documentStore';
+import { CONTACT_EMAIL, SOCIAL } from '@/lib/site';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,12 +28,12 @@ export async function POST(request: NextRequest) {
 - If the answer isn't in the document, politely say so and offer to help with what you can
 - Be concise but thorough
 - If asked for a summary, provide a clear overview of the document's main points`
-      : `You are a helpful AI assistant for VAWCOM, a company specializing in automation-first digital solutions including web development, mobile apps, voice agents, chatbots, and n8n automations. 
+      : `You are a helpful AI assistant for VAWCOM, a full-service digital studio. We deliver web and mobile applications, voice experiences, AI chatbots, integrations, and related engineering support.
 
 Answer questions clearly and concisely. You can help with:
-- Questions about VAWCOM's services (web, mobile, voice, chatbot, automation)
+- Questions about VAWCOM's services (web, mobile, voice, AI/chat, integrations)
 - General technical questions
-- Information about n8n, Vapi, and other technologies we use
+- Information about tools we use (e.g. n8n, Vapi) when relevant
 - General assistance and conversation
 
 Be friendly, professional, and helpful.`;
@@ -187,8 +188,7 @@ Be friendly, professional, and helpful.`;
 
 function generateSmartResponse(message: string, context: string): string {
   const lowerMessage = message.toLowerCase();
-  const lowerContext = context.toLowerCase();
-  
+
   // Extract keywords from user message
   const questionWords = lowerMessage.split(/\s+/).filter(w => w.length > 3);
   
@@ -238,22 +238,22 @@ function generateDefaultResponse(message: string): string {
   
   // Asking for user info or introduction
   if (lowerMessage.includes('who are you') || lowerMessage.includes('what are you') || lowerMessage.includes('introduce')) {
-    return 'I\'m an AI assistant for VAWCOM, a company specializing in automation-first digital solutions. I can help you learn about our services including web development, mobile apps, voice agents, chatbots, and n8n automations. What would you like to know?';
+    return 'I\'m an AI assistant for VAWCOM, a full-service digital studio. I can help you learn about our work: web and mobile apps, voice products, AI chat experiences, integrations, and more. What would you like to know?';
   }
   
   // Company information
   if (lowerMessage.includes('company') || lowerMessage.includes('about') || lowerMessage.includes('vawcom')) {
-    return 'VAWCOM specializes in automation-first digital solutions. We offer:\n\n• Web Development\n• Mobile App Development\n• Voice Agents (using Vapi)\n• Chatbots\n• n8n Automations\n\nWhat service interests you most?';
+    return 'VAWCOM is a full-service digital studio. We offer:\n\n• Web development\n• Mobile app development\n• Voice experiences (e.g. Vapi)\n• AI chatbots\n• Integrations & orchestration (e.g. n8n)\n\nWhat are you looking to build?';
   }
   
   // Services
   if (lowerMessage.includes('service') || lowerMessage.includes('what do you offer') || lowerMessage.includes('what can you do')) {
-    return 'We offer comprehensive digital solutions:\n\n🌐 **Web Development** - Custom websites and web applications\n📱 **Mobile Apps** - iOS and Android development\n🎙️ **Voice Agents** - AI-powered voice assistants using Vapi\n💬 **Chatbots** - Intelligent conversational interfaces\n⚙️ **n8n Automations** - Workflow automation and integrations\n\nWhich service would you like to learn more about?';
+    return 'We offer end-to-end digital services:\n\n🌐 **Web** — Sites and web apps\n📱 **Mobile** — iOS, Android, cross-platform\n🎙️ **Voice** — Voice products and telephony integrations\n💬 **AI chat** — Assistants for support and engagement\n🔗 **Integrations** — APIs, data sync, orchestration (e.g. n8n)\n\nWhich area should we dive into?';
   }
   
   // Contact information
   if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('phone') || lowerMessage.includes('reach') || lowerMessage.includes('get in touch')) {
-    return 'To get in touch with VAWCOM:\n\n📧 Email: contact@vawcom.com\n📞 Phone: (123) 456-7890\n🌐 Website: www.vawcom.com\n\nFeel free to reach out for a consultation about your project needs!';
+    return `To get in touch with VAWCOM:\n\n📧 Email: ${CONTACT_EMAIL} (tap email links on our site to open Gmail compose)\n📸 Instagram: ${SOCIAL.instagram}\n🔗 LinkedIn: ${SOCIAL.linkedin}\n🌐 Website: https://www.vawcom.com\n\nYou can also use the Contact form on our site.`;
   }
   
   // Pricing
@@ -278,17 +278,17 @@ function generateDefaultResponse(message: string): string {
   
   // Chatbots
   if (lowerMessage.includes('chatbot') || lowerMessage.includes('chat bot')) {
-    return 'We build intelligent chatbots that can:\n\n• Answer customer questions\n• Handle support requests\n• Qualify leads\n• Schedule appointments\n• Integrate with your CRM\n\nChatbots help automate customer interactions and improve response times. Want to learn more?';
+    return 'We build intelligent chatbots that can:\n\n• Answer customer questions\n• Handle support requests\n• Qualify leads\n• Schedule appointments\n• Integrate with your CRM\n\nThey’re built to match your tone and workflows. Want to learn more?';
   }
   
   // n8n automations
   if (lowerMessage.includes('n8n') || lowerMessage.includes('automation') || lowerMessage.includes('workflow')) {
-    return 'We create powerful automations using n8n, an open-source workflow automation tool. Our automation services include:\n\n• Workflow automation\n• System integrations\n• Data synchronization\n• Process automation\n• API connections\n\nWhat processes would you like to automate?';
+    return 'We use n8n and similar tools when your product needs reliable orchestration—connecting CRMs, messaging, email, databases, and custom APIs. It’s one part of our broader integration and backend work.\n\nWhat systems are you trying to connect?';
   }
   
   // Portfolio or examples
   if (lowerMessage.includes('portfolio') || lowerMessage.includes('example') || lowerMessage.includes('work') || lowerMessage.includes('project')) {
-    return 'We\'ve worked on various projects across different industries. Our portfolio includes e-commerce platforms, mobile apps, voice agents, and automation solutions. Would you like to see specific examples? I can help connect you with our team to discuss case studies relevant to your industry!';
+    return 'We\'ve shipped web and mobile products, voice and chat experiences, and integration-heavy builds across different industries. For concrete examples, our team can walk you through case studies that match your use case.';
   }
   
   // Timeline or duration
@@ -298,12 +298,12 @@ function generateDefaultResponse(message: string): string {
   
   // Technology stack
   if (lowerMessage.includes('technology') || lowerMessage.includes('tech stack') || lowerMessage.includes('what technology') || lowerMessage.includes('stack')) {
-    return 'We use modern technologies and tools:\n\n• **Web**: React, Next.js, Node.js, TypeScript\n• **Mobile**: React Native, Swift, Kotlin\n• **Voice**: Vapi, Twilio\n• **Automation**: n8n, Zapier\n• **Cloud**: AWS, Vercel, and more\n\nWe choose the best tools for each project. What technologies are you interested in?';
+    return 'We use modern technologies and tools:\n\n• **Web**: React, Next.js, Node.js, TypeScript\n• **Mobile**: React Native, Swift, Kotlin\n• **Voice**: Vapi, Twilio\n• **Integrations & orchestration**: n8n, Zapier, custom APIs\n• **Cloud**: AWS, Vercel, and more\n\nWe pick the right stack per project. What are you leaning toward?';
   }
   
   // Help
   if (lowerMessage.includes('help') || lowerMessage.includes('what can you help')) {
-    return 'I can help you with:\n\n✅ Information about VAWCOM services\n✅ Questions about web development, mobile apps, voice agents, chatbots, and automations\n✅ Contact information\n✅ General inquiries\n\nYou can also upload a document and I\'ll answer questions about it! What would you like to know?';
+    return 'I can help you with:\n\n✅ VAWCOM services (web, mobile, voice, AI, integrations)\n✅ Contact and next steps\n✅ General questions\n\nYou can also upload a document and I\'ll answer questions about it. What would you like to know?';
   }
   
   // Upload/document questions
@@ -322,7 +322,7 @@ function generateDefaultResponse(message: string): string {
   }
   
   // Default response for unmatched queries
-  return 'I\'m here to help you learn about VAWCOM\'s services! You can ask me about:\n\n• Our services (web, mobile, voice, chatbot, automation)\n• Company information\n• Contact details\n• Technology stack\n• Project timelines\n\nOr try saying "hi" to get started! What would you like to know?';
+  return 'I\'m here to help you learn about VAWCOM. Ask about our services (web, mobile, voice, AI, integrations), the company, contact options, tech stack, or timelines—or say hi to get started.';
 }
 
 

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import GooeyNav from './GooeyNav';
 import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
@@ -19,9 +18,10 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when route changes
+  // Close mobile menu when route changes (defer to avoid cascading renders in the effect body)
   useEffect(() => {
-    setMobileMenuOpen(false);
+    const id = requestAnimationFrame(() => setMobileMenuOpen(false));
+    return () => cancelAnimationFrame(id);
   }, [pathname]);
 
   // Prevent body scroll when mobile menu is open
@@ -42,13 +42,6 @@ const Navbar = () => {
     { label: "Contact", href: "/contact" },
   ];
 
-  // Determine active index based on current pathname
-  const getActiveIndex = () => {
-    if (pathname === '/about') return 1;
-    if (pathname === '/contact') return 2;
-    return -1; // No active state for homepage or other routes
-  };
-
   const handleMobileNavClick = (href: string) => {
     setMobileMenuOpen(false);
     if (href === '/#services') {
@@ -61,36 +54,82 @@ const Navbar = () => {
     }
   };
 
+  const handleDesktopNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href === '/#services' && pathname === '/') {
+      e.preventDefault();
+      setTimeout(() => {
+        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    }
+  };
+
+  const navLinkClass = (href: string) => {
+    const active =
+      pathname === href || (href === '/#services' && pathname === '/');
+    return `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-out ${
+      active
+        ? 'text-emerald-400'
+        : 'text-slate-300 hover:text-white hover:bg-white/5'
+    }`;
+  };
+
+  const desktopNav = (
+    <nav className="hidden md:flex items-center gap-0.5" aria-label="Main">
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          onClick={(e) => handleDesktopNavClick(e, item.href)}
+          className={navLinkClass(item.href)}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+
   return (
     <>
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`fixed w-full z-50 transition-all duration-500 ${
-          scrolled 
-            ? 'bg-slate-950/90 backdrop-blur-md shadow-lg py-2 border-b border-slate-800' 
-            : 'bg-transparent py-4'
-        }`}
+        transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
+        className={`fixed left-0 right-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-[padding] duration-300 ease-out ${scrolled ? 'py-2' : 'py-3 sm:py-4'}`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+        <div className="container mx-auto max-w-7xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
+          {scrolled ? (
+            <div className="rounded-2xl glass-nav px-4 py-2">
+              <div className="flex justify-between items-center">
+                <Link href="/" className="text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-300/95 to-teal-300/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold">
+                  VAWCOM
+                </Link>
+                
+                {desktopNav}
+
+                <button 
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden text-slate-300 hover:text-white transition-colors z-50 relative"
+                  aria-label="Toggle mobile menu"
+                >
+                  {mobileMenuOpen ? (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between items-center">
+            <Link href="/" className="text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-400/95 to-teal-400/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold">
               VAWCOM
             </Link>
             
-            <div className="hidden md:block">
-              <GooeyNav
-                items={navItems}
-                particleCount={8}
-                particleDistances={[60, 6]}
-                particleR={60}
-                initialActiveIndex={-1}
-                animationTime={800}
-                timeVariance={150}
-                colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-              />
-            </div>
+            {desktopNav}
 
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -108,6 +147,7 @@ const Navbar = () => {
               )}
             </button>
           </div>
+          )}
         </div>
       </motion.nav>
 
@@ -121,7 +161,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-40 md:hidden"
+              className="fixed inset-0 z-40 bg-slate-950/88 backdrop-blur-sm md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             
@@ -131,15 +171,15 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-64 bg-slate-900/98 backdrop-blur-md z-40 md:hidden shadow-2xl border-l border-slate-800"
+              className="fixed top-0 right-0 z-40 h-full w-[min(18rem,calc(100vw-1.5rem))] rounded-l-2xl border-l border-white/10 bg-slate-950/90 shadow-xl backdrop-blur-xl md:hidden"
             >
-              <div className="flex flex-col h-full pt-20 px-6">
+              <div className="flex h-full flex-col px-5 pt-[max(5rem,env(safe-area-inset-top,0px)+4rem)] pb-[env(safe-area-inset-bottom,0px)]">
                 {navItems.map((item, index) => (
                   <Link
                     key={index}
                     href={item.href}
                     onClick={() => handleMobileNavClick(item.href)}
-                    className={`py-4 text-lg font-medium transition-colors border-b border-slate-800 ${
+                    className={`border-b border-slate-800/80 py-3.5 text-[15px] font-medium transition-colors sm:py-4 sm:text-base ${
                       pathname === item.href || (item.href === '/#services' && pathname === '/')
                         ? 'text-emerald-400'
                         : 'text-slate-300 hover:text-emerald-400'

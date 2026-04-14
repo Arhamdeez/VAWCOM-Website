@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { easeSnappy } from '@/lib/motion';
 import React, { useState, useEffect, useRef } from 'react';
 
 interface ServiceCardProps {
@@ -8,7 +9,6 @@ interface ServiceCardProps {
   title: string;
   description: string;
   gradient: string;
-  delay: number;
   index?: number;
   interactive?: boolean;
   type?: string;
@@ -16,8 +16,7 @@ interface ServiceCardProps {
   isActive?: boolean;
 }
 
-export default function ServiceCard({ icon: Icon, title, description, gradient, delay = 0, interactive = false, type, isActive = false }: ServiceCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function ServiceCard({ icon: Icon, title, description, gradient, interactive = false, type, isActive = false }: ServiceCardProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isCalling, setIsCalling] = useState(false);
   const [callStatus, setCallStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
@@ -41,7 +40,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
     if (type === 'n8n-automations' && isActive) {
       const interval = setInterval(() => {
         setActiveNode((prev) => (prev + 1) % 4);
-      }, 2000);
+      }, 1400);
       return () => clearInterval(interval);
     }
   }, [type, isActive]);
@@ -54,52 +53,45 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
   }, [botHistory, isTyping, type]);
 
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative group cursor-pointer h-full w-full"
-    >
+    <div className="relative group cursor-pointer h-full w-full">
       {/* Simple glow effect */}
       <div
-        className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}
+        className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-0 transition-opacity duration-200 group-hover:opacity-[0.18] md:group-hover:opacity-25`}
       />
 
-      {/* Main card */}
-      <div className={`relative w-full h-full min-h-[400px] p-[3%] rounded-xl md:rounded-2xl overflow-hidden bg-slate-900/95 backdrop-blur-xl`}>
-        {/* Glass morphism background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/80 to-slate-900/95 backdrop-blur-xl border border-emerald-500/10 rounded-xl md:rounded-2xl" />
-
-        {/* Simple background gradient */}
-        <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-500 to-teal-500" />
-
+      {/* Frosted shell: stacked Services cards need opacity + blur so back cards don’t bleed through */}
+      <div className="relative isolate h-full min-h-[360px] w-full overflow-hidden rounded-2xl p-4 glass-dense sm:min-h-[400px] sm:p-5 md:min-h-[420px] md:p-8">
         {/* Content */}
         <div className="relative z-10 h-full flex flex-col">
           {/* Simple Icon */}
-          <div className="relative mb-[2%]" style={{ marginBottom: 'clamp(0.75rem, 2%, 1.5rem)' }}>
-            <div className="w-[12%] aspect-square max-w-[64px] min-w-[48px] rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center" style={{ width: 'clamp(48px, 12%, 64px)' }}>
+          <div className="relative" style={{ marginBottom: 'clamp(0.75rem, 1.75vw, 1.25rem)' }}>
+            <div className="aspect-square w-12 md:w-14 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
               {Icon ? <Icon className="text-white" style={{ width: 'clamp(24px, 50%, 32px)', height: 'clamp(24px, 50%, 32px)' }} /> : null}
             </div>
           </div>
 
-          <h3 className={`text-white mb-[1%] font-semibold`} style={{ 
+          <h3 className="text-white font-semibold" style={{ 
             fontSize: interactive ? 'clamp(1rem, 4vw, 1.5rem)' : 'clamp(0.875rem, 3vw, 1.125rem)',
-            marginBottom: 'clamp(0.5rem, 1%, 0.75rem)',
+            marginBottom: 'clamp(0.5rem, 1vw, 0.75rem)',
             lineHeight: '1.2'
           }}>{title}</h3>
 
-          <p className={`text-slate-400 leading-relaxed mb-[1.5%]`} style={{ 
+          <p className="text-slate-400 leading-relaxed" style={{ 
             fontSize: interactive ? 'clamp(0.75rem, 2.5vw, 1rem)' : 'clamp(0.625rem, 2vw, 0.875rem)',
-            marginBottom: 'clamp(0.75rem, 1.5%, 1rem)',
+            marginBottom: 'clamp(0.75rem, 1.25vw, 1rem)',
             lineHeight: '1.5'
           }}>{description}</p>
 
           {/* Interactive Demo Section */}
           {interactive && isActive && (
-            <div className="mt-[2%] p-[2.5%] bg-slate-800/50 rounded-lg md:rounded-xl border border-emerald-500/20 flex flex-col flex-1 min-h-0" style={{ 
-              marginTop: 'clamp(0.75rem, 2%, 1.5rem)',
-              padding: 'clamp(0.75rem, 2.5%, 1rem)',
-              minHeight: 'clamp(200px, 40%, 250px)'
-            }}>
+            <div
+              className="rounded-xl border border-white/10 flex flex-col flex-1 min-h-0 bg-slate-900/95 backdrop-blur-md"
+              style={{
+                marginTop: 'clamp(0.75rem, 1.5vw, 1.25rem)',
+                padding: 'clamp(0.75rem, 1.5vw, 1rem)',
+                minHeight: type === 'n8n-automations' ? 'clamp(260px, 46vh, 320px)' : 'clamp(220px, 40vh, 280px)',
+              }}
+            >
               {type === 'ai-agent' && (
                 <div className="flex flex-col h-full min-h-0">
                   <div className="flex items-center gap-2 mb-[2%]" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)', marginBottom: 'clamp(0.5rem, 2%, 1rem)' }}>
@@ -281,7 +273,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isCalling}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20 active:scale-95"
+                      className="btn-glass-primary flex w-full items-center justify-center gap-2 rounded-lg font-medium text-white disabled:cursor-not-allowed"
                       style={{ 
                         padding: 'clamp(0.5rem, 2.5%, 0.75rem)',
                         fontSize: 'clamp(0.75rem, 2.5vw, 1rem)',
@@ -355,7 +347,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                                 message: `❌ Error: ${data.error || 'Failed to upload document'}`
                               }]);
                             }
-                          } catch (error) {
+                          } catch {
                             setBotHistory(prev => [...prev, {
                               type: 'ai',
                               message: '❌ Failed to upload document. Please try again.'
@@ -494,7 +486,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                               type: 'ai',
                               message: data.response || 'Sorry, I encountered an error.'
                             }]);
-                          } catch (error) {
+                          } catch {
                             setBotHistory(prev => [...prev, {
                               type: 'ai',
                               message: 'Sorry, I encountered an error. Please try again.'
@@ -526,7 +518,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                               type: 'ai',
                               message: data.response || 'Sorry, I encountered an error.'
                             }]);
-                          } catch (error) {
+                          } catch {
                             setBotHistory(prev => [...prev, {
                               type: 'ai',
                               message: 'Sorry, I encountered an error. Please try again.'
@@ -537,7 +529,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isTyping || !botMessage.trim()}
-                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all font-medium flex-shrink-0 flex items-center justify-center"
+                      className="btn-glass-primary flex flex-shrink-0 items-center justify-center rounded-lg font-medium text-white disabled:cursor-not-allowed"
                       style={{ 
                         padding: 'clamp(0.5rem, 2%, 0.625rem)',
                         fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
@@ -552,29 +544,27 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
 
               {type === 'n8n-automations' && (
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="text-center flex-shrink-0" style={{ 
-                    marginBottom: 'clamp(0.5rem, 2%, 0.75rem)'
-                  }}>
-                    <h4 className="text-white font-semibold mb-[0.5%]" style={{ 
-                      fontSize: 'clamp(0.875rem, 3.5vw, 1.25rem)',
-                      marginBottom: 'clamp(0.25rem, 0.5%, 0.5rem)'
-                    }}>n8n Workflow Demo</h4>
-                    <p className="text-slate-400 px-2" style={{ 
-                      fontSize: 'clamp(0.5rem, 1.5vw, 0.875rem)',
-                      paddingLeft: 'clamp(0.25rem, 1%, 0.5rem)',
-                      paddingRight: 'clamp(0.25rem, 1%, 0.5rem)'
-                    }}>Watch how we connect your apps with visual workflows</p>
+                  <div className="flex items-center justify-between flex-shrink-0" style={{ marginBottom: 'clamp(0.5rem, 1vw, 0.75rem)' }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="text-emerald-300 font-medium" style={{ fontSize: 'clamp(0.7rem, 1.6vw, 0.9rem)' }}>
+                        Integration demo
+                      </span>
+                    </div>
+                    <span className="text-slate-400" style={{ fontSize: 'clamp(0.65rem, 1.4vw, 0.85rem)' }}>
+                      Gmail → n8n → Slack/Notion
+                    </span>
                   </div>
                   
                   {/* Visual Workflow Diagram */}
-                  <div className="bg-slate-900/70 rounded-lg relative overflow-hidden flex-shrink" style={{ 
-                    padding: 'clamp(0.5rem, 2%, 1rem)',
-                    minHeight: 'clamp(120px, 30%, 160px)',
-                    maxHeight: 'clamp(120px, 50%, 180px)',
-                    marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
-                    flex: '1 1 auto'
-                  }}>
-                    <svg viewBox="0 0 300 160" className="w-full h-full" style={{ maxHeight: '100%' }} preserveAspectRatio="xMidYMid meet">
+                  <div
+                    className="bg-slate-900/70 rounded-lg relative overflow-hidden flex-1 min-h-[180px] md:min-h-[220px]"
+                    style={{
+                      padding: 'clamp(0.5rem, 2%, 1rem)',
+                      marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
+                    }}
+                  >
+                    <svg viewBox="0 0 300 160" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
                       {/* Connection lines */}
                       {/* Gmail -> n8n */}
                       <motion.line
@@ -587,7 +577,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         strokeDasharray={activeNode >= 1 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 1 ? 1 : 0.3 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.26, ease: easeSnappy }}
                       />
                       {/* n8n -> Slack */}
                       <motion.line
@@ -600,7 +590,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         strokeDasharray={activeNode >= 2 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 2 ? 1 : 0.3 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.26, ease: easeSnappy }}
                       />
                       {/* n8n -> Notion */}
                       <motion.line
@@ -613,7 +603,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         strokeDasharray={activeNode >= 3 ? '0' : '4,4'}
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: activeNode >= 3 ? 1 : 0.3 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.26, ease: easeSnappy }}
                       />
                       
                       {/* Workflow Nodes */}
@@ -628,21 +618,21 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                           <motion.circle
                             cx={node.x}
                             cy={node.y}
-                            r="15"
+                            r="17"
                             fill={activeNode === idx ? node.color : '#374151'}
                             stroke={activeNode === idx ? '#10b981' : '#4a5568'}
                             strokeWidth={activeNode === idx ? '2' : '1.5'}
                             initial={{ scale: 1 }}
                             animate={{ scale: activeNode === idx ? 1.1 : 1 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.2, ease: easeSnappy }}
                           />
                           {/* Node label */}
                           <text
                             x={node.x}
-                            y={node.y + 25}
+                            y={node.y + 28}
                             textAnchor="middle"
                             fill="#e5e7eb"
-                            fontSize="9"
+                            fontSize="10"
                             fontWeight="500"
                             className="select-none"
                           >
@@ -653,12 +643,12 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                             <motion.circle
                               cx={node.x}
                               cy={node.y}
-                              r="15"
+                              r="17"
                               fill={node.color}
                               opacity="0.3"
                               initial={{ scale: 1, opacity: 0.5 }}
                               animate={{ scale: 1.4, opacity: 0 }}
-                              transition={{ duration: 1, repeat: Infinity }}
+                              transition={{ duration: 0.7, repeat: Infinity }}
                             />
                           )}
                         </g>
@@ -668,22 +658,25 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                     {/* Auto-play animation indicator */}
                     <div className="absolute bottom-1.5 md:bottom-2 right-1.5 md:right-2 flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-emerald-400">
                       <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                      <span className="hidden sm:inline">Workflow Active</span>
+                      <span className="hidden sm:inline">Demo active</span>
                       <span className="sm:hidden">Active</span>
                     </div>
                   </div>
 
                   {/* Workflow Description */}
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full" style={{ 
-                    padding: 'clamp(0.375rem, 1.5%, 0.625rem)',
-                    marginTop: 'auto',
-                    marginBottom: 'clamp(0.5rem, 2%, 0.75rem)'
-                  }}>
+                  <div
+                    className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full"
+                    style={{
+                      padding: 'clamp(0.5rem, 1.8%, 0.75rem)',
+                      marginTop: 'auto',
+                      marginBottom: 'clamp(0.5rem, 2%, 0.75rem)',
+                    }}
+                  >
                     <p className="text-emerald-300 text-center leading-relaxed break-words" style={{ 
-                      fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)',
-                      lineHeight: '1.3'
+                      fontSize: 'clamp(0.6rem, 1.6vw, 0.85rem)',
+                      lineHeight: '1.35'
                     }}>
-                      Email triggers → n8n processes → Updates Slack & Notion automatically
+                      Example flow: email in → n8n routes → Slack & Notion stay in sync
                     </p>
                   </div>
 
@@ -701,7 +694,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               <motion.div
                 className="absolute inset-0 flex items-center justify-center"
                 animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -717,7 +710,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
             <motion.div
               className="w-full h-full flex flex-col gap-2"
               animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
             >
               <div className="w-12 h-8 bg-emerald-500 rounded-lg rounded-bl-none ml-auto"></div>
               <div className="w-10 h-8 bg-slate-600 rounded-lg rounded-br-none"></div>
@@ -737,7 +730,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   r="8"
                   fill="#10b981"
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
                 />
               ))}
               <motion.circle
@@ -746,7 +739,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                 r="8"
                 fill="#10b981"
                 animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
               />
             </svg>
           </div>
