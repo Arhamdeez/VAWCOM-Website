@@ -131,7 +131,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                       className="flex-1 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
                       style={{ 
                         padding: 'clamp(0.375rem, 2%, 0.5rem)',
-                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)'
+                        fontSize: 'clamp(1rem, 2.5vw, 1rem)'
                       }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && chatMessage.trim()) {
@@ -182,7 +182,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                       className="w-full bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ 
                         padding: 'clamp(0.5rem, 2.5%, 0.75rem)',
-                        fontSize: 'clamp(0.75rem, 3vw, 1.125rem)'
+                        fontSize: 'clamp(1rem, 3vw, 1.125rem)'
                       }}
                       disabled={isCalling}
                     />
@@ -461,7 +461,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                       className="flex-1 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none disabled:opacity-50"
                       style={{ 
                         padding: 'clamp(0.5rem, 2%, 0.625rem)',
-                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)'
+                        fontSize: 'clamp(1rem, 2.5vw, 1rem)'
                       }}
                       onKeyPress={async (e) => {
                         if (e.key === 'Enter' && botMessage.trim() && !isTyping) {

@@ -103,7 +103,7 @@ export default function Contact() {
   }
 
   const fieldClass =
-    'w-full rounded-lg border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left text-[15px] text-white placeholder:text-slate-600 transition-[border-color,box-shadow] duration-150 focus:border-emerald-500/45 focus:outline-none focus:ring-1 focus:ring-emerald-500/25';
+    'w-full rounded-lg border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left text-base text-white placeholder:text-slate-600 transition-[border-color,box-shadow] duration-150 focus:border-emerald-500/45 focus:outline-none focus:ring-1 focus:ring-emerald-500/25';
   const labelClass = 'mb-1.5 block text-center text-xs font-medium uppercase tracking-[0.1em] text-slate-500';
 
   return (
@@ -260,7 +260,7 @@ export default function Contact() {
                       whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                       whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                       transition={{ type: 'spring', stiffness: 450, damping: 30 }}
-                      className="btn-glass-primary flex w-full max-w-xs items-center justify-center gap-2 rounded-full px-8 py-3.5 text-[15px] font-semibold text-white disabled:cursor-not-allowed sm:w-auto sm:max-w-none sm:min-w-[200px]"
+                      className="btn-glass-primary flex w-full max-w-xs items-center justify-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold text-white disabled:cursor-not-allowed sm:w-auto sm:max-w-none sm:min-w-[200px]"
                     >
                       {isSubmitting ? (
                         <>

@@ -1,4 +1,5 @@
 import Hero from '@/components/Hero';
+import HomeHashScroll from '@/components/HomeHashScroll';
 import Services from '@/components/Services';
 import TechMarquee from '@/components/TechMarquee';
 import AdditionalServices from '@/components/AdditionalServices';
@@ -6,6 +7,7 @@ import AdditionalServices from '@/components/AdditionalServices';
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#050a14]">
+      <HomeHashScroll />
       {/* Full-bleed hero — standalone */}
       <Hero />
 

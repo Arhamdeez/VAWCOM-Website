@@ -17,7 +17,11 @@ export default function Footer() {
           <div>
             <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-500 sm:mb-4">Quick links</h4>
             <ul className="space-y-2.5 text-sm">
-              <li><a href="#services" className="text-slate-400 transition-colors hover:text-emerald-400/90">Services</a></li>
+              <li>
+                <Link href="/#services" className="text-slate-400 transition-colors hover:text-emerald-400/90">
+                  Services
+                </Link>
+              </li>
               <li><Link href="/about" className="text-slate-400 transition-colors hover:text-emerald-400/90">About Us</Link></li>
               <li><Link href="/contact" className="text-slate-400 transition-colors hover:text-emerald-400/90">Contact</Link></li>
             </ul>
@@ -30,38 +34,38 @@ export default function Footer() {
                 href={SOCIAL.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
+                className="flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
                 aria-label="VAWCOM on LinkedIn"
               >
-                <Linkedin className="w-5 h-5" />
+                <Linkedin className="h-5 w-5" />
               </a>
               <a
                 href={SOCIAL.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
+                className="flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
                 aria-label="VAWCOM on Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="h-5 w-5" />
               </a>
               <a
                 href={SOCIAL.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
+                className="flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
                 aria-label="VAWCOM on GitHub"
               >
-                <Github className="w-5 h-5" />
+                <Github className="h-5 w-5" />
               </a>
               <a
                 href={getGmailComposeUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
+                className="flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-slate-800/90 text-slate-400 transition-colors hover:bg-emerald-600/90 hover:text-white"
                 aria-label="Email VAWCOM in Gmail"
                 title="Opens Gmail compose"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="h-5 w-5" />
               </a>
             </div>
           </div>

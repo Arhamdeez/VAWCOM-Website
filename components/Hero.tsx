@@ -2,10 +2,20 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function Hero() {
+  const pathname = usePathname();
+
+  const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-slate-950 pt-[max(6rem,calc(env(safe-area-inset-top,0px)+4.25rem))] pb-16 sm:pb-12">
       {/* Radial spotlight — bright mint/teal center, deep charcoal-green edges (reference look) */}
@@ -105,14 +115,14 @@ export default function Hero() {
           className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
         >
           <Link href="/contact" className="w-full sm:w-auto sm:min-w-0">
-            <Button size="lg" variant="solidEmerald" className="w-full sm:w-auto">
+            <Button size="lg" variant="solidEmerald" className="min-h-[44px] w-full sm:w-auto">
               Get Started
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>
-          <Link href="#services" className="w-full sm:w-auto sm:min-w-0">
-            <Button size="lg" variant="solidWhite" className="w-full sm:w-auto">
-              What we Offer
+          <Link href="/#services" onClick={scrollToServices} className="w-full sm:w-auto sm:min-w-0">
+            <Button size="lg" variant="solidWhite" className="min-h-[44px] w-full sm:w-auto">
+              What we offer
             </Button>
           </Link>
         </motion.div>

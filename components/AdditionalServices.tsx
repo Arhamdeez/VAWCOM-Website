@@ -48,7 +48,7 @@ export default function AdditionalServices() {
   return (
     <section
       id="more"
-      className="relative overflow-hidden py-12 md:py-20 lg:py-24"
+      className="relative scroll-mt-28 overflow-hidden py-12 md:py-20 lg:py-24"
     >
       {/* Reference #050a14: one soft top glow + bottom vignette; grid reads in lower half */}
       <div className="pointer-events-none absolute inset-0 bg-[#050a14]" aria-hidden />

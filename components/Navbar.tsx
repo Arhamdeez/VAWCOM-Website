@@ -46,10 +46,7 @@ const Navbar = () => {
     setMobileMenuOpen(false);
     if (href === '/#services') {
       setTimeout(() => {
-        const servicesElement = document.getElementById('services');
-        if (servicesElement) {
-          servicesElement.scrollIntoView({ behavior: 'smooth' });
-        }
+        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
   };
@@ -106,17 +103,18 @@ const Navbar = () => {
                 
                 {desktopNav}
 
-                <button 
+                <button
+                  type="button"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden text-slate-300 hover:text-white transition-colors z-50 relative"
+                  className="relative z-50 inline-flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-slate-300 transition-colors hover:text-white md:hidden"
                   aria-label="Toggle mobile menu"
                 >
                   {mobileMenuOpen ? (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   ) : (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   )}
@@ -131,17 +129,18 @@ const Navbar = () => {
             
             {desktopNav}
 
-            <button 
+            <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-slate-300 hover:text-white transition-colors z-50 relative"
+              className="relative z-50 inline-flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-slate-300 transition-colors hover:text-white md:hidden"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}

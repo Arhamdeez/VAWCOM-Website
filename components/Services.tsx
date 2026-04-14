@@ -48,7 +48,10 @@ export default function Services() {
 	const current = services[currentCardIndex];
 
 	return (
-		<section id="services" className="relative overflow-hidden py-12 md:py-20 lg:py-24">
+		<section
+			id="services"
+			className="relative scroll-mt-28 overflow-hidden py-12 md:py-20 lg:py-24"
+		>
 			{/* Mockup: demos sit on a slightly darker navy than #050a14; same grid + soft depth */}
 			<div className="pointer-events-none absolute inset-0 bg-[#020508]" aria-hidden />
 			<div
