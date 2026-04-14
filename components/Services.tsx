@@ -49,20 +49,20 @@ export default function Services() {
 
 	return (
 		<section id="services" className="relative overflow-hidden bg-slate-950 py-12 md:py-20 lg:py-24">
-			<div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f06_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f06_1px,transparent_1px)] bg-[size:3rem_3rem] md:bg-[size:4rem_4rem]" />
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f0a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f0a_1px,transparent_1px)] bg-[size:3rem_3rem] md:bg-[size:4rem_4rem]" />
 			<div className="container relative z-10 mx-auto max-w-5xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8">
 				<div className="mb-8 text-center md:mb-11">
-					<div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/18 bg-slate-950/40 px-3 py-1.5 text-xs text-emerald-200/90 backdrop-blur-sm sm:mb-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+					<div className="glass-pill mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
 						<Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
 						<span>What we offer</span>
 					</div>
 					<h2 className="mb-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:mb-4 md:text-4xl">
 						Interactive{' '}
-						<span className="bg-gradient-to-r from-emerald-400/85 to-teal-400/85 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
 							demos
 						</span>
 					</h2>
-					<p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-500 sm:text-base md:text-[17px]">
+					<p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base md:text-[17px]">
 						Voice, chat, and integrations—try the same kinds of builds we deliver for clients.
 					</p>
 				</div>

@@ -85,7 +85,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
           {/* Interactive Demo Section */}
           {interactive && isActive && (
             <div
-              className="rounded-xl border border-white/10 flex flex-col flex-1 min-h-0 bg-slate-900/95 backdrop-blur-md"
+              className="glass-inset flex min-h-0 flex-1 flex-col rounded-xl"
               style={{
                 marginTop: 'clamp(0.75rem, 1.5vw, 1.25rem)',
                 padding: 'clamp(0.75rem, 1.5vw, 1rem)',

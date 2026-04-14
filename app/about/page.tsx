@@ -51,13 +51,13 @@ export default function About() {
       <section className="pb-12 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-16">
         <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/18 bg-slate-950/35 px-3 py-1.5 text-xs text-emerald-200/90 backdrop-blur-sm sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+            <div className="glass-pill mb-5 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
               <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
               <span>About</span>
             </div>
             <h1 className="mb-4 text-3xl font-semibold tracking-tight text-balance text-white sm:mb-5 sm:text-4xl md:text-5xl">
               A full-service{' '}
-              <span className="bg-gradient-to-r from-emerald-400/95 to-teal-400/95 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                 digital studio
               </span>
             </h1>

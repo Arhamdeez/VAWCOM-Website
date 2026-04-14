@@ -10,11 +10,15 @@ const technologies = [
 // Duplicate once for seamless CSS looping (0% -> -50%)
 const duplicatedTechnologies = [...technologies, ...technologies];
 
+/** Liquid glass pills — teal/cyan chips over dark band */
+const pillClass =
+  'glass-pill-teal flex-shrink-0 cursor-default rounded-full px-3 py-1.5 text-xs font-medium text-cyan-200 [text-shadow:0_0_18px_rgba(79,209,197,0.18)] sm:px-5 sm:py-2 sm:text-sm md:px-6 md:py-2.5 md:hover:scale-[1.02] md:hover:border-cyan-200/45 md:hover:text-cyan-50';
+
 export default function TechMarquee() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-emerald-950/12 to-slate-950 py-10 md:py-14">
-      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/35 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/35 to-transparent" />
+    <section className="relative overflow-hidden bg-[#030712] py-10 md:py-14">
+      <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/35 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/35 to-transparent" />
 
       <div className="relative">
         {/* Top row - scrolling left */}
@@ -22,10 +26,7 @@ export default function TechMarquee() {
           <div className="vawcom-marquee">
             <div className="vawcom-marquee-track vawcom-marquee-left">
             {duplicatedTechnologies.map((tech, i) => (
-              <div 
-                key={`top-${i}-${tech}`} 
-                className="flex-shrink-0 cursor-default rounded-full border border-emerald-400/22 bg-slate-950/30 px-3 py-1.5 text-xs text-emerald-200/85 backdrop-blur-[4px] sm:px-5 sm:py-2 sm:text-sm md:border-emerald-400/28 md:px-6 md:py-2.5 md:hover:scale-[1.02] md:hover:border-emerald-400/40 md:hover:text-emerald-100"
-              >
+              <div key={`top-${i}-${tech}`} className={pillClass}>
                 {tech}
               </div>
             ))}
@@ -38,10 +39,7 @@ export default function TechMarquee() {
           <div className="vawcom-marquee">
             <div className="vawcom-marquee-track vawcom-marquee-right">
             {duplicatedTechnologies.map((tech, i) => (
-              <div 
-                key={`bottom-${i}-${tech}`} 
-                className="flex-shrink-0 cursor-default rounded-full border border-teal-400/22 bg-emerald-500/[0.04] px-3 py-1.5 text-xs text-teal-200/85 backdrop-blur-[4px] sm:px-5 sm:py-2 sm:text-sm md:border-teal-400/28 md:px-6 md:py-2.5 md:hover:scale-[1.02] md:hover:border-teal-400/40 md:hover:text-teal-100"
-              >
+              <div key={`bottom-${i}-${tech}`} className={pillClass}>
                 {tech}
               </div>
             ))}

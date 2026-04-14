@@ -94,11 +94,11 @@ const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
-        className={`fixed left-0 right-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-[padding] duration-300 ease-out ${scrolled ? 'py-2' : 'py-3 sm:py-4'}`}
+        className="fixed inset-x-0 z-50 px-3 pb-2 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] transition-[padding] duration-300 ease-out sm:px-4 sm:pb-3 sm:pt-[calc(env(safe-area-inset-top,0px)+1rem)]"
       >
         <div className="container mx-auto max-w-7xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
           {scrolled ? (
-            <div className="rounded-2xl glass-nav px-4 py-2">
+            <div className="rounded-2xl glass-nav px-4 py-2.5 sm:py-3">
               <div className="flex justify-between items-center">
                 <Link href="/" className="text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-300/95 to-teal-300/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold">
                   VAWCOM
@@ -124,7 +124,7 @@ const Navbar = () => {
               </div>
             </div>
           ) : (
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between py-1 sm:py-1.5">
             <Link href="/" className="text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-400/95 to-teal-400/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold">
               VAWCOM
             </Link>
@@ -161,7 +161,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-slate-950/88 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-slate-950/45 backdrop-blur-md md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             
@@ -171,7 +171,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 z-40 h-full w-[min(18rem,calc(100vw-1.5rem))] rounded-l-2xl border-l border-white/10 bg-slate-950/90 shadow-xl backdrop-blur-xl md:hidden"
+              className="glass-drawer fixed top-0 right-0 z-40 h-full w-[min(18rem,calc(100vw-1.5rem))] rounded-l-2xl md:hidden"
             >
               <div className="flex h-full flex-col px-5 pt-[max(5rem,env(safe-area-inset-top,0px)+4rem)] pb-[env(safe-area-inset-bottom,0px)]">
                 {navItems.map((item, index) => (

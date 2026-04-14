@@ -69,7 +69,7 @@ export default function Contact() {
               transition={{ duration: 0.3, ease: easeSnappy }}
               className="max-w-2xl mx-auto text-center"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-sm border border-emerald-500/25 text-emerald-300 mb-8">
+              <div className="glass-pill mb-8 inline-flex items-center gap-2 rounded-full px-4 py-2 text-emerald-200/95">
                 <Sparkles className="w-4 h-4 shrink-0" />
                 <span>Thank you</span>
               </div>
@@ -157,7 +157,7 @@ export default function Contact() {
             transition={{ duration: 0.3, ease: easeSnappy }}
             className="mx-auto max-w-xl text-center"
           >
-            <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/18 bg-slate-950/35 px-3 py-1.5 text-xs text-emerald-200/90 backdrop-blur-sm sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+            <div className="glass-pill mb-5 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
               <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
               <span>Contact</span>
             </div>

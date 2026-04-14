@@ -1,3 +1,4 @@
+import path from 'path';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -11,8 +12,11 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Fix warning about multiple lockfiles
-  outputFileTracingRoot: process.cwd(),
+  /**
+   * Pin tracing to this app directory (not process.cwd()). Avoids wrong roots when multiple
+   * lockfiles exist, and matches Vercel single-package checkout without Turbopack path issues.
+   */
+  outputFileTracingRoot: path.join(__dirname),
 };
 
 export default nextConfig;
