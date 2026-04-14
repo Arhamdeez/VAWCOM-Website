@@ -5,15 +5,18 @@ import AdditionalServices from '@/components/AdditionalServices';
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen bg-[#050a14]">
+      {/* Full-bleed hero — standalone */}
       <Hero />
+
+      {/* Tech strip — standalone */}
       <TechMarquee />
 
-      <div className="site-bg">
-        {/* Keep existing sections/components */}
-        <Services />
-        <AdditionalServices />
-      </div>
-    </div>
+      {/* Interactive demos — feathered into #050a14 below (no divider strip) */}
+      <Services />
+
+      {/* And much more — matches feather end colour */}
+      <AdditionalServices />
+    </main>
   );
 }

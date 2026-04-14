@@ -7,16 +7,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const services = [
 	{
-		icon: Mic,
-		title: 'Voice Agent Demo',
-		description:
-			'Experience natural voice interfaces powered by advanced speech recognition. Try a demo voice agent for calls, FAQs, and handoffs to your team.',
-		gradient: 'from-teal-600 to-cyan-600',
-		interactive: true,
-		type: 'voice-agent',
-		image: 'voice',
-	},
-	{
 		icon: MessageSquare,
 		title: 'AI Chatbot Demo',
 		description:
@@ -25,6 +15,16 @@ const services = [
 		interactive: true,
 		type: 'chatbot',
 		image: 'chatbot',
+	},
+	{
+		icon: Mic,
+		title: 'Voice Agent Demo',
+		description:
+			'Experience natural voice interfaces powered by advanced speech recognition. Try a demo voice agent for calls, FAQs, and handoffs to your team.',
+		gradient: 'from-teal-600 to-cyan-600',
+		interactive: true,
+		type: 'voice-agent',
+		image: 'voice',
 	},
 	{
 		icon: GitBranch,
@@ -48,8 +48,26 @@ export default function Services() {
 	const current = services[currentCardIndex];
 
 	return (
-		<section id="services" className="relative overflow-hidden bg-slate-950 py-12 md:py-20 lg:py-24">
-			<div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f0a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f0a_1px,transparent_1px)] bg-[size:3rem_3rem] md:bg-[size:4rem_4rem]" />
+		<section id="services" className="relative overflow-hidden py-12 md:py-20 lg:py-24">
+			{/* Mockup: demos sit on a slightly darker navy than #050a14; same grid + soft depth */}
+			<div className="pointer-events-none absolute inset-0 bg-[#020508]" aria-hidden />
+			<div
+				className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_95%_70%_at_50%_0%,rgba(45,212,191,0.05)_0%,transparent_48%)]"
+				aria-hidden
+			/>
+			<div
+				className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_65%_at_50%_105%,rgba(0,0,0,0.45)_0%,transparent_52%)]"
+				aria-hidden
+			/>
+			<div
+				className="pointer-events-none absolute inset-0 z-[1] bg-site-zone-grid"
+				aria-hidden
+			/>
+			{/* Soft blend into next section — no hard line (content stays z-10 above this) */}
+			<div
+				className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[min(12rem,28%)] bg-[linear-gradient(to_bottom,transparent_0%,rgba(5,10,20,0.35)_38%,rgba(5,10,20,0.82)_72%,#050a14_100%)]"
+				aria-hidden
+			/>
 			<div className="container relative z-10 mx-auto max-w-5xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8">
 				<div className="mb-8 text-center md:mb-11">
 					<div className="glass-pill mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
@@ -63,7 +81,7 @@ export default function Services() {
 						</span>
 					</h2>
 					<p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base md:text-[17px]">
-						Voice, chat, and integrations—try the same kinds of builds we deliver for clients.
+						Chat, voice, and integrations—try the same kinds of builds we deliver for clients.
 					</p>
 				</div>
 

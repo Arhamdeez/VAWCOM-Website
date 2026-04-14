@@ -24,17 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Company email - messages will be sent here
     const recipientEmail = process.env.CONTACT_EMAIL || 'vawcomtechnologies@gmail.com';
-    
-    // Debug: Log environment variables (without sensitive data)
-    console.log('🔍 Environment check:', {
-      SMTP_HOST: process.env.SMTP_HOST ? 'SET' : 'NOT SET',
-      SMTP_PORT: process.env.SMTP_PORT ? 'SET' : 'NOT SET',
-      SMTP_USER: process.env.SMTP_USER ? 'SET' : 'NOT SET',
-      SMTP_PASS: process.env.SMTP_PASS ? 'SET' : 'NOT SET',
-      SMTP_FROM: process.env.SMTP_FROM ? 'SET' : 'NOT SET',
-      CONTACT_EMAIL: process.env.CONTACT_EMAIL ? 'SET' : 'NOT SET',
-    });
-    
+
     // Prepare email content
     const emailSubject = `New Contact Form Submission${service ? ` - ${service}` : ''}`;
     const emailBody = `
@@ -100,8 +90,6 @@ Timestamp: ${new Date().toISOString()}
           `,
         });
 
-        console.log('✅ Email sent successfully via SMTP to:', recipientEmail);
-        console.log('📧 Email ID:', info.messageId);
         return NextResponse.json({ 
           success: true, 
           message: 'Message sent successfully to ' + recipientEmail,
@@ -162,8 +150,6 @@ Timestamp: ${new Date().toISOString()}
           throw error;
         }
 
-        console.log('✅ Email sent successfully via Resend to:', recipientEmail);
-        console.log('📧 Email ID:', data?.id);
         return NextResponse.json({ 
           success: true, 
           message: 'Message sent successfully to ' + recipientEmail,
@@ -176,25 +162,7 @@ Timestamp: ${new Date().toISOString()}
     }
 
 
-    // Option 3: Log to console (for development/testing)
-    console.log('\n📧 ============================================');
-    console.log('📧 NEW CONTACT FORM SUBMISSION');
-    console.log('📧 ============================================');
-    console.log('📬 Would send to:', recipientEmail);
-    console.log('Name:', name);
-    console.log('Email:', email);
-    if (company) console.log('Company:', company);
-    if (phone) console.log('Phone:', phone);
-    if (service) console.log('Service:', service);
-    console.log('Message:', message);
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('============================================\n');
-    console.log('⚠️  NOTE: No email service configured.');
-    console.log('Environment check:');
-    console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'NOT SET');
-    console.log('  SMTP_USER:', process.env.SMTP_USER || 'NOT SET');
-    console.log('  SMTP_PASS:', process.env.SMTP_PASS ? 'SET (hidden)' : 'NOT SET');
-    console.log('============================================\n');
+    console.warn('Contact form: no SMTP or Resend configured; submission not emailed.');
 
     // Return error response so user knows email wasn't sent
     return NextResponse.json({ 

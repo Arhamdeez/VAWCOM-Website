@@ -62,20 +62,19 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 blur-3xl rounded-full"
-                style={{ width: '250px', height: '250px', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                className="absolute left-1/2 top-1/2 h-[min(78vw,18rem)] w-[min(78vw,18rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 blur-3xl sm:h-[20rem] sm:w-[20rem] md:h-[27rem] md:w-[27rem] lg:h-[30rem] lg:w-[30rem]"
               />
-              
+
               {/* Logo — unoptimized avoids loader flicker on the splash overlay */}
-              <div className="relative w-[200px] h-[200px] flex items-center justify-center">
+              <div className="relative flex h-[15rem] w-[15rem] items-center justify-center sm:h-[17rem] sm:w-[17rem] md:h-[23rem] md:w-[23rem] lg:h-[26rem] lg:w-[26rem]">
                 <Image
                   src="/logo.png"
                   alt="VAWCOM Logo"
-                  width={200}
-                  height={200}
+                  width={512}
+                  height={512}
                   priority
                   unoptimized
-                  className="w-full h-full object-contain drop-shadow-2xl"
+                  className="h-full w-full object-contain drop-shadow-2xl"
                   style={{ imageRendering: 'crisp-edges' }}
                 />
               </div>

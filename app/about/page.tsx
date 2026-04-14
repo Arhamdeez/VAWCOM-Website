@@ -1,28 +1,55 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Zap, Link2, Layers, Linkedin, Github, Sparkles } from 'lucide-react';
+import {
+  Lightbulb,
+  ListChecks,
+  LayoutTemplate,
+  Layers2,
+  Code2,
+  Rocket,
+  Linkedin,
+  Github,
+  Sparkles,
+  ArrowRight,
+} from 'lucide-react';
 import Link from 'next/link';
 import PremiumPageBackdrop from '@/components/PremiumPageBackdrop';
-import { easeSnappy, ui } from '@/lib/motion';
+import { easeSnappy } from '@/lib/motion';
+import { SOCIAL } from '@/lib/site';
 
-const pillars = [
+const processSteps = [
   {
-    icon: Zap,
-    title: 'Product & delivery',
-    line: 'We own outcomes: UX, engineering, and launch—not just scripts or one-off tools.',
+    title: 'Idea',
+    line: 'What problem, for whom, and what “done” looks like.',
+    Icon: Lightbulb,
   },
   {
-    icon: Link2,
-    title: 'Integrations & APIs',
-    line: 'Connect Slack, CRMs, payments, and data pipelines when your product needs to talk to the rest of the stack.',
+    title: 'Planning',
+    line: 'Scope, milestones, and tradeoffs—on paper before code.',
+    Icon: ListChecks,
   },
   {
-    icon: Layers,
-    title: 'Built to last',
-    line: 'Clear architecture and maintainable code so what we ship can grow with you.',
+    title: 'Wireframes',
+    line: 'Flows and rough layouts so UX is cheap to change.',
+    Icon: LayoutTemplate,
   },
-];
+  {
+    title: 'Structure',
+    line: 'Architecture, data model, and the build order.',
+    Icon: Layers2,
+  },
+  {
+    title: 'Development',
+    line: 'UI, APIs, integrations—voice & AI when they earn their place.',
+    Icon: Code2,
+  },
+  {
+    title: 'Deploy',
+    line: 'Release, monitor, harden—then iterate from real usage.',
+    Icon: Rocket,
+  },
+] as const;
 
 const team = [
   {
@@ -48,134 +75,180 @@ export default function About() {
     <div className="relative min-h-screen overflow-hidden">
       <PremiumPageBackdrop />
       <div className="relative z-10">
-      <section className="pb-12 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-16">
-        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="glass-pill mb-5 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
-              <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
-              <span>About</span>
-            </div>
-            <h1 className="mb-4 text-3xl font-semibold tracking-tight text-balance text-white sm:mb-5 sm:text-4xl md:text-5xl">
-              A full-service{' '}
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                digital studio
-              </span>
-            </h1>
-            <p className="text-sm leading-relaxed text-slate-400 sm:text-base md:text-lg">
-              Web and mobile apps, voice experiences, AI assistants, and integrations—designed and built as one coherent service.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-16 md:pb-20">
-        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: ui.reveal, ease: easeSnappy }}
-            className="max-w-2xl mx-auto rounded-2xl glass px-6 py-8 md:px-10 md:py-10"
-          >
-            <h2 className="text-lg font-semibold text-white mb-4">Why we exist</h2>
-            <p className="text-slate-300 leading-relaxed mb-4">
-              Teams need a partner who can ship whole products—not only point tools. VAWCOM exists to take ideas
-              from concept through production: interfaces, backends, voice and chat surfaces, and the glue between systems.
-            </p>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              We use modern web and mobile stacks, voice platforms like Vapi, AI where it fits, and tools like n8n when
-              orchestration is part of the solution—always in service of the product, not the other way around.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="border-t border-emerald-500/[0.08] pb-20">
-        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-center text-sm font-medium text-slate-500 uppercase tracking-wider mb-10">
-              How we work
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              {pillars.map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.24, delay: i * 0.04, ease: easeSnappy }}
-                  className="rounded-xl glass-sm px-5 py-6"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-4">
-                    <item.icon className="w-5 h-5 text-emerald-400" strokeWidth={1.75} />
-                  </div>
-                  <h3 className="text-white font-semibold mb-2">{item.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{item.line}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-20 sm:pb-24">
-        <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-center text-2xl font-bold text-white mb-2">Founders</h2>
-            <p className="text-center text-slate-500 text-sm mb-10">People behind VAWCOM</p>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              {team.map((person) => (
-                <motion.div
-                  key={person.name}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.26, ease: easeSnappy }}
-                  className="rounded-xl glass-sm p-6 flex flex-col items-center text-center"
-                >
-                  <div
-                    className={`w-16 h-16 rounded-full bg-gradient-to-br ${person.gradient} flex items-center justify-center text-lg font-bold text-white mb-4 shadow-lg`}
-                  >
-                    {person.initials}
-                  </div>
-                  <h3 className="text-white font-semibold">{person.name}</h3>
-                  <p className="text-emerald-400/90 text-sm mb-5">{person.role}</p>
-                  <div className="flex gap-3">
-                    <Link
-                      href={person.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-colors duration-150"
-                      aria-label={`${person.name} on LinkedIn`}
-                    >
-                      <Linkedin className="w-5 h-5" />
-                    </Link>
-                    <Link
-                      href={person.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-colors duration-150"
-                      aria-label={`${person.name} on GitHub`}
-                    >
-                      <Github className="w-5 h-5" />
-                    </Link>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <p className="text-center mt-12">
-              <Link
-                href="/contact"
-                className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors duration-150"
+        {/* Hero */}
+        <section className="pb-10 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-14">
+          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+            <div className="w-full max-w-3xl text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: easeSnappy }}
+                className="glass-pill mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs text-emerald-200/95 sm:text-sm"
               >
-                Work with us →
-              </Link>
-            </p>
+                <Sparkles className="h-4 w-4 shrink-0 opacity-90" />
+                <span>About VAWCOM</span>
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.42, delay: 0.04, ease: easeSnappy }}
+                className="mb-5 text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[2.75rem] lg:leading-[1.15]"
+              >
+                A studio that{' '}
+                <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                  ships the whole thing
+                </span>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1, ease: easeSnappy }}
+                className="mx-auto max-w-lg text-base leading-relaxed text-slate-400 md:text-[17px]"
+              >
+                End-to-end product work—UI, APIs, voice, and AI—so it ships as{' '}
+                <span className="text-slate-300">one thing</span>, not a pile of parts.
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.38, delay: 0.16, ease: easeSnappy }}
+                className="mx-auto mt-6 max-w-xl text-sm text-slate-500"
+              >
+                One straight path from first thought to production—no mystery phases.
+              </motion.p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Process: idea → deploy */}
+        <section className="pb-16 md:pb-20" aria-labelledby="about-process-heading">
+          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+            <div className="w-full max-w-2xl text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.35, ease: easeSnappy }}
+                className="mb-10 text-center md:mb-12"
+              >
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400/85">How we work</p>
+                <h2 id="about-process-heading" className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">
+                  From idea to deploy
+                </h2>
+                <p className="mx-auto mt-2 max-w-md px-1 text-sm leading-relaxed text-slate-500">
+                  Six beats we move through with you—each step has a clear output before the next begins.
+                </p>
+              </motion.div>
+
+              <div className="relative mx-auto w-full max-w-xl md:max-w-2xl">
+                {/* timeline rail — desktop / tablet only; mobile uses stacked centered cards */}
+                <div
+                  className="pointer-events-none absolute left-[15px] top-3 hidden h-[calc(100%-1.5rem)] w-px bg-gradient-to-b from-emerald-500/45 via-teal-500/25 to-cyan-500/35 md:block"
+                  aria-hidden
+                />
+
+                <ol className="relative space-y-0 text-left">
+                  {processSteps.map((item, i) => (
+                    <motion.li
+                      key={item.title}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-24px' }}
+                      transition={{ duration: 0.3, delay: i * 0.05, ease: easeSnappy }}
+                      className="relative flex flex-col items-center gap-3 pb-10 last:pb-0 md:flex-row md:items-start md:gap-6 md:pb-10"
+                    >
+                      <div className="relative z-[1] flex shrink-0 flex-col items-center md:w-[52px] md:min-w-[52px]">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/35 bg-[#0a1628] shadow-[0_0_20px_-4px_rgba(52,211,153,0.35)] md:h-9 md:w-9">
+                          <item.Icon className="h-[17px] w-[17px] text-emerald-300/95" strokeWidth={1.85} />
+                        </div>
+                        <span className="mt-2 font-mono text-[10px] font-medium tabular-nums text-emerald-500/75 md:text-[11px]">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <div className="w-full min-w-0 max-w-md rounded-xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-transparent px-4 py-3.5 text-center md:max-w-none md:flex-1 md:px-5 md:py-4 md:text-left">
+                        <h3 className="text-base font-semibold text-white md:text-[17px]">{item.title}</h3>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-500">{item.line}</p>
+                      </div>
+                    </motion.li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team */}
+        <section className="pb-20 sm:pb-28">
+          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
+            <div className="w-full max-w-4xl text-center">
+              <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400/85 sm:text-sm sm:tracking-[0.12em]">
+                Founders
+              </h2>
+
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-6">
+                {team.map((person, i) => (
+                  <motion.div
+                    key={person.name}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.26, delay: i * 0.05, ease: easeSnappy }}
+                    className="flex flex-col items-center rounded-xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-transparent px-5 py-6 text-center md:px-6 md:py-7"
+                  >
+                    <div
+                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${person.gradient} text-base font-semibold text-white shadow-lg shadow-emerald-950/20`}
+                    >
+                      {person.initials}
+                    </div>
+                    <h3 className="mt-4 font-semibold text-white">{person.name}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{person.role}</p>
+                    <div className="mt-5 flex justify-center gap-1 sm:gap-2">
+                      <Link
+                        href={person.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-slate-400 transition-colors hover:border-white/15 hover:bg-white/[0.05] hover:text-white active:bg-white/[0.06]"
+                        aria-label={`${person.name} on LinkedIn`}
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </Link>
+                      <Link
+                        href={person.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-slate-400 transition-colors hover:border-white/15 hover:bg-white/[0.05] hover:text-white active:bg-white/[0.06]"
+                        aria-label={`${person.name} on GitHub`}
+                      >
+                        <Github className="h-5 w-5" />
+                      </Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-10 flex w-full flex-col items-center gap-4 px-1 sm:flex-row sm:justify-center sm:gap-6">
+                <Link
+                  href={SOCIAL.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-slate-500 transition-colors hover:text-emerald-400/90"
+                >
+                  VAWCOM on LinkedIn
+                </Link>
+                <span className="hidden text-slate-700 sm:inline" aria-hidden>
+                  ·
+                </span>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-200 transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/15"
+                >
+                  Start a project
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

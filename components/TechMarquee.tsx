@@ -16,7 +16,7 @@ const pillClass =
 
 export default function TechMarquee() {
   return (
-    <section className="relative overflow-hidden bg-[#030712] py-10 md:py-14">
+    <section className="relative overflow-hidden bg-[#050a14] py-10 md:py-14">
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/35 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/35 to-transparent" />
 

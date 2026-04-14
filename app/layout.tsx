@@ -65,12 +65,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-black">
-      <body className={`${inter.className} bg-black`}>
+    <html lang="en" className="bg-[#050a14]" data-scroll-behavior="smooth">
+      <body className={`${inter.className} bg-[#050a14]`}>
         <SplashScreenWrapper>
           <BackgroundEffectWrapper />
           <Navbar />
-          <main className="relative min-h-0 w-full overflow-x-hidden bg-black supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
+          <main className="relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />

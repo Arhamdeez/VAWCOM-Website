@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Code, Smartphone, Globe, Shield } from 'lucide-react';
+import { Code, Smartphone, Globe, Shield, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 
 const additionalServices = [
@@ -46,28 +46,46 @@ const additionalServices = [
 
 export default function AdditionalServices() {
   return (
-    <section className="relative overflow-hidden bg-[#030712] py-14 md:py-20">
-      {/* Subtle grid — faint lines on very dark navy */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(45,212,191,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(45,212,191,0.06)_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-90 md:bg-[size:4rem_4rem]" />
-      
+    <section
+      id="more"
+      className="relative overflow-hidden py-12 md:py-20 lg:py-24"
+    >
+      {/* Reference #050a14: one soft top glow + bottom vignette; grid reads in lower half */}
+      <div className="pointer-events-none absolute inset-0 bg-[#050a14]" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_75%_at_50%_-5%,rgba(45,212,191,0.065)_0%,transparent_50%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_115%,rgba(2,6,14,0.65)_0%,transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-site-zone-grid"
+        aria-hidden
+      />
+
       <div className="container relative z-10 mx-auto max-w-7xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.36, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-12 text-center md:mb-14"
+          className="mb-8 text-center md:mb-11"
         >
-          <div className="glass-pill-teal mb-4 inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-medium tracking-wide text-teal-300 sm:mb-5 sm:px-5 sm:py-2 sm:text-sm">
-            <span>And Much More</span>
+          <div className="glass-pill mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 opacity-80 sm:h-4 sm:w-4" />
+            <span>And much more</span>
           </div>
 
-          <h2 className="mb-3 text-balance text-2xl font-bold tracking-tight text-white sm:text-3xl md:mb-4 md:text-4xl">
+          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:mb-4 md:text-4xl">
             Seamless{' '}
-            <span className="text-teal-400">Integrations & Workflows</span>
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Integrations & Workflows
+            </span>
           </h2>
-          
-          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base md:max-w-3xl md:text-[17px]">
+
+          <p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base md:text-[17px]">
             Alongside product and integration work, we cover the full lifecycle: e-commerce, maintenance, fixes, and refactors—so what we ship stays fast and reliable.
           </p>
         </motion.div>

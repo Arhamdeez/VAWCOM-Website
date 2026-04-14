@@ -11,14 +11,6 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('\n\n🚀 ============================================');
-  console.log('📞 VAPI CALL API ROUTE HIT!');
-  console.log('🚀 ============================================');
-  console.log('📍 Request URL:', request.url);
-  console.log('📍 Request Method: POST');
-  console.log('📍 Timestamp:', new Date().toISOString());
-  console.log('============================================\n');
-  
   try {
     const body = await request.json().catch(() => {
       console.error('❌ Failed to parse request body');
@@ -32,7 +24,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log('📥 Received request body:', body);
     const { phoneNumber } = body;
 
     // Validate phone number
@@ -61,7 +52,6 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      console.log('📱 Phone number already in E.164 format:', formattedNumber);
     } else {
       // No + prefix, need to format it
       const cleanedNumber = trimmed.replace(/\D/g, '');
@@ -97,7 +87,6 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      console.log('📱 Formatted phone number:', formattedNumber);
     }
     
     // Additional validation for +1 numbers (US/Canada)
@@ -117,7 +106,6 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      console.log('✅ Validated US/Canada number:', formattedNumber);
     }
     
     // Additional validation for +92 numbers (Pakistan)
@@ -137,7 +125,6 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      console.log('✅ Validated Pakistan number:', formattedNumber);
     }
 
     // Get Vapi keys from environment variables (REQUIRED - no hardcoded fallbacks)
@@ -169,32 +156,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log('\n📋 Configuration:');
-    console.log('   🔑 Using Vapi key:', VAPI_KEY.substring(0, 10) + '...', VAPI_PRIVATE_KEY ? '(private)' : '(public)');
-    console.log('   🤖 Agent ID:', VAPI_AGENT_ID || 'Not provided');
-    console.log('   📱 TO (destination - number to call):', formattedNumber);
-    
-    if (VAPI_PHONE_NUMBER_ID) {
-      if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
-        console.log('   🔵 Twilio Mode: ENABLED');
-        console.log('   📞 Phone Number ID (Twilio number in Vapi):', VAPI_PHONE_NUMBER_ID);
-        console.log('   💡 Using Twilio number imported to Vapi');
-        console.log('   💡 Twilio Account SID:', TWILIO_ACCOUNT_SID.substring(0, 10) + '...');
-      } else {
-        console.log('   📞 FROM (caller ID - Phone number ID):', VAPI_PHONE_NUMBER_ID);
-        console.log('   💡 Using your phone number as caller ID (Twilio or Vapi)');
-      }
-    } else if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
-      console.log('   🔵 Twilio Mode: ENABLED (Direct)');
-      console.log('   📞 FROM (caller ID - Twilio number):', TWILIO_PHONE_NUMBER);
-      console.log('   💡 Using Twilio credentials directly');
-      console.log('   💡 Twilio Account SID:', TWILIO_ACCOUNT_SID.substring(0, 10) + '...');
-    } else {
-      console.log('   📞 FROM (caller ID): Vapi default FREE US number (10 calls/day limit)');
-      console.log('   💡 Using Vapi\'s default free phone numbers - no paid account needed!');
-    }
-    console.log('');
-
     // Based on Vapi API responses:
     // 1. Endpoint is: https://api.vapi.ai/call (singular)
     // 2. Must have: assistantId (or assistant, squad, squadId)
@@ -293,9 +254,6 @@ export async function POST(request: NextRequest) {
     let lastError: { endpoint?: string; status?: number; data?: unknown; error?: string; fullError?: string } | null = null;
     let attemptCount = 0;
 
-    // Try each endpoint with each request body format until one works
-    console.log(`🔄 Starting attempts: ${endpoints.length} endpoints × ${requestBodies.length} formats = ${endpoints.length * requestBodies.length} total attempts`);
-    
     for (const endpoint of endpoints) {
       for (const requestBody of requestBodies) {
         attemptCount++;
@@ -306,40 +264,6 @@ export async function POST(request: NextRequest) {
           );
           
           // Validate that we have required fields
-          if (!cleanedBody.assistantId && !cleanedBody.agentId) {
-            console.log(`⚠️ Attempt ${attemptCount}: Trying without agent ID - Vapi might require one`);
-          }
-          
-          // Check what fields we have
-          if (cleanedBody.phoneNumber !== undefined) {
-            console.log(`✅ phoneNumber found:`, cleanedBody.phoneNumber, `(type: ${typeof cleanedBody.phoneNumber})`);
-          }
-          if (cleanedBody.phoneNumberId !== undefined) {
-            console.log(`✅ phoneNumberId found:`, cleanedBody.phoneNumberId);
-          }
-          if (cleanedBody.customer !== undefined) {
-            console.log(`✅ customer found:`, JSON.stringify(cleanedBody.customer));
-          }
-          if (!cleanedBody.phoneNumber && !cleanedBody.phoneNumberId && !cleanedBody.customer) {
-            console.log(`❌ WARNING: No phone number fields found in request body!`);
-          }
-
-          console.log(`\n═══════════════════════════════════════════════════════`);
-          console.log(`🔄 Attempt ${attemptCount}: ${endpoint}`);
-          console.log(`═══════════════════════════════════════════════════════`);
-          console.log(`📦 Request Body:`);
-          console.log(JSON.stringify(cleanedBody, null, 2));
-          console.log(`\n📋 Request Details:`);
-          console.log(`   - Endpoint: ${endpoint}`);
-          console.log(`   - Method: POST`);
-          console.log(`   - Headers: Authorization: Bearer ${VAPI_KEY.substring(0, 15)}...`);
-          console.log(`   - Body Keys: [${Object.keys(cleanedBody).join(', ')}]`);
-          console.log(`   - Has phoneNumberId: ${'phoneNumberId' in cleanedBody} ${'phoneNumberId' in cleanedBody ? `(${cleanedBody.phoneNumberId})` : ''}`);
-          console.log(`   - Has phoneNumber: ${'phoneNumber' in cleanedBody} ${'phoneNumber' in cleanedBody ? `(${cleanedBody.phoneNumber})` : ''}`);
-          console.log(`   - Has to: ${'to' in cleanedBody} ${'to' in cleanedBody ? `(${cleanedBody.to})` : ''}`);
-          console.log(`   - Has assistantId: ${'assistantId' in cleanedBody} ${'assistantId' in cleanedBody ? `(${cleanedBody.assistantId})` : ''}`);
-          console.log(`═══════════════════════════════════════════════════════\n`);
-          
           vapiResponse = await fetch(endpoint, {
             method: 'POST',
             headers: {
@@ -350,24 +274,14 @@ export async function POST(request: NextRequest) {
           });
 
           const responseText = await vapiResponse.text();
-          console.log(`\n📊 Response from ${endpoint}:`);
-          console.log(`   - Status: ${vapiResponse.status} ${vapiResponse.statusText}`);
-          console.log(`   - Response Length: ${responseText.length} characters`);
-          console.log(`   - Full Response:`);
-          console.log(responseText);
-          
+
           try {
             data = JSON.parse(responseText) as Record<string, unknown>;
-            console.log(`\n📋 Parsed Response Data:`);
-            console.log(JSON.stringify(data, null, 2));
           } catch {
             data = { error: 'Failed to parse response', raw: responseText };
-            console.log(`\n⚠️ Could not parse response as JSON. Raw text:`);
-            console.log(responseText);
           }
 
           if (vapiResponse.ok) {
-            console.log('✅ Success! Call initiated');
             // Success - break out of loops
             return NextResponse.json({
               success: true,
@@ -376,9 +290,7 @@ export async function POST(request: NextRequest) {
               phoneNumber: formattedNumber,
             });
           }
-          
-          console.log(`❌ Failed with status ${vapiResponse.status}`);
-          console.log(`📋 Error data:`, JSON.stringify(data, null, 2));
+
           lastError = { endpoint, status: vapiResponse.status, data };
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';

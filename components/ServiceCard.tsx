@@ -220,8 +220,6 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         setCallStatus({ type: null, message: '' });
 
                         try {
-                          console.log('📞 Calling API with phone:', phoneNumber);
-                          
                           const response = await fetch('/api/vapi/call', {
                             method: 'POST',
                             headers: {
@@ -230,9 +228,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                             body: JSON.stringify({ phoneNumber }),
                           });
 
-                          console.log('📥 API Response status:', response.status);
                           const data = await response.json();
-                          console.log('📥 API Response data:', data);
 
                           if (response.ok) {
                             setCallStatus({ 

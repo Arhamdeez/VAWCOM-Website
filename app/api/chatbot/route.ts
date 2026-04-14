@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocumentText, setDocumentText } from '@/lib/documentStore';
+import { generateGeminiReply } from '@/lib/gemini';
 import { CONTACT_EMAIL, SOCIAL } from '@/lib/site';
 
 export async function POST(request: NextRequest) {
@@ -22,95 +23,40 @@ export async function POST(request: NextRequest) {
     const storedContext = getDocumentText(sessionId || 'default');
 
     // Prepare the context for AI
+    const styleRules = `Style (always): Reply in a direct, minimal tone. Prefer 1–3 short sentences unless the user asks for detail, a list, or a summary. No filler (“I’d be happy to”, “Feel free to”, long intros/outros). No emojis unless the user uses them. Use short bullets only when listing multiple items.`;
+
     const context = storedContext 
-      ? `You are a helpful AI assistant. The user has uploaded a document. Use the following document content to answer their questions:\n\n${storedContext}\n\nInstructions:
-- Answer questions using information from the document when possible
-- If the answer isn't in the document, politely say so and offer to help with what you can
-- Be concise but thorough
-- If asked for a summary, provide a clear overview of the document's main points`
-      : `You are a helpful AI assistant for VAWCOM, a full-service digital studio. We deliver web and mobile applications, voice experiences, AI chatbots, integrations, and related engineering support.
+      ? `You answer questions about an uploaded document.\n\nDocument:\n${storedContext}\n\n${styleRules}\nRules: Use the document when it applies. If it doesn’t contain the answer, say so in one brief sentence. Summaries: at most 5 tight bullets unless asked for more.`
+      : `You are VAWCOM’s site assistant. VAWCOM is a digital studio: web/mobile apps, voice products, AI chat, integrations, and related engineering.\n\n${styleRules}\nTopics: our services, tools (e.g. n8n, Vapi), light technical Q&A, and next steps to contact. Stay factual and brief.`;
 
-Answer questions clearly and concisely. You can help with:
-- Questions about VAWCOM's services (web, mobile, voice, AI/chat, integrations)
-- General technical questions
-- Information about tools we use (e.g. n8n, Vapi) when relevant
-- General assistance and conversation
+    const geminiKey = process.env.GEMINI_API_KEY?.trim();
+    const openAiKey = process.env.OPENAI_API_KEY?.trim();
+    let lastGeminiError: string | null = null;
 
-Be friendly, professional, and helpful.`;
-
-    // Get API keys from environment variables
-    // Priority: Gemini > OpenAI > Predefined responses
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-    // Try Gemini API first (if available)
-    if (GEMINI_API_KEY && GEMINI_API_KEY.trim()) {
-      try {
-        console.log('🤖 Calling Google Gemini API...');
-        console.log('📝 Message:', message);
-        console.log('🔑 Gemini API Key present:', GEMINI_API_KEY.substring(0, 10) + '...');
-        
-        // Prepare the prompt with context
-        const fullPrompt = storedContext 
-          ? `${context}\n\nUser question: ${message}`
-          : `${context}\n\nUser: ${message}\n\nAssistant:`;
-        
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY.trim()}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: fullPrompt
-                }]
-              }],
-              generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 500,
-              }
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          const geminiResponse = data.candidates[0].content.parts[0].text;
-          console.log('✅ Gemini response received:', geminiResponse.substring(0, 100));
-          return NextResponse.json({
-            response: geminiResponse,
-            hasContext: !!storedContext,
-          });
-        } else {
-          console.error('❌ Gemini API error response:', {
-            status: response.status,
-            statusText: response.statusText,
-            data: data
-          });
-          // Fall through to OpenAI or predefined responses
-        }
-      } catch (error) {
-        console.error('❌ Gemini API request error:', error);
-        // Fall through to OpenAI or predefined responses
+    // Gemini (Google AI) — @google/generative-ai SDK, model from GEMINI_MODEL or default in lib/gemini.ts
+    if (geminiKey) {
+      const gemini = await generateGeminiReply({
+        systemInstruction: context,
+        userMessage: message,
+      });
+      if (gemini.ok) {
+        return NextResponse.json({
+          response: gemini.text,
+          hasContext: !!storedContext,
+        });
       }
+      lastGeminiError = gemini.error;
+      console.error('Gemini error:', gemini.error);
     }
 
-    // Try OpenAI API as fallback (if available)
-    if (OPENAI_API_KEY && OPENAI_API_KEY.trim()) {
+    // OpenAI fallback (if configured)
+    if (openAiKey) {
       try {
-        console.log('🤖 Calling OpenAI API...');
-        console.log('📝 Message:', message);
-        console.log('🔑 API Key present:', OPENAI_API_KEY.substring(0, 10) + '...');
-        
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${OPENAI_API_KEY.trim()}`,
+            Authorization: `Bearer ${openAiKey}`,
           },
           body: JSON.stringify({
             model: 'gpt-3.5-turbo',
@@ -124,15 +70,14 @@ Be friendly, professional, and helpful.`;
                 content: message,
               },
             ],
-            max_tokens: 500,
-            temperature: 0.7,
+            max_tokens: 400,
+            temperature: 0.45,
           }),
         });
 
         const data = await response.json();
 
         if (response.ok && data.choices?.[0]?.message?.content) {
-          console.log('✅ OpenAI response received:', data.choices[0].message.content.substring(0, 100));
           return NextResponse.json({
             response: data.choices[0].message.content,
             hasContext: !!storedContext,
@@ -145,7 +90,7 @@ Be friendly, professional, and helpful.`;
           });
           // Return error message to user instead of falling back
           return NextResponse.json({
-            response: `I apologize, but I'm having trouble connecting to the AI service. Error: ${data.error?.message || 'Unknown error'}. Please try again.`,
+            response: `AI unavailable: ${data.error?.message || 'unknown error'}. Retry or check your API key.`,
             hasContext: !!storedContext,
           });
         }
@@ -154,33 +99,43 @@ Be friendly, professional, and helpful.`;
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         // Return error message to user
         return NextResponse.json({
-          response: `I apologize, but I encountered an error: ${errorMessage}. Please try again.`,
+          response: `Request failed: ${errorMessage}. Try again.`,
           hasContext: !!storedContext,
         });
       }
-    } else {
-      // No API keys - use predefined responses
-      console.log('⚠️ No Gemini or OpenAI API key found. Using predefined responses.');
-      
-      // If there's document context, use smart response
+    }
+
+    // No provider keys — offline canned replies only when neither env var is set
+    if (!geminiKey && !openAiKey) {
+      console.warn(
+        '⚠️ No Gemini or OpenAI API key found. Using predefined responses. (Set GEMINI_API_KEY in .env — .env.local empty values override .env.)',
+      );
+
       if (storedContext) {
         return NextResponse.json({
           response: generateSmartResponse(message, storedContext),
           hasContext: true,
         });
       }
-      
-      // Otherwise use default predefined responses
+
       return NextResponse.json({
         response: generateDefaultResponse(message),
         hasContext: false,
       });
     }
 
+    // Keys were set but every configured provider failed (e.g. Gemini error and no OpenAI)
+    return NextResponse.json({
+      response: lastGeminiError
+        ? `AI error: ${lastGeminiError.length > 180 ? `${lastGeminiError.slice(0, 180)}…` : lastGeminiError}`
+        : 'No response from the AI. Retry.',
+      hasContext: !!storedContext,
+    });
+
   } catch (error) {
     console.error('Chatbot API error:', error);
     return NextResponse.json(
-      { error: 'Failed to process message', response: 'I apologize, but I encountered an error. Please try again.' },
+      { error: 'Failed to process message', response: 'Something went wrong. Try again.' },
       { status: 500 }
     );
   }
@@ -203,29 +158,28 @@ function generateSmartResponse(message: string, context: string): string {
   
   // If we found relevant content
   if (relevantSentences.length > 0) {
-    const answer = relevantSentences.slice(0, 3).join('. ').trim();
-    return answer.substring(0, 400) + (answer.length > 400 ? '...' : '');
+    const answer = relevantSentences.slice(0, 2).join('. ').trim();
+    return answer.substring(0, 280) + (answer.length > 280 ? '…' : '');
   }
   
   // Handle specific question types
   if (lowerMessage.includes('summary') || lowerMessage.includes('summarize')) {
-    const summary = sentences.slice(0, 4).join('. ').trim();
-    return `Summary: ${summary.substring(0, 300)}${summary.length > 300 ? '...' : ''}`;
+    const summary = sentences.slice(0, 3).join('. ').trim();
+    return `${summary.substring(0, 220)}${summary.length > 220 ? '…' : ''}`;
   }
   
   if (lowerMessage.includes('what') && (lowerMessage.includes('about') || lowerMessage.includes('contain'))) {
-    const firstParagraph = sentences.slice(0, 3).join('. ').trim();
-    return `Based on the document: ${firstParagraph.substring(0, 250)}${firstParagraph.length > 250 ? '...' : ''}`;
+    const firstParagraph = sentences.slice(0, 2).join('. ').trim();
+    return `${firstParagraph.substring(0, 200)}${firstParagraph.length > 200 ? '…' : ''}`;
   }
   
   if (lowerMessage.includes('key point') || lowerMessage.includes('important') || lowerMessage.includes('main')) {
     const keyPoints = sentences.filter((s, i) => i % 2 === 0).slice(0, 3);
-    return `Key points from the document:\n${keyPoints.map((p, i) => `${i + 1}. ${p.trim()}`).join('\n')}`.substring(0, 350);
+    return keyPoints.map((p, i) => `${i + 1}. ${p.trim()}`).join('\n').substring(0, 280);
   }
   
-  // Default: show that we have the document and can answer questions
-  const preview = sentences.slice(0, 2).join('. ').trim().substring(0, 150);
-  return `I have access to your document. ${preview}...\n\nWhat specific information would you like to know about it?`;
+  const preview = sentences.slice(0, 1).join('. ').trim().substring(0, 120);
+  return preview ? `${preview}… Ask a specific question if you need more.` : 'Upload is loaded. Ask a question about the document.';
 }
 
 function generateDefaultResponse(message: string): string {
@@ -233,96 +187,96 @@ function generateDefaultResponse(message: string): string {
   
   // Greetings
   if (lowerMessage.match(/^(hi|hello|hey|greetings|good morning|good afternoon|good evening)$/)) {
-    return 'Hello! 👋 Welcome to VAWCOM! I\'m here to help you learn about our services. How can I assist you today?';
+    return 'Hi. I can answer questions about VAWCOM’s services or point you to contact options. What do you need?';
   }
   
   // Asking for user info or introduction
   if (lowerMessage.includes('who are you') || lowerMessage.includes('what are you') || lowerMessage.includes('introduce')) {
-    return 'I\'m an AI assistant for VAWCOM, a full-service digital studio. I can help you learn about our work: web and mobile apps, voice products, AI chat experiences, integrations, and more. What would you like to know?';
+    return 'I’m the VAWCOM site assistant: web/mobile, voice, AI chat, integrations. What should we cover?';
   }
   
   // Company information
   if (lowerMessage.includes('company') || lowerMessage.includes('about') || lowerMessage.includes('vawcom')) {
-    return 'VAWCOM is a full-service digital studio. We offer:\n\n• Web development\n• Mobile app development\n• Voice experiences (e.g. Vapi)\n• AI chatbots\n• Integrations & orchestration (e.g. n8n)\n\nWhat are you looking to build?';
+    return 'VAWCOM builds web and mobile apps, voice experiences, AI chat, and integrations (e.g. n8n, APIs). What are you trying to ship?';
   }
   
   // Services
   if (lowerMessage.includes('service') || lowerMessage.includes('what do you offer') || lowerMessage.includes('what can you do')) {
-    return 'We offer end-to-end digital services:\n\n🌐 **Web** — Sites and web apps\n📱 **Mobile** — iOS, Android, cross-platform\n🎙️ **Voice** — Voice products and telephony integrations\n💬 **AI chat** — Assistants for support and engagement\n🔗 **Integrations** — APIs, data sync, orchestration (e.g. n8n)\n\nWhich area should we dive into?';
+    return 'Web & mobile apps, voice (e.g. Vapi), AI assistants, and integrations/orchestration. Which one matters most for you?';
   }
   
   // Contact information
   if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('phone') || lowerMessage.includes('reach') || lowerMessage.includes('get in touch')) {
-    return `To get in touch with VAWCOM:\n\n📧 Email: ${CONTACT_EMAIL} (tap email links on our site to open Gmail compose)\n📸 Instagram: ${SOCIAL.instagram}\n🔗 LinkedIn: ${SOCIAL.linkedin}\n🌐 Website: https://www.vawcom.com\n\nYou can also use the Contact form on our site.`;
+    return `Email: ${CONTACT_EMAIL}. Instagram: ${SOCIAL.instagram}. LinkedIn: ${SOCIAL.linkedin}. Site: https://www.vawcom.com — or use the Contact page.`;
   }
   
   // Pricing
   if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('how much') || lowerMessage.includes('pricing')) {
-    return 'Our pricing varies based on project scope and requirements. We offer customized solutions tailored to your needs. Would you like to schedule a consultation to discuss your specific project? I can help you get in touch with our team!';
+    return 'Pricing depends on scope. Use Contact with your requirements and we’ll quote.';
   }
   
   // Web development
   if (lowerMessage.includes('web') || lowerMessage.includes('website') || lowerMessage.includes('web development')) {
-    return 'We build modern, responsive websites and web applications using the latest technologies. Our web development services include:\n\n• Custom website design\n• E-commerce solutions\n• Web applications\n• API development\n• Performance optimization\n\nTell me more about your web project needs!';
+    return 'We build sites and web apps: UI, APIs, performance. Describe the product or page you need.';
   }
   
   // Mobile apps
   if (lowerMessage.includes('mobile') || lowerMessage.includes('app') || lowerMessage.includes('ios') || lowerMessage.includes('android')) {
-    return 'We develop native and cross-platform mobile applications for iOS and Android. Our mobile app services include:\n\n• Native iOS development\n• Native Android development\n• Cross-platform solutions\n• App design and UX\n• App store optimization\n\nWhat type of mobile app are you looking to build?';
+    return 'Native and cross-platform mobile (iOS/Android). What platform and core features?';
   }
   
   // Voice agents
   if (lowerMessage.includes('voice') || lowerMessage.includes('vapi') || lowerMessage.includes('voice agent')) {
-    return 'We create intelligent voice agents using Vapi technology. Our voice agent solutions can:\n\n• Handle customer calls automatically\n• Provide 24/7 support\n• Integrate with your systems\n• Support multiple languages\n• Scale with your business\n\nInterested in implementing a voice agent for your business?';
+    return 'We ship voice agents with Vapi/Twilio-style stacks: calls, routing, integrations. What’s the use case?';
   }
   
   // Chatbots
   if (lowerMessage.includes('chatbot') || lowerMessage.includes('chat bot')) {
-    return 'We build intelligent chatbots that can:\n\n• Answer customer questions\n• Handle support requests\n• Qualify leads\n• Schedule appointments\n• Integrate with your CRM\n\nThey’re built to match your tone and workflows. Want to learn more?';
+    return 'We build support/sales chatbots with your tone and CRM/API hooks. What should it handle?';
   }
   
   // n8n automations
   if (lowerMessage.includes('n8n') || lowerMessage.includes('automation') || lowerMessage.includes('workflow')) {
-    return 'We use n8n and similar tools when your product needs reliable orchestration—connecting CRMs, messaging, email, databases, and custom APIs. It’s one part of our broader integration and backend work.\n\nWhat systems are you trying to connect?';
+    return 'We use n8n to wire CRMs, email, DBs, and APIs. Which systems need to talk?';
   }
   
   // Portfolio or examples
   if (lowerMessage.includes('portfolio') || lowerMessage.includes('example') || lowerMessage.includes('work') || lowerMessage.includes('project')) {
-    return 'We\'ve shipped web and mobile products, voice and chat experiences, and integration-heavy builds across different industries. For concrete examples, our team can walk you through case studies that match your use case.';
+    return 'We can walk through relevant work on a call—tell us your industry and product type.';
   }
   
   // Timeline or duration
   if (lowerMessage.includes('how long') || lowerMessage.includes('timeline') || lowerMessage.includes('duration') || lowerMessage.includes('when')) {
-    return 'Project timelines vary based on complexity and scope. A simple website might take 2-4 weeks, while a complex mobile app could take 3-6 months. We\'ll provide a detailed timeline after understanding your specific requirements. Would you like to discuss your project timeline?';
+    return 'Rough guide: small sites weeks; larger apps months. Exact timeline after scope. Share what you’re building.';
   }
   
   // Technology stack
   if (lowerMessage.includes('technology') || lowerMessage.includes('tech stack') || lowerMessage.includes('what technology') || lowerMessage.includes('stack')) {
-    return 'We use modern technologies and tools:\n\n• **Web**: React, Next.js, Node.js, TypeScript\n• **Mobile**: React Native, Swift, Kotlin\n• **Voice**: Vapi, Twilio\n• **Integrations & orchestration**: n8n, Zapier, custom APIs\n• **Cloud**: AWS, Vercel, and more\n\nWe pick the right stack per project. What are you leaning toward?';
+    return 'Typical: React/Next, TypeScript, Node; mobile React Native/Swift/Kotlin; voice Vapi/Twilio; orchestration n8n. Stack is chosen per project.';
   }
   
   // Help
   if (lowerMessage.includes('help') || lowerMessage.includes('what can you help')) {
-    return 'I can help you with:\n\n✅ VAWCOM services (web, mobile, voice, AI, integrations)\n✅ Contact and next steps\n✅ General questions\n\nYou can also upload a document and I\'ll answer questions about it. What would you like to know?';
+    return 'Services, contact, tech questions, or upload a doc for Q&A. What do you want?';
   }
   
   // Upload/document questions
   if (lowerMessage.includes('upload') || lowerMessage.includes('document') || lowerMessage.includes('file')) {
-    return 'Yes! You can upload documents (PDF, TXT, or DOC) using the upload feature. Once uploaded, I can answer questions based on the document content. Try uploading a document and ask me about it!';
+    return 'Upload PDF/TXT/DOC here; I’ll answer from the text. Ask something specific after upload.';
   }
   
   // Thank you
   if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-    return 'You\'re welcome! 😊 Is there anything else I can help you with? Feel free to ask about our services or upload a document!';
+    return 'Welcome. Anything else?';
   }
   
   // Goodbye
   if (lowerMessage.includes('bye') || lowerMessage.includes('goodbye') || lowerMessage.includes('see you') || lowerMessage.includes('later')) {
-    return 'Goodbye! 👋 Thanks for visiting VAWCOM. Feel free to come back anytime if you have more questions. Have a great day!';
+    return 'Thanks for stopping by. Reach out via Contact if you want to talk.';
   }
   
   // Default response for unmatched queries
-  return 'I\'m here to help you learn about VAWCOM. Ask about our services (web, mobile, voice, AI, integrations), the company, contact options, tech stack, or timelines—or say hi to get started.';
+  return 'Ask about services (web, mobile, voice, AI, integrations), contact, or upload a document for questions.';
 }
 
 
