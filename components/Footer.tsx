@@ -1,15 +1,16 @@
 import { Github, Instagram, Linkedin, Mail } from 'lucide-react';
 import Link from 'next/link';
+import { SiteContainer } from '@/components/SiteContainer';
 import { getGmailComposeUrl, SOCIAL } from '@/lib/site';
 
 export default function Footer() {
   return (
     <footer className="glass-footer py-10 pb-[max(2.5rem,env(safe-area-inset-bottom,0px))] sm:py-12">
-      <div className="container mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-10">
+      <SiteContainer>
+        <div className="mb-8 grid grid-cols-1 gap-8 text-center md:grid-cols-4 md:gap-10 md:text-left">
           <div className="md:col-span-2">
             <h3 className="mb-3 text-base font-semibold tracking-tight text-white sm:mb-4 sm:text-lg">VAWCOM</h3>
-            <p className="max-w-md text-sm leading-relaxed text-slate-500 sm:text-[15px] sm:text-slate-400">
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-500 sm:text-[15px] sm:text-slate-400 md:mx-0">
               Web, mobile, voice, and AI—end-to-end delivery from product thinking to launch. A full-service partner for digital builds and integrations.
             </p>
           </div>
@@ -29,7 +30,7 @@ export default function Footer() {
 
           <div>
             <h4 className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-500 sm:mb-4">Connect</h4>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:justify-start">
               <a
                 href={SOCIAL.linkedin}
                 target="_blank"
@@ -74,7 +75,7 @@ export default function Footer() {
         <div className="border-t border-white/[0.07] pt-6 text-center text-xs text-slate-500 sm:pt-8 sm:text-sm sm:text-slate-400">
           <p>© {new Date().getFullYear()} VAWCOM. All rights reserved.</p>
         </div>
-      </div>
+      </SiteContainer>
     </footer>
   );
 }

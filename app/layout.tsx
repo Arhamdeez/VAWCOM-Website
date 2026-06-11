@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 import PageTransition from '@/components/PageTransition';
+import { SPLASH_BOOT_SCRIPT } from '@/lib/splashBoot';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -65,7 +66,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-[#050a14]" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      className="bg-[#050a14]"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
+      </head>
       <body className={`${inter.className} bg-[#050a14]`}>
         <SplashScreenWrapper>
           <BackgroundEffectWrapper />

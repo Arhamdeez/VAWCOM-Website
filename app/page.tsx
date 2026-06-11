@@ -6,7 +6,7 @@ import AdditionalServices from '@/components/AdditionalServices';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#050a14]">
+    <>
       <HomeHashScroll />
       {/* Full-bleed hero — standalone */}
       <Hero />
@@ -19,6 +19,6 @@ export default function Home() {
 
       {/* And much more — matches feather end colour */}
       <AdditionalServices />
-    </main>
+    </>
   );
 }

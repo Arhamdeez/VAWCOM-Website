@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Code, Smartphone, Globe, Shield, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
+import { spring, tEnter, tReveal, tStagger } from '@/lib/motion';
+import { SiteContainer } from './SiteContainer';
 
 const additionalServices = [
   {
@@ -48,7 +50,7 @@ export default function AdditionalServices() {
   return (
     <section
       id="more"
-      className="relative scroll-mt-28 overflow-hidden py-12 md:py-20 lg:py-24"
+      className="relative scroll-mt-28 overflow-hidden py-12 [content-visibility:auto] [contain-intrinsic-size:auto_720px] md:py-20 lg:py-24"
     >
       {/* Reference #050a14: one soft top glow + bottom vignette; grid reads in lower half */}
       <div className="pointer-events-none absolute inset-0 bg-[#050a14]" aria-hidden />
@@ -65,12 +67,12 @@ export default function AdditionalServices() {
         aria-hidden
       />
 
-      <div className="container relative z-10 mx-auto max-w-7xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8">
+      <SiteContainer>
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.36, ease: [0.4, 0, 0.2, 1] }}
+          transition={tReveal()}
           className="mb-8 text-center md:mb-11"
         >
           <div className="glass-pill mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-emerald-200/95 sm:mb-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
@@ -90,21 +92,21 @@ export default function AdditionalServices() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-6">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {additionalServices.map((service, index) => (
             <motion.div
               key={service.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.24, delay: index * 0.03, ease: [0.4, 0, 0.2, 1] }}
+              transition={tStagger(index)}
               className="group"
             >
-              <div className="glass-sm relative rounded-2xl p-4 transition-[border-color,box-shadow] duration-200 hover:border-teal-400/30 sm:p-5 md:p-6">
-                <div className={`absolute -inset-px rounded-2xl bg-gradient-to-r ${service.gradient} opacity-0 blur-xl transition-opacity duration-200 group-hover:opacity-[0.14] md:group-hover:opacity-[0.22]`} />
+              <div className="glass-sm relative rounded-2xl p-4 text-center transition-[border-color,box-shadow] duration-300 ease-smooth hover:border-teal-400/30 sm:p-5 sm:text-left md:p-6">
+                <div className={`absolute -inset-px rounded-2xl bg-gradient-to-r ${service.gradient} opacity-0 blur-xl transition-opacity duration-300 ease-smooth group-hover:opacity-[0.14] md:group-hover:opacity-[0.22]`} />
                 
-                <div className="relative">
-                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${service.gradient} sm:mb-4 sm:h-12 sm:w-12 md:group-hover:scale-[1.04] md:group-hover:transition-transform`}>
+                <div className="relative flex flex-col items-center sm:items-start">
+                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${service.gradient} transition-transform duration-300 ease-smooth sm:mb-4 sm:h-12 sm:w-12 md:group-hover:scale-[1.04]`}>
                     <service.icon className="h-5 w-5 text-white sm:h-6 sm:w-6" />
                   </div>
                   
@@ -125,7 +127,7 @@ export default function AdditionalServices() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.36, delay: 0.12, ease: [0.4, 0, 0.2, 1] }}
+          transition={tEnter(0.12)}
           className="mt-10 text-center sm:mt-12"
         >
           <p className="mb-6 text-sm text-slate-400 sm:mb-8 sm:text-base">
@@ -133,7 +135,7 @@ export default function AdditionalServices() {
           </p>
           
           <div className="flex justify-center">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ type: 'spring', stiffness: 450, damping: 30 }} className="w-full max-w-xs sm:w-auto sm:max-w-none">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={spring.hover} className="w-full max-w-xs sm:w-auto sm:max-w-none">
               <Link href="/contact" className="block w-full sm:inline-block sm:w-auto">
                 <Button
                   size="lg"
@@ -146,7 +148,7 @@ export default function AdditionalServices() {
             </motion.div>
           </div>
         </motion.div>
-      </div>
+      </SiteContainer>
     </section>
   );
 }

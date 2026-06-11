@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import PremiumPageBackdrop from '@/components/PremiumPageBackdrop';
-import { easeSnappy } from '@/lib/motion';
+import { tEnter, tReveal, tStagger } from '@/lib/motion';
+import { SiteCenter, SiteContainer } from '@/components/SiteContainer';
 import { SOCIAL } from '@/lib/site';
 
 const processSteps = [
@@ -77,12 +78,12 @@ export default function About() {
       <div className="relative z-10">
         {/* Hero */}
         <section className="pb-10 pt-[max(7rem,env(safe-area-inset-top,0px)+5.5rem)] md:pb-14">
-          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-            <div className="w-full max-w-3xl text-center">
+          <SiteContainer center>
+            <SiteCenter max="3xl">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: easeSnappy }}
+                transition={tEnter()}
                 className="glass-pill mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs text-emerald-200/95 sm:text-sm"
               >
                 <Sparkles className="h-4 w-4 shrink-0 opacity-90" />
@@ -91,7 +92,7 @@ export default function About() {
               <motion.h1
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.42, delay: 0.04, ease: easeSnappy }}
+                transition={tEnter(0.06)}
                 className="mb-5 text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[2.75rem] lg:leading-[1.15]"
               >
                 A studio that{' '}
@@ -102,7 +103,7 @@ export default function About() {
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1, ease: easeSnappy }}
+                transition={tEnter(0.12)}
                 className="mx-auto max-w-lg text-base leading-relaxed text-slate-400 md:text-[17px]"
               >
                 End-to-end product work—UI, APIs, voice, and AI—so it ships as{' '}
@@ -111,24 +112,24 @@ export default function About() {
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.38, delay: 0.16, ease: easeSnappy }}
+                transition={tEnter(0.18)}
                 className="mx-auto mt-6 max-w-xl text-sm text-slate-500"
               >
                 One straight path from first thought to production—no mystery phases.
               </motion.p>
-            </div>
-          </div>
+            </SiteCenter>
+          </SiteContainer>
         </section>
 
         {/* Process: idea → deploy */}
         <section className="pb-16 md:pb-20" aria-labelledby="about-process-heading">
-          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-            <div className="w-full max-w-2xl text-center">
+          <SiteContainer center>
+            <SiteCenter max="2xl">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.35, ease: easeSnappy }}
+                transition={tReveal()}
                 className="mb-10 text-center md:mb-12"
               >
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400/85">How we work</p>
@@ -154,7 +155,7 @@ export default function About() {
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-24px' }}
-                      transition={{ duration: 0.3, delay: i * 0.05, ease: easeSnappy }}
+                      transition={tStagger(i, 0.04)}
                       className="relative flex flex-col items-center gap-3 pb-10 last:pb-0 md:flex-row md:items-start md:gap-6 md:pb-10"
                     >
                       <div className="relative z-[1] flex shrink-0 flex-col items-center md:w-[52px] md:min-w-[52px]">
@@ -173,14 +174,14 @@ export default function About() {
                   ))}
                 </ol>
               </div>
-            </div>
-          </div>
+            </SiteCenter>
+          </SiteContainer>
         </section>
 
         {/* Team */}
         <section className="pb-20 sm:pb-28">
-          <div className="container mx-auto flex max-w-7xl justify-center px-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6">
-            <div className="w-full max-w-4xl text-center">
+          <SiteContainer center>
+            <SiteCenter max="4xl">
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400/85 sm:text-sm sm:tracking-[0.12em]">
                 Founders
               </h2>
@@ -192,7 +193,7 @@ export default function About() {
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.26, delay: i * 0.05, ease: easeSnappy }}
+                    transition={tStagger(i, 0.04)}
                     className="flex flex-col items-center rounded-xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-transparent px-5 py-6 text-center md:px-6 md:py-7"
                   >
                     <div
@@ -246,8 +247,8 @@ export default function About() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </div>
-          </div>
+            </SiteCenter>
+          </SiteContainer>
         </section>
       </div>
     </div>

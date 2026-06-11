@@ -1,67 +1,65 @@
 'use client';
 
-import { useState, useEffect, useSyncExternalStore } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 import SplashScreen from './SplashScreen';
-
-const clientSubscribe = () => () => {};
-const isClientSnapshot = () => true;
-const isServerSnapshot = () => false;
 
 interface SplashScreenWrapperProps {
   children: React.ReactNode;
 }
 
+function hasSeenSplash(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    return sessionStorage.getItem('hasSeenSplash') === 'true';
+  } catch {
+    return true;
+  }
+}
+
+function setSplashClasses(pending: boolean) {
+  const root = document.documentElement;
+  root.classList.toggle('splash-pending', pending);
+  root.classList.toggle('splash-complete', !pending);
+}
+
+const subscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function SplashScreenWrapper({ children }: SplashScreenWrapperProps) {
-  const [showSplash, setShowSplash] = useState(true);
-  const isClient = useSyncExternalStore(clientSubscribe, isClientSnapshot, isServerSnapshot);
+  const isClient = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      if (sessionStorage.getItem('hasSeenSplash')) {
-        setShowSplash(false);
-        document.body.classList.add('splash-complete');
-      }
-    });
-    return () => cancelAnimationFrame(id);
+    const seen = hasSeenSplash();
+    setShowSplash(!seen);
+    setSplashClasses(!seen);
+    if (seen) {
+      document.body.classList.add('splash-complete');
+    }
   }, []);
 
-  const handleSplashComplete = () => {
+  const handleSplashComplete = useCallback(() => {
     setShowSplash(false);
-    sessionStorage.setItem('hasSeenSplash', 'true');
-    document.body.classList.add('splash-complete');
-  };
-
-  useEffect(() => {
-    if (showSplash && isClient) {
-      document.body.classList.remove('splash-complete');
+    try {
+      sessionStorage.setItem('hasSeenSplash', 'true');
+    } catch {
+      /* ignore */
     }
-  }, [showSplash, isClient]);
-
-  if (!isClient) {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-[#050a14]" />
-    );
-  }
+    setSplashClasses(false);
+    document.body.classList.add('splash-complete');
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-[#050a14]">
-      <AnimatePresence>
-        {showSplash && (
-          <SplashScreen key="splash" onComplete={handleSplashComplete} />
-        )}
-      </AnimatePresence>
+      {/* Instant cover before React hydrates (hidden when splash-complete). */}
+      <div className="splash-boot" aria-hidden="true" />
 
-      {!showSplash && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          className="relative"
-        >
-          {children}
-        </motion.div>
-      )}
+      <div id="vawcom-app" className="relative">
+        {children}
+      </div>
+
+      {isClient && showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
     </div>
   );
 }

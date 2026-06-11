@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-300 ease-smooth disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -25,9 +25,9 @@ const buttonVariants = cva(
           "btn-glass-secondary rounded-xl border font-medium tracking-tight text-emerald-50/95 focus-visible:ring-0",
         /** Solid fills — high contrast on dark / green BGs (hero-style) */
         solidEmerald:
-          "rounded-lg border-0 bg-emerald-600/95 font-semibold text-white shadow-md shadow-emerald-900/25 transition-colors hover:bg-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:shadow-lg sm:shadow-emerald-900/30",
+          "rounded-lg border-0 bg-emerald-600/95 font-semibold text-white shadow-md shadow-emerald-900/25 transition-colors duration-300 ease-smooth hover:bg-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:shadow-lg sm:shadow-emerald-900/30",
         solidWhite:
-          "rounded-lg border-0 bg-white/95 font-semibold text-emerald-700 shadow-sm shadow-black/15 transition-colors hover:bg-white hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:shadow-md sm:shadow-black/20",
+          "rounded-lg border-0 bg-white/95 font-semibold text-emerald-700 shadow-sm shadow-black/15 transition-colors duration-300 ease-smooth hover:bg-white hover:text-emerald-800 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:shadow-md sm:shadow-black/20",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

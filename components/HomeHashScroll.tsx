@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { scrollToServicesSection } from '@/lib/navigation';
 
 function getNavigationType(): string | undefined {
   if (typeof performance === 'undefined') return undefined;
@@ -12,13 +13,11 @@ function getNavigationType(): string | undefined {
 }
 
 /**
- * Ensures /#services (and other in-page hashes) scroll into view after
- * client navigations and hash changes — but a full **reload** stays at the hero
- * (no jump to #services from a lingering hash).
+ * Ensures /#services scrolls into view after client navigations and hash changes.
+ * On full reload with a hash, strip hash and stay at hero (no jump).
  */
 export default function HomeHashScroll() {
   const pathname = usePathname();
-  /** True only for the initial paint after a full reload (skip auto hash scroll once). */
   const skipInitialHashScrollRef = useRef(false);
 
   useLayoutEffect(() => {
@@ -48,20 +47,14 @@ export default function HomeHashScroll() {
 
     const scrollToHash = () => {
       const hash = window.location.hash.slice(1);
-      if (!hash) return;
-      const el = document.getElementById(hash);
-      if (!el) return;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          el.scrollIntoView({ behavior: 'smooth' });
-        });
-      });
+      if (hash !== 'services') return;
+      scrollToServicesSection();
     };
 
     let t: number | undefined;
     if (!skipInitialHashScrollRef.current) {
       scrollToHash();
-      t = window.setTimeout(scrollToHash, 120);
+      t = window.setTimeout(scrollToHash, 180);
     } else {
       skipInitialHashScrollRef.current = false;
     }

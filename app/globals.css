@@ -5,6 +5,7 @@
 html {
   @apply dark;
   background-color: #050a14;
+  overflow-x: clip;
   /* Hide native scrollbar — keeps full width, no gutter jump between routes (scroll still works) */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -23,9 +24,39 @@ body::-webkit-scrollbar {
   }
 }
 
-/* Prevent flash of content before splash screen */
-body:not(.splash-complete) {
+/* ─── Splash boot (no content flash before animated splash) ─── */
+
+html.splash-pending body {
   overflow: hidden !important;
+}
+
+html.splash-pending #vawcom-app {
+  visibility: hidden;
+}
+
+.splash-boot {
+  display: none;
+}
+
+html.splash-pending .splash-boot {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #000;
+  pointer-events: none;
+}
+
+html.splash-pending.splash-react-ready .splash-boot {
+  display: none;
+}
+
+html.splash-complete .splash-boot {
+  display: none;
+}
+
+html.splash-complete #vawcom-app {
+  visibility: visible;
 }
 
 .vawcom-marquee {
@@ -148,10 +179,10 @@ body:not(.splash-complete) {
       0 10px 32px rgba(0, 0, 0, 0.16),
       0 0 18px rgba(16, 185, 129, 0.08);
     transition:
-      border-color 0.12s ease,
-      background 0.12s ease,
-      box-shadow 0.12s ease,
-      transform 0.1s ease;
+      border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-glass-primary:hover {
@@ -193,9 +224,9 @@ body:not(.splash-complete) {
       0 6px 24px rgba(0, 0, 0, 0.15);
     color: rgba(248, 250, 252, 0.98);
     transition:
-      border-color 0.12s ease,
-      background 0.12s ease,
-      box-shadow 0.12s ease;
+      border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-glass-secondary:hover {
@@ -222,7 +253,10 @@ body:not(.splash-complete) {
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
       0 4px 16px rgba(0, 0, 0, 0.12);
-    transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+    transition:
+      border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-glass-muted:hover {
@@ -314,6 +348,102 @@ body:not(.splash-complete) {
   }
 }
 
+/* Mobile / touch: drop backdrop-filter on heavy surfaces — keep nav frost matching desktop */
+@media (max-width: 767px), ((hover: none) and (pointer: coarse)) {
+  .glass,
+  .glass-sm,
+  .glass-pill,
+  .glass-pill-teal,
+  .glass-field,
+  .glass-footer,
+  .glass-dense,
+  .glass-inset,
+  .btn-glass-primary,
+  .btn-glass-secondary,
+  .btn-glass-muted {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .glass-dense {
+    background: rgba(5, 10, 20, 0.97);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .glass-pill,
+  .glass-pill-teal {
+    background: rgba(15, 23, 42, 0.78);
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0.88;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.page-enter {
+  animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* Smoother utility animations (replace default Tailwind bounce/pulse/spin feel) */
+@keyframes smooth-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes smooth-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes smooth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-smooth-bounce {
+  animation: smooth-bounce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.animate-smooth-pulse {
+  animation: smooth-pulse 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.animate-smooth-spin {
+  animation: smooth-spin 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-smooth-bounce,
+  .animate-smooth-pulse,
+  .animate-smooth-spin {
+    animation: none;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -375,11 +505,14 @@ body:not(.splash-complete) {
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     background-color: #050a14;
+    min-height: 100dvh;
+    overflow-x: clip;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    -webkit-text-size-adjust: 100%;
   }
 }
 

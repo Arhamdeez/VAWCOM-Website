@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { easeSnappy } from '@/lib/motion';
 import React, { useState, useEffect, useRef } from 'react';
 
 interface ServiceCardProps {
@@ -14,6 +12,29 @@ interface ServiceCardProps {
   type?: string;
   currentIndex?: number;
   isActive?: boolean;
+}
+
+const N8N_NODES = [
+  { id: 0, label: 'Gmail', color: '#ea4335' },
+  { id: 1, label: 'n8n', color: '#10b981' },
+  { id: 2, label: 'Slack', color: '#4a154b' },
+  { id: 3, label: 'Notion', color: '#64748b' },
+] as const;
+
+/** Same demo chrome height for every card — phone + laptop stay aligned. */
+const DEMO_PANEL =
+  'glass-inset flex h-[252px] flex-col overflow-hidden rounded-xl p-3 sm:h-[272px] sm:p-4 md:h-[292px]';
+
+function DemoStatusBar({ label, hint }: { label: string; hint?: string }) {
+  return (
+    <div className="mb-2 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
+      <div className="flex min-w-0 items-center gap-1.5">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 animate-smooth-pulse" />
+        <span className="truncate text-xs font-medium text-emerald-300">{label}</span>
+      </div>
+      {hint ? <span className="hidden shrink-0 text-[10px] text-slate-500 sm:inline">{hint}</span> : null}
+    </div>
+  );
 }
 
 export default function ServiceCard({ icon: Icon, title, description, gradient, interactive = false, type, isActive = false }: ServiceCardProps) {
@@ -35,14 +56,54 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
   const [activeNode, setActiveNode] = useState(0);
   const chatHistoryRef = useRef<HTMLDivElement>(null);
 
-  // Auto-advance n8n workflow nodes
+  // Auto-advance n8n nodes — delayed until crossfade finishes; paused when hidden
   useEffect(() => {
-    if (type === 'n8n-automations' && isActive) {
-      const interval = setInterval(() => {
-        setActiveNode((prev) => (prev + 1) % 4);
-      }, 1400);
-      return () => clearInterval(interval);
+    if (type !== 'n8n-automations' || !isActive) {
+      setActiveNode(0);
+      return;
     }
+
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let startTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    const stop = () => {
+      if (startTimeout) {
+        clearTimeout(startTimeout);
+        startTimeout = undefined;
+      }
+      if (interval) {
+        clearInterval(interval);
+        interval = undefined;
+      }
+    };
+
+    const start = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        setActiveNode((prev) => (prev + 1) % N8N_NODES.length);
+      }, 1600);
+    };
+
+    const scheduleStart = () => {
+      stop();
+      setActiveNode(0);
+      startTimeout = setTimeout(() => {
+        if (document.visibilityState === 'visible') start();
+      }, 520);
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && isActive) scheduleStart();
+      else stop();
+    };
+
+    scheduleStart();
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [type, isActive]);
 
   // Auto-scroll chat history to bottom when new messages arrive
@@ -56,46 +117,28 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
     <div className="relative group cursor-pointer h-full w-full">
       {/* Simple glow effect */}
       <div
-        className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-0 transition-opacity duration-200 group-hover:opacity-[0.18] md:group-hover:opacity-25`}
+        className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-0 transition-opacity duration-300 ease-smooth group-hover:opacity-[0.18] md:group-hover:opacity-25`}
       />
 
       {/* Frosted shell: stacked Services cards need opacity + blur so back cards don’t bleed through */}
-      <div className="relative isolate h-full min-h-[360px] w-full overflow-hidden rounded-2xl p-4 glass-dense sm:min-h-[400px] sm:p-5 md:min-h-[420px] md:p-8">
-        {/* Content */}
-        <div className="relative z-10 h-full flex flex-col">
-          {/* Simple Icon */}
-          <div className="relative" style={{ marginBottom: 'clamp(0.75rem, 1.75vw, 1.25rem)' }}>
-            <div className="aspect-square w-12 md:w-14 rounded-lg md:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-              {Icon ? <Icon className="text-white" style={{ width: 'clamp(24px, 50%, 32px)', height: 'clamp(24px, 50%, 32px)' }} /> : null}
+      <div className="relative isolate w-full overflow-hidden rounded-2xl p-4 glass-dense sm:p-5 md:p-6">
+        <div className="relative z-10 flex flex-col">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 md:h-11 md:w-11">
+              {Icon ? <Icon className="h-5 w-5 text-white" /> : null}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-semibold leading-snug text-white md:text-lg">{title}</h3>
+              <p className="mt-1 line-clamp-2 text-sm leading-snug text-slate-400">{description}</p>
             </div>
           </div>
 
-          <h3 className="text-white font-semibold" style={{ 
-            fontSize: interactive ? 'clamp(1rem, 4vw, 1.5rem)' : 'clamp(0.875rem, 3vw, 1.125rem)',
-            marginBottom: 'clamp(0.5rem, 1vw, 0.75rem)',
-            lineHeight: '1.2'
-          }}>{title}</h3>
-
-          <p className="text-slate-400 leading-relaxed" style={{ 
-            fontSize: interactive ? 'clamp(0.75rem, 2.5vw, 1rem)' : 'clamp(0.625rem, 2vw, 0.875rem)',
-            marginBottom: 'clamp(0.75rem, 1.25vw, 1rem)',
-            lineHeight: '1.5'
-          }}>{description}</p>
-
-          {/* Interactive Demo Section */}
           {interactive && isActive && (
-            <div
-              className="glass-inset flex min-h-0 flex-1 flex-col rounded-xl"
-              style={{
-                marginTop: 'clamp(0.75rem, 1.5vw, 1.25rem)',
-                padding: 'clamp(0.75rem, 1.5vw, 1rem)',
-                minHeight: type === 'n8n-automations' ? 'clamp(260px, 46vh, 320px)' : 'clamp(220px, 40vh, 280px)',
-              }}
-            >
+            <div className={DEMO_PANEL}>
               {type === 'ai-agent' && (
                 <div className="flex flex-col h-full min-h-0">
                   <div className="flex items-center gap-2 mb-[2%]" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)', marginBottom: 'clamp(0.5rem, 2%, 1rem)' }}>
-                    <div className="bg-emerald-500 rounded-full animate-pulse" style={{ width: 'clamp(6px, 1.5%, 8px)', height: 'clamp(6px, 1.5%, 8px)' }}></div>
+                    <div className="bg-emerald-500 rounded-full animate-smooth-pulse" style={{ width: 'clamp(6px, 1.5%, 8px)', height: 'clamp(6px, 1.5%, 8px)' }}></div>
                     <span className="text-emerald-400 font-medium" style={{ fontSize: 'clamp(0.625rem, 2vw, 0.875rem)' }}>Live Demo</span>
                   </div>
                   
@@ -279,7 +322,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                     >
                       {isCalling ? (
                         <>
-                          <div className="border-2 border-white border-t-transparent rounded-full animate-spin" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }}></div>
+                          <div className="border-2 border-white border-t-transparent rounded-full animate-smooth-spin" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }}></div>
                           <span>Initiating Call...</span>
                         </>
                       ) : (
@@ -367,7 +410,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                       }}>
                         {isUploading ? (
                           <>
-                            <div className="border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" style={{ width: 'clamp(10px, 2.5vw, 12px)', height: 'clamp(10px, 2.5vw, 12px)' }}></div>
+                            <div className="border-2 border-emerald-500 border-t-transparent rounded-full animate-smooth-spin" style={{ width: 'clamp(10px, 2.5vw, 12px)', height: 'clamp(10px, 2.5vw, 12px)' }}></div>
                             <span className="text-emerald-400" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>Uploading...</span>
                           </>
                         ) : (
@@ -441,9 +484,9 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         <div className="flex justify-start">
                           <div className="bg-slate-700 text-slate-200 rounded-lg" style={{ padding: 'clamp(0.375rem, 1.5%, 0.5rem)' }}>
                             <div className="flex" style={{ gap: 'clamp(2px, 0.5vw, 4px)' }}>
-                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '0ms' }}></div>
-                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '150ms' }}></div>
-                              <div className="bg-emerald-400 rounded-full animate-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '300ms' }}></div>
+                              <div className="bg-emerald-400 rounded-full animate-smooth-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '0ms' }}></div>
+                              <div className="bg-emerald-400 rounded-full animate-smooth-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '150ms' }}></div>
+                              <div className="bg-emerald-400 rounded-full animate-smooth-bounce" style={{ width: 'clamp(6px, 1.5vw, 8px)', height: 'clamp(6px, 1.5vw, 8px)', animationDelay: '300ms' }}></div>
                             </div>
                           </div>
                         </div>
@@ -539,209 +582,48 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               )}
 
               {type === 'n8n-automations' && (
-                <div className="flex flex-col h-full min-h-0">
-                  <div className="flex items-center justify-between flex-shrink-0" style={{ marginBottom: 'clamp(0.5rem, 1vw, 0.75rem)' }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                      <span className="text-emerald-300 font-medium" style={{ fontSize: 'clamp(0.7rem, 1.6vw, 0.9rem)' }}>
-                        Integration demo
-                      </span>
-                    </div>
-                    <span className="text-slate-400" style={{ fontSize: 'clamp(0.65rem, 1.4vw, 0.85rem)' }}>
-                      Gmail → n8n → Slack/Notion
-                    </span>
-                  </div>
-                  
-                  {/* Visual Workflow Diagram */}
-                  <div
-                    className="bg-slate-900/70 rounded-lg relative overflow-hidden flex-1 min-h-[180px] md:min-h-[220px]"
-                    style={{
-                      padding: 'clamp(0.5rem, 2%, 1rem)',
-                      marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
-                    }}
-                  >
-                    <svg viewBox="0 0 300 160" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-                      {/* Connection lines */}
-                      {/* Gmail -> n8n */}
-                      <motion.line
-                        x1={40}
-                        y1={80}
-                        x2={120}
-                        y2={50}
-                        stroke={activeNode >= 1 ? '#10b981' : '#4a5568'}
-                        strokeWidth="1.5"
-                        strokeDasharray={activeNode >= 1 ? '0' : '4,4'}
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: activeNode >= 1 ? 1 : 0.3 }}
-                        transition={{ duration: 0.26, ease: easeSnappy }}
-                      />
-                      {/* n8n -> Slack */}
-                      <motion.line
-                        x1={120}
-                        y1={50}
-                        x2={200}
-                        y2={80}
-                        stroke={activeNode >= 2 ? '#10b981' : '#4a5568'}
-                        strokeWidth="1.5"
-                        strokeDasharray={activeNode >= 2 ? '0' : '4,4'}
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: activeNode >= 2 ? 1 : 0.3 }}
-                        transition={{ duration: 0.26, ease: easeSnappy }}
-                      />
-                      {/* n8n -> Notion */}
-                      <motion.line
-                        x1={120}
-                        y1={50}
-                        x2={120}
-                        y2={110}
-                        stroke={activeNode >= 3 ? '#10b981' : '#4a5568'}
-                        strokeWidth="1.5"
-                        strokeDasharray={activeNode >= 3 ? '0' : '4,4'}
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: activeNode >= 3 ? 1 : 0.3 }}
-                        transition={{ duration: 0.26, ease: easeSnappy }}
-                      />
-                      
-                      {/* Workflow Nodes */}
-                      {[
-                        { id: 0, x: 40, y: 80, label: 'Gmail', color: '#ea4335' },
-                        { id: 1, x: 120, y: 50, label: 'n8n', color: '#10b981' },
-                        { id: 2, x: 200, y: 80, label: 'Slack', color: '#4a154b' },
-                        { id: 3, x: 120, y: 110, label: 'Notion', color: '#000000' },
-                      ].map((node, idx) => (
-                        <g key={node.id}>
-                          {/* Node circle */}
-                          <motion.circle
-                            cx={node.x}
-                            cy={node.y}
-                            r="17"
-                            fill={activeNode === idx ? node.color : '#374151'}
-                            stroke={activeNode === idx ? '#10b981' : '#4a5568'}
-                            strokeWidth={activeNode === idx ? '2' : '1.5'}
-                            initial={{ scale: 1 }}
-                            animate={{ scale: activeNode === idx ? 1.1 : 1 }}
-                            transition={{ duration: 0.2, ease: easeSnappy }}
-                          />
-                          {/* Node label */}
-                          <text
-                            x={node.x}
-                            y={node.y + 28}
-                            textAnchor="middle"
-                            fill="#e5e7eb"
-                            fontSize="10"
-                            fontWeight="500"
-                            className="select-none"
+                <div className="flex h-full min-h-0 flex-col">
+                  <DemoStatusBar label="Integration demo" hint="Gmail → n8n → Slack/Notion" />
+
+                  <div className="flex min-h-0 flex-1 items-center justify-center gap-0.5 px-0.5 sm:gap-1.5">
+                    {N8N_NODES.map((node, idx) => (
+                      <React.Fragment key={node.id}>
+                        <div
+                          className={`flex w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-lg border px-1 py-2 transition-[border-color,background-color,transform] duration-500 ease-smooth sm:w-[4.75rem] ${
+                            activeNode === idx
+                              ? 'scale-[1.02] border-emerald-500/40 bg-emerald-500/10'
+                              : 'scale-100 border-transparent bg-white/[0.02]'
+                          }`}
+                        >
+                          <div
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-semibold text-white transition-[background-color,transform] duration-500 ease-smooth sm:h-9 sm:w-9"
+                            style={{
+                              backgroundColor: activeNode === idx ? node.color : '#374151',
+                              transform: activeNode === idx ? 'scale(1.05)' : 'scale(1)',
+                            }}
                           >
-                            {node.label}
-                          </text>
-                          {/* Active pulse effect */}
-                          {activeNode === idx && (
-                            <motion.circle
-                              cx={node.x}
-                              cy={node.y}
-                              r="17"
-                              fill={node.color}
-                              opacity="0.3"
-                              initial={{ scale: 1, opacity: 0.5 }}
-                              animate={{ scale: 1.4, opacity: 0 }}
-                              transition={{ duration: 0.7, repeat: Infinity }}
-                            />
-                          )}
-                        </g>
-                      ))}
-                    </svg>
-
-                    {/* Auto-play animation indicator */}
-                    <div className="absolute bottom-1.5 md:bottom-2 right-1.5 md:right-2 flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-emerald-400">
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                      <span className="hidden sm:inline">Demo active</span>
-                      <span className="sm:hidden">Active</span>
-                    </div>
+                            {node.label.slice(0, 1)}
+                          </div>
+                          <span className="text-[10px] font-medium text-slate-300 sm:text-[11px]">{node.label}</span>
+                        </div>
+                        {idx < N8N_NODES.length - 1 && (
+                          <span className="shrink-0 px-0.5 text-[10px] text-slate-600 sm:text-xs" aria-hidden>
+                            →
+                          </span>
+                        )}
+                      </React.Fragment>
+                    ))}
                   </div>
 
-                  {/* Workflow Description */}
-                  <div
-                    className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex-shrink-0 w-full"
-                    style={{
-                      padding: 'clamp(0.5rem, 1.8%, 0.75rem)',
-                      marginTop: 'auto',
-                      marginBottom: 'clamp(0.5rem, 2%, 0.75rem)',
-                    }}
-                  >
-                    <p className="text-emerald-300 text-center leading-relaxed break-words" style={{ 
-                      fontSize: 'clamp(0.6rem, 1.6vw, 0.85rem)',
-                      lineHeight: '1.35'
-                    }}>
-                      Example flow: email in → n8n routes → Slack & Notion stay in sync
-                    </p>
-                  </div>
-
+                  <p className="mt-auto shrink-0 pt-2 text-center text-[11px] leading-snug text-slate-500">
+                    Email in → n8n routes → Slack &amp; Notion stay in sync
+                  </p>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Visual Enhancement - Phone Mockup for Voice */}
-        {type === 'voice-agent' && isActive && (
-          <div className="absolute top-4 right-4 w-24 h-24 opacity-20">
-            <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full blur-xl"></div>
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center"
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </motion.div>
-            </div>
-          </div>
-        )}
-
-        {/* Visual Enhancement - Chat Bubbles for Chatbot */}
-        {type === 'chatbot' && isActive && (
-          <div className="absolute top-4 right-4 w-20 h-20 opacity-20">
-            <motion.div
-              className="w-full h-full flex flex-col gap-2"
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <div className="w-12 h-8 bg-emerald-500 rounded-lg rounded-bl-none ml-auto"></div>
-              <div className="w-10 h-8 bg-slate-600 rounded-lg rounded-br-none"></div>
-            </motion.div>
-          </div>
-        )}
-
-        {/* Visual Enhancement - Network Nodes for n8n */}
-        {type === 'n8n-automations' && isActive && (
-          <div className="absolute top-4 right-4 w-20 h-20 opacity-20">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              {[0, 1, 2].map((i) => (
-                <motion.circle
-                  key={i}
-                  cx={50 + Math.cos(i * 2.09) * 20}
-                  cy={50 + Math.sin(i * 2.09) * 20}
-                  r="8"
-                  fill="#10b981"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
-                />
-              ))}
-              <motion.circle
-                cx={50}
-                cy={50}
-                r="8"
-                fill="#10b981"
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </svg>
-          </div>
-        )}
-
-        {/* Bottom accent line */}
         <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${gradient}`} />
       </div>
     </div>

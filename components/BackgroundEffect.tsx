@@ -211,7 +211,7 @@ export default function BackgroundEffect() {
       if (scrollTimeout) window.clearTimeout(scrollTimeout);
       scrollTimeout = window.setTimeout(() => {
         isScrolling = false;
-      }, 150);
+      }, 320);
     }
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -223,14 +223,15 @@ export default function BackgroundEffect() {
     
     let frameIndex = 0;
     function animate() {
-      if (!isVisible) {
-        animationRef.current = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
+
+      if (!isVisible || isScrolling) {
         return;
       }
+
       frameIndex += 1;
       // Cap ~30fps to reduce main-thread load (canvas + page blur layers)
       if (frameIndex % 2 !== 0) {
-        animationRef.current = requestAnimationFrame(animate);
         return;
       }
       const currentTime = Date.now();
@@ -242,7 +243,6 @@ export default function BackgroundEffect() {
       const height = Math.max(1, window.innerHeight);
 
       animateDots(width, height, time, deltaTime);
-      animationRef.current = requestAnimationFrame(animate);
     }
 
     function handleMouseMove(e: MouseEvent) {
