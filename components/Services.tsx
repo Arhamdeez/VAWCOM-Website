@@ -91,8 +91,8 @@ export default function Services() {
 				</div>
 
 				{/* All demos stay mounted — opacity crossfade avoids remount jank (esp. n8n). */}
-				<div className="relative mx-auto w-full max-w-4xl">
-					<div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+				<div className="relative mx-auto w-full min-w-0 max-w-4xl overflow-x-clip">
+					<div className="grid min-w-0 [&>*]:col-start-1 [&>*]:row-start-1 [&>*]:min-w-0">
 						{services.map((service, index) => {
 							const isCurrent = currentCardIndex === index;
 							return (

@@ -23,7 +23,7 @@ const N8N_NODES = [
 
 /** Same demo chrome height for every card — phone + laptop stay aligned. */
 const DEMO_PANEL =
-  'glass-inset flex h-[252px] flex-col overflow-hidden rounded-xl p-3 sm:h-[272px] sm:p-4 md:h-[292px]';
+  'glass-inset flex h-[252px] min-w-0 max-w-full flex-col overflow-hidden rounded-xl p-2.5 sm:h-[272px] sm:p-4 md:h-[292px]';
 
 function DemoStatusBar({ label, hint }: { label: string; hint?: string }) {
   return (
@@ -114,14 +114,14 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
   }, [botHistory, isTyping, type]);
 
   return (
-    <div className="relative group cursor-pointer h-full w-full">
+    <div className="relative group h-full w-full min-w-0 max-w-full cursor-pointer overflow-hidden">
       {/* Simple glow effect */}
       <div
         className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-xl opacity-0 transition-opacity duration-300 ease-smooth group-hover:opacity-[0.18] md:group-hover:opacity-25`}
       />
 
       {/* Frosted shell: stacked Services cards need opacity + blur so back cards don’t bleed through */}
-      <div className="relative isolate w-full overflow-hidden rounded-2xl p-4 glass-dense sm:p-5 md:p-6">
+      <div className="relative isolate w-full min-w-0 max-w-full overflow-hidden rounded-2xl p-3 glass-dense sm:p-5 md:p-6">
         <div className="relative z-10 flex flex-col">
           <div className="mb-4 flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 md:h-11 md:w-11">
@@ -339,21 +339,17 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
               )}
 
               {type === 'chatbot' && (
-                <div className="flex flex-col h-full min-h-0">
-                  <div className="text-center mb-[1.5%] flex-shrink-0" style={{ marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)' }}>
-                    <h4 className="text-white font-semibold mb-[0.5%]" style={{ 
-                      fontSize: 'clamp(0.875rem, 3.5vw, 1.25rem)',
-                      marginBottom: 'clamp(0.25rem, 0.5%, 0.5rem)'
-                    }}>AI Chatbot with Document Q&A</h4>
-                    <p className="text-slate-400" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>Upload documents and ask questions about them</p>
+                <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
+                  <div className="mb-2 shrink-0 text-center">
+                    <h4 className="mb-0.5 text-sm font-semibold leading-snug text-white sm:text-base md:text-lg">
+                      AI Chatbot with Document Q&amp;A
+                    </h4>
+                    <p className="text-[11px] text-slate-400 sm:text-xs">Upload documents and ask questions about them</p>
                   </div>
 
                   {/* Document Upload Section */}
-                  <div className="mb-[1.5%] flex gap-2 flex-shrink-0" style={{ 
-                    marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
-                    gap: 'clamp(0.25rem, 1%, 0.5rem)'
-                  }}>
-                    <label className="flex-1 block">
+                  <div className="mb-2 flex min-w-0 shrink-0 gap-1.5 sm:gap-2">
+                    <label className="block min-w-0 flex-1">
                       <input
                         type="file"
                         accept=".txt,.pdf,.doc,.docx,.md"
@@ -400,14 +396,11 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         className="hidden"
                         disabled={isUploading}
                       />
-                      <div className={`flex items-center rounded-lg border-2 border-dashed cursor-pointer transition-all ${
+                      <div className={`flex min-w-0 items-center gap-1.5 rounded-lg border-2 border-dashed px-2 py-1.5 transition-all sm:gap-2 sm:px-2.5 sm:py-2 ${
                         isUploading
                           ? 'border-emerald-500 bg-emerald-500/10 cursor-wait'
                           : 'border-slate-600 hover:border-emerald-500/50 bg-slate-800/50'
-                      }`} style={{ 
-                        gap: 'clamp(0.25rem, 1%, 0.5rem)',
-                        padding: 'clamp(0.375rem, 2%, 0.5rem)'
-                      }}>
+                      }`}>
                         {isUploading ? (
                           <>
                             <div className="border-2 border-emerald-500 border-t-transparent rounded-full animate-smooth-spin" style={{ width: 'clamp(10px, 2.5vw, 12px)', height: 'clamp(10px, 2.5vw, 12px)' }}></div>
@@ -418,8 +411,8 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                             <svg className="text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(14px, 3.5vw, 16px)', height: 'clamp(14px, 3.5vw, 16px)' }}>
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
-                            <span className="text-slate-300 truncate" style={{ fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)' }}>
-                              {uploadedFile ? `📄 ${uploadedFile.name.substring(0, 20)}${uploadedFile.name.length > 20 ? '...' : ''}` : 'Upload Document'}
+                            <span className="min-w-0 truncate text-[11px] text-slate-300 sm:text-xs">
+                              {uploadedFile ? `📄 ${uploadedFile.name}` : 'Upload Document'}
                             </span>
                           </>
                         )}
@@ -441,11 +434,7 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                           setUploadedFile(null);
                           setBotHistory([{ type: 'ai', message: "Document cleared. Upload a new document or ask me anything!" }]);
                         }}
-                        className="bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg border border-red-500/30 transition-colors flex-shrink-0 flex items-center justify-center"
-                        style={{ 
-                          padding: 'clamp(0.375rem, 2%, 0.5rem)',
-                          minWidth: 'clamp(2rem, 8%, 2.5rem)'
-                        }}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-red-600/20 text-red-400 transition-colors hover:bg-red-600/30 sm:h-10 sm:w-10"
                         title="Clear document"
                       >
                         <svg className="flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: 'clamp(14px, 3.5vw, 16px)', height: 'clamp(14px, 3.5vw, 16px)' }}>
@@ -458,24 +447,16 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   {/* Chat History */}
                   <div 
                     ref={chatHistoryRef}
-                    className="bg-slate-900/50 rounded-lg flex-1 overflow-y-auto mb-[1.5%] min-h-0 scroll-smooth" 
-                    style={{ 
-                      padding: 'clamp(0.5rem, 2%, 0.75rem)',
-                      marginBottom: 'clamp(0.5rem, 1.5%, 0.75rem)',
-                      maxHeight: '50%'
-                    }}
+                    className="mb-2 min-h-0 flex-1 overflow-x-hidden overflow-y-auto scroll-smooth rounded-lg bg-slate-900/50 p-2 sm:p-3" 
                   >
                     <div style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)' }}>
                       {botHistory.map((msg, idx) => (
                         <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`} style={{ marginBottom: 'clamp(0.25rem, 1%, 0.5rem)' }}>
-                          <div className={`max-w-[85%] rounded-lg ${
+                          <div className={`max-w-[88%] break-words rounded-lg px-2 py-1.5 text-[11px] leading-snug sm:max-w-[85%] sm:px-2.5 sm:py-2 sm:text-xs ${
                             msg.type === 'user' 
                               ? 'bg-emerald-600 text-white' 
                               : 'bg-slate-700 text-slate-200'
-                          }`} style={{ 
-                            padding: 'clamp(0.375rem, 1.5%, 0.5rem)',
-                            fontSize: 'clamp(0.5rem, 1.5vw, 0.75rem)'
-                          }}>
+                          }`}>
                             {msg.message}
                           </div>
                         </div>
@@ -495,17 +476,13 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                   </div>
 
                   {/* Input Area */}
-                  <div className="flex gap-2 flex-shrink-0" style={{ gap: 'clamp(0.25rem, 1%, 0.5rem)' }}>
+                  <div className="flex min-w-0 shrink-0 gap-1.5 sm:gap-2">
                     <input
                       type="text"
                       value={botMessage}
                       onChange={(e) => setBotMessage(e.target.value)}
-                      placeholder={uploadedFile ? "Ask about your document..." : "Ask me anything..."}
-                      className="flex-1 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none disabled:opacity-50"
-                      style={{ 
-                        padding: 'clamp(0.5rem, 2%, 0.625rem)',
-                        fontSize: 'clamp(1rem, 2.5vw, 1rem)'
-                      }}
+                      placeholder={uploadedFile ? 'Ask about doc…' : 'Ask me anything…'}
+                      className="min-w-0 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-2 text-base text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none disabled:opacity-50 sm:px-3"
                       onKeyPress={async (e) => {
                         if (e.key === 'Enter' && botMessage.trim() && !isTyping) {
                           const userMessage = botMessage;
@@ -568,56 +545,68 @@ export default function ServiceCard({ icon: Icon, title, description, gradient, 
                         }
                       }}
                       disabled={isTyping || !botMessage.trim()}
-                      className="btn-glass-primary flex flex-shrink-0 items-center justify-center rounded-lg font-medium text-white disabled:cursor-not-allowed"
-                      style={{ 
-                        padding: 'clamp(0.5rem, 2%, 0.625rem)',
-                        fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
-                        minWidth: 'clamp(3rem, 12%, 4rem)'
-                      }}
+                      className="btn-glass-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white disabled:cursor-not-allowed sm:h-auto sm:w-auto sm:min-w-[4rem] sm:px-3 sm:py-2 sm:text-sm sm:font-medium"
+                      aria-label="Send message"
                     >
-                      Send
+                      <span className="hidden sm:inline">Send</span>
+                      <svg className="h-4 w-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
                     </button>
                   </div>
                 </div>
               )}
 
               {type === 'n8n-automations' && (
-                <div className="flex h-full min-h-0 flex-col">
+                <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
                   <DemoStatusBar label="Integration demo" hint="Gmail → n8n → Slack/Notion" />
 
-                  <div className="flex min-h-0 flex-1 items-center justify-center gap-0.5 px-0.5 sm:gap-1.5">
-                    {N8N_NODES.map((node, idx) => (
-                      <React.Fragment key={node.id}>
-                        <div
-                          className={`flex w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-lg border px-1 py-2 transition-[border-color,background-color,transform] duration-500 ease-smooth sm:w-[4.75rem] ${
-                            activeNode === idx
-                              ? 'scale-[1.02] border-emerald-500/40 bg-emerald-500/10'
-                              : 'scale-100 border-transparent bg-white/[0.02]'
-                          }`}
-                        >
-                          <div
-                            className="flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-semibold text-white transition-[background-color,transform] duration-500 ease-smooth sm:h-9 sm:w-9"
-                            style={{
-                              backgroundColor: activeNode === idx ? node.color : '#374151',
-                              transform: activeNode === idx ? 'scale(1.05)' : 'scale(1)',
-                            }}
-                          >
-                            {node.label.slice(0, 1)}
-                          </div>
-                          <span className="text-[10px] font-medium text-slate-300 sm:text-[11px]">{node.label}</span>
-                        </div>
-                        {idx < N8N_NODES.length - 1 && (
-                          <span className="shrink-0 px-0.5 text-[10px] text-slate-600 sm:text-xs" aria-hidden>
-                            →
-                          </span>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-gradient-to-b from-slate-900/35 to-slate-950/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
+                    <div className="flex min-h-0 flex-1 items-center justify-center px-2 sm:px-3">
+                      <div className="flex w-full min-w-0 items-center justify-center gap-0.5 sm:gap-1">
+                        {N8N_NODES.map((node, idx) => (
+                          <React.Fragment key={node.id}>
+                            <div
+                              className={`relative flex min-h-[3.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-1 py-2 transition-[background-color,box-shadow] duration-500 ease-smooth sm:min-h-[3.75rem] sm:gap-1.5 sm:px-1.5 ${
+                                activeNode === idx
+                                  ? 'bg-emerald-500/[0.09] shadow-[inset_0_0_16px_rgba(16,185,129,0.12)] ring-1 ring-inset ring-emerald-500/28'
+                                  : 'bg-white/[0.02]'
+                              }`}
+                            >
+                              {activeNode === idx ? (
+                                <div
+                                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_90%_at_50%_50%,rgba(16,185,129,0.2),transparent_68%)]"
+                                  aria-hidden
+                                />
+                              ) : null}
+                              <div
+                                className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold text-white transition-[background-color,box-shadow] duration-500 ease-smooth sm:h-8 sm:w-8 sm:text-[10px] ${
+                                  activeNode === idx ? 'shadow-[0_0_0_2px_rgba(16,185,129,0.35),0_0_10px_rgba(16,185,129,0.18)]' : ''
+                                }`}
+                                style={{
+                                  backgroundColor: activeNode === idx ? node.color : '#374151',
+                                }}
+                              >
+                                {node.label.slice(0, 1)}
+                              </div>
+                              <span className="relative z-10 w-full truncate text-center text-[9px] font-medium leading-none text-slate-300 sm:text-[11px]">
+                                {node.label}
+                              </span>
+                            </div>
+                            {idx < N8N_NODES.length - 1 && (
+                              <span className="shrink-0 px-0.5 text-[8px] leading-none text-slate-600 sm:text-xs" aria-hidden>
+                                →
+                              </span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
 
-                  <p className="mt-auto shrink-0 pt-2 text-center text-[11px] leading-snug text-slate-500">
-                    Email in → n8n routes → Slack &amp; Notion stay in sync
-                  </p>
+                    <p className="shrink-0 border-t border-white/[0.05] px-2 py-2 text-center text-[10px] leading-snug text-slate-500 sm:py-2.5 sm:text-[11px]">
+                      Email in → n8n routes → Slack &amp; Notion stay in sync
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

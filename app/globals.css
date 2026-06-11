@@ -24,18 +24,21 @@ body::-webkit-scrollbar {
   }
 }
 
-/* ─── Splash boot (no content flash before animated splash) ─── */
+/* ─── Splash boot (overlay covers app — never hide #vawcom-app or a stuck splash blanks the page) ─── */
 
 html.splash-pending body {
   overflow: hidden !important;
 }
 
-html.splash-pending #vawcom-app {
-  visibility: hidden;
+#vawcom-app {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .splash-boot {
   display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 html.splash-pending .splash-boot {
@@ -43,20 +46,26 @@ html.splash-pending .splash-boot {
   position: fixed;
   inset: 0;
   z-index: 9998;
-  background: #000;
-  pointer-events: none;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 85% 60% at 50% 42%, rgba(16, 185, 129, 0.07) 0%, transparent 55%),
+    #050a14;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html.splash-pending.splash-react-ready .splash-boot {
+  opacity: 0;
+}
+
+html.splash-complete .splash-boot,
+html.splash-exiting .splash-boot {
   display: none;
 }
 
-html.splash-complete .splash-boot {
-  display: none;
-}
-
-html.splash-complete #vawcom-app {
-  visibility: visible;
+@media (prefers-reduced-motion: reduce) {
+  html.splash-pending .splash-boot {
+    transition: opacity 0.15s ease;
+  }
 }
 
 .vawcom-marquee {

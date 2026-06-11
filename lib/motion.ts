@@ -49,6 +49,15 @@ export const tCrossfade: Transition = { duration: ui.crossfade, ease: easeSmooth
 
 export const tExit: Transition = { duration: ui.exit, ease: easeOut };
 
+/** Splash logo enter — soft premium settle. */
+export const tSplashEnter: Transition = { duration: 0.62, ease: easeSmooth };
+
+/** Splash overlay exit — overlaps with app reveal. */
+export const tSplashExit: Transition = { duration: 0.72, ease: easeOut };
+
+/** App content reveal under splash. */
+export const tSplashReveal: Transition = { duration: 0.78, ease: easePage };
+
 export function tAmbient(duration: number, delay = 0): Transition {
   return { duration, delay, repeat: Infinity, ease: easeAmbient };
 }
