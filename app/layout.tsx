@@ -1,11 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
-import SplashScreenWrapper from '@/components/SplashScreenWrapper';
-import PageTransition from '@/components/PageTransition';
+import SiteShell from '@/components/SiteShell';
 import { SPLASH_BOOT_SCRIPT } from '@/lib/splashBoot';
 
 const inter = Inter({ 
@@ -76,14 +72,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
       </head>
       <body className={`${inter.className} bg-[#050a14]`}>
-        <SplashScreenWrapper>
-          <BackgroundEffectWrapper />
-          <Navbar />
-          <main className="relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
-            <PageTransition>{children}</PageTransition>
-          </main>
-          <Footer />
-        </SplashScreenWrapper>
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );
