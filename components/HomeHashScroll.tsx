@@ -47,7 +47,7 @@ export default function HomeHashScroll() {
 
     const scrollToHash = () => {
       const hash = window.location.hash.slice(1);
-      if (hash !== 'services') return;
+      if (hash !== 'demos' && hash !== 'services') return;
       scrollToServicesSection();
     };
 

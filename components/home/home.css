@@ -1,0 +1,107 @@
+@font-face {
+  font-family: 'Brodish';
+  src: url('/fonts/Brodish.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Sticky zoom/track need a visible overflow chain up to the viewport scroller */
+html:has(.vaw-home),
+body:has(.vaw-home) {
+  overflow-x: visible !important;
+}
+
+.vaw-home {
+  --vaw-bg: #0b0d0c;
+  --vaw-ink: #ece9e3;
+  --vaw-muted: rgba(236, 233, 227, 0.72);
+  --vaw-faint: rgba(236, 233, 227, 0.45);
+  --vaw-green: #429f7f;
+  --vaw-green-hover: #429f7f;
+  --vaw-mint: #429f7f; /* kept alias — all green text/accents share one shade */
+  --vaw-orange: #cf6a2c;
+  --vaw-panel: #131816;
+  --vaw-cream: #fbf6ec;
+  position: relative;
+  /* Must stay visible — overflow-x clip/hidden on an ancestor kills position:sticky */
+  overflow: visible;
+  background: var(--vaw-bg);
+  color: var(--vaw-ink);
+  font-family: var(--font-space), 'Space Grotesk', Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vaw-home a:hover {
+  color: var(--vaw-green);
+}
+
+.vaw-home ::selection {
+  background: var(--vaw-green);
+  color: var(--vaw-bg);
+}
+
+/* Single green for copy; use opacity modifiers when softer */
+.vaw-green {
+  color: #429f7f;
+}
+
+.vaw-display {
+  font-family: 'Brodish', var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 0.92;
+}
+
+/* Organic CTA / box masks from the design prototype */
+.vaw-wavy {
+  border-radius: 0 !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 208 82' preserveAspectRatio='none'%3E%3Cpath d='M14 26 C14 11 30 4 52 7 C78 11 104 2 132 5 C158 8 184 1 194 13 C204 25 197 41 199 53 C201 68 180 77 152 74 C124 71 96 79 68 76 C42 73 16 80 8 67 C1 55 14 40 14 26 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 208 82' preserveAspectRatio='none'%3E%3Cpath d='M14 26 C14 11 30 4 52 7 C78 11 104 2 132 5 C158 8 184 1 194 13 C204 25 197 41 199 53 C201 68 180 77 152 74 C124 71 96 79 68 76 C42 73 16 80 8 67 C1 55 14 40 14 26 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.vaw-wavybox {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 308 152' preserveAspectRatio='none'%3E%3Cpath d='M6 34 C6 14 26 6 58 8 C96 11 140 3 184 6 C226 9 268 2 288 12 C306 21 300 40 302 58 C304 78 298 96 300 116 C302 138 282 148 244 145 C202 142 158 150 116 147 C76 144 30 152 16 140 C4 130 8 110 6 90 C4 70 6 52 6 34 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 308 152' preserveAspectRatio='none'%3E%3Cpath d='M6 34 C6 14 26 6 58 8 C96 11 140 3 184 6 C226 9 268 2 288 12 C306 21 300 40 302 58 C304 78 298 96 300 116 C302 138 282 148 244 145 C202 142 158 150 116 147 C76 144 30 152 16 140 C4 130 8 110 6 90 C4 70 6 52 6 34 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.vaw-splash-mask {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C22 6 52 14 78 16 C108 18 132 2 158 8 C180 13 194 14 200 26 L200 74 C192 90 172 88 148 90 C120 93 96 100 70 96 C44 92 20 96 0 78 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C22 6 52 14 78 16 C108 18 132 2 158 8 C180 13 194 14 200 26 L200 74 C192 90 172 88 148 90 C120 93 96 100 70 96 C44 92 20 96 0 78 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.vaw-paint-mask {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 192'%3E%3Cpath d='M92 6 C104 22 118 14 128 24 C136 32 130 46 140 50 C152 55 168 34 178 44 C187 53 166 68 170 78 C174 89 196 88 196 100 C196 113 172 108 166 118 C160 128 176 146 165 154 C153 162 140 142 128 144 C114 146 112 168 98 168 C84 168 84 147 71 143 C57 139 44 160 34 152 C24 144 40 128 34 117 C28 107 4 112 4 98 C4 85 27 88 32 77 C37 66 16 52 26 43 C36 34 52 54 63 48 C73 42 66 27 75 19 C82 12 86 14 92 6 Z M186 22 C193 14 200 20 197 28 C195 34 189 36 186 33 C183 30 183 26 186 22 Z M12 44 C17 36 24 41 22 49 C20 55 15 57 12 54 C9 51 9 48 12 44 Z M158 176 C165 170 171 176 168 184 C166 190 160 191 157 187 C155 184 155 179 158 176 Z M38 178 C44 172 50 178 47 186 C45 191 40 192 37 188 C35 185 35 181 38 178 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 192'%3E%3Cpath d='M92 6 C104 22 118 14 128 24 C136 32 130 46 140 50 C152 55 168 34 178 44 C187 53 166 68 170 78 C174 89 196 88 196 100 C196 113 172 108 166 118 C160 128 176 146 165 154 C153 162 140 142 128 144 C114 146 112 168 98 168 C84 168 84 147 71 143 C57 139 44 160 34 152 C24 144 40 128 34 117 C28 107 4 112 4 98 C4 85 27 88 32 77 C37 66 16 52 26 43 C36 34 52 54 63 48 C73 42 66 27 75 19 C82 12 86 14 92 6 Z M186 22 C193 14 200 20 197 28 C195 34 189 36 186 33 C183 30 183 26 186 22 Z M12 44 C17 36 24 41 22 49 C20 55 15 57 12 54 C9 51 9 48 12 44 Z M158 176 C165 170 171 176 168 184 C166 190 160 191 157 187 C155 184 155 179 158 176 Z M38 178 C44 172 50 178 47 186 C45 191 40 192 37 188 C35 185 35 181 38 178 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.vaw-drop {
+  border-radius: 62% 38% 55% 45% / 45% 58% 42% 55%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-home [data-bar] {
+    animation: none !important;
+  }
+}

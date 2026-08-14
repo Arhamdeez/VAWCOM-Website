@@ -32,6 +32,18 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     return <StandaloneShell>{children}</StandaloneShell>;
   }
 
+  /* Design home + contact own nav/footer/backdrop */
+  if (pathname === '/' || pathname === '/contact') {
+    return (
+      <SplashScreenWrapper>
+        {/* overflow visible so sticky zoom / services pin work */}
+        <main className="relative min-h-0 w-full bg-[#0b0d0c] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
+          {children}
+        </main>
+      </SplashScreenWrapper>
+    );
+  }
+
   return (
     <SplashScreenWrapper>
       <BackgroundEffectWrapper />
