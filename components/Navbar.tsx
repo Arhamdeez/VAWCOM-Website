@@ -47,7 +47,7 @@ const Navbar = () => {
   }, [mobileMenuOpen]);
 
   const navItems = [
-    { label: 'Services', href: '/#services' },
+    { label: 'Demos', href: '/#demos' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
   ];
@@ -72,7 +72,7 @@ const Navbar = () => {
 
   const navLinkClass = (href: string) => {
     const active =
-      pathname === href || (href === '/#services' && pathname === '/');
+      pathname === href || (href === '/#demos' && pathname === '/');
     return `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-smooth ${
       active
         ? 'text-emerald-400'
