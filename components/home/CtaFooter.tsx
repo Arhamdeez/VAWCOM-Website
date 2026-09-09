@@ -8,10 +8,7 @@ export default function CtaFooter() {
   return (
     <>
       <section id="contact" className="mx-auto mt-[104px] max-w-[1440px] px-8">
-        <div
-          data-reveal="up"
-          className="vaw-wavybox grid grid-cols-1 items-end gap-12 bg-[#131816] px-8 py-14 sm:px-16 sm:py-[72px] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
-        >
+        <div className="vaw-wavybox grid grid-cols-1 items-end gap-12 bg-[#131816] px-8 py-14 sm:px-16 sm:py-[72px] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <div>
             <h2 className="vaw-display m-0 max-w-[20ch] text-[clamp(34px,4.2vw,62px)] leading-[0.96] tracking-[-0.02em]">
               Have a project in mind?
@@ -47,9 +44,9 @@ export default function CtaFooter() {
           </div>
           <div className="flex flex-col gap-2.5 text-[14.5px]">
             <span className="text-[13.5px] text-[rgba(236,233,227,0.45)]">Quick links</span>
-            <a href="#demos">Demos</a>
-            <a href="#process">Services</a>
-            <a href="#about">About</a>
+            <Link href="/services">Services</Link>
+            <Link href="/gallery">Gallery</Link>
+            <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
           </div>
           <div className="flex flex-col gap-2.5 text-[14.5px]">

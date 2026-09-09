@@ -3,20 +3,32 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { easeOut, tAmbient, tSplashEnter, tSplashExit } from '@/lib/motion';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import { easeSmooth, easeOut } from '@/lib/motion';
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['800'],
+  display: 'swap',
+});
 
 interface SplashScreenProps {
   onExiting: () => void;
   onComplete: () => void;
 }
 
-const SPLASH_HOLD_MS = 1080;
-const SPLASH_HOLD_REDUCED_MS = 380;
-const EXIT_FALLBACK_MS = 900;
+const FADE_MS = 280;
+const HOLD_MS = 60;
+const SPLIT_MS = 480;
+const SIDES_MS = 280;
+const LOGO_HOLD_MS = 160;
+const EXIT_FALLBACK_MS = 550;
 
 export default function SplashScreen({ onExiting, onComplete }: SplashScreenProps) {
   const reduceMotion = useReducedMotion();
   const [show, setShow] = useState(true);
+  const [split, setSplit] = useState(false);
+  const [clearSides, setClearSides] = useState(false);
   const finishedRef = useRef(false);
   const exitFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -35,37 +47,68 @@ export default function SplashScreen({ onExiting, onComplete }: SplashScreenProp
     document.documentElement.classList.add('splash-react-ready');
     document.body.style.overflow = 'hidden';
 
-    const holdMs = reduceMotion === true ? SPLASH_HOLD_REDUCED_MS : SPLASH_HOLD_MS;
-    const timer = setTimeout(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    const beginExit = () => {
       onExiting();
       setShow(false);
       exitFallbackRef.current = setTimeout(finishOnce, EXIT_FALLBACK_MS);
-    }, holdMs);
+    };
+
+    if (reduceMotion === true) {
+      setSplit(true);
+      setClearSides(true);
+      timers.push(setTimeout(beginExit, 380));
+    } else {
+      const splitAt = FADE_MS + HOLD_MS;
+      const sidesAt = splitAt + SPLIT_MS;
+      const exitAt = sidesAt + SIDES_MS + LOGO_HOLD_MS;
+      timers.push(setTimeout(() => setSplit(true), splitAt));
+      timers.push(setTimeout(() => setClearSides(true), sidesAt));
+      timers.push(setTimeout(beginExit, exitAt));
+    }
 
     return () => {
-      clearTimeout(timer);
+      timers.forEach(clearTimeout);
       if (exitFallbackRef.current) {
         clearTimeout(exitFallbackRef.current);
         exitFallbackRef.current = null;
       }
       document.body.style.overflow = '';
     };
-    // reduceMotion intentionally omitted — only read once per mount to avoid resetting the hold timer
+    // reduceMotion intentionally omitted — only read once per mount to avoid resetting timers
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onExiting, finishOnce]);
 
   const backdropExit = reduceMotion
-    ? { opacity: 0, transition: { duration: 0.2 } }
-    : { opacity: 0, scale: 1.015, transition: tSplashExit };
+    ? { opacity: 0, transition: { duration: 0.15 } }
+    : { opacity: 0, transition: { duration: 0.4, ease: easeOut } };
 
-  const logoExit = reduceMotion
-    ? { opacity: 0, transition: { duration: 0.18 } }
+  const markExit = reduceMotion
+    ? { opacity: 0, transition: { duration: 0.15 } }
     : {
         opacity: 0,
-        scale: 0.94,
-        y: -10,
-        transition: { ...tSplashExit, duration: 0.58 },
+        y: -6,
+        transition: { duration: 0.35, ease: easeOut },
       };
+
+  const splitTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.38, ease: easeSmooth };
+
+  const sidesTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: SIDES_MS / 1000, ease: easeSmooth };
+
+  const knockTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.28, ease: [0.5, 0, 1, 1] as const, delay: split ? 0.02 : 0 };
+
+  const dropTransition = reduceMotion
+    ? { duration: 0 }
+    : split
+      ? { type: 'spring' as const, stiffness: 520, damping: 30, mass: 0.65, delay: 0.03 }
+      : { duration: 0 };
 
   return (
     <AnimatePresence onExitComplete={finishOnce}>
@@ -77,77 +120,75 @@ export default function SplashScreen({ onExiting, onComplete }: SplashScreenProp
           onAnimationComplete={(definition) => {
             if (definition === 'exit') finishOnce();
           }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#050a14]"
+          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#F5F3EE]"
+          aria-label="VAWCOM"
+          role="img"
         >
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_65%_at_50%_40%,rgba(16,185,129,0.09)_0%,transparent_58%)]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_50%_100%,rgba(0,0,0,0.45)_0%,transparent_55%)]"
-            aria-hidden
-          />
-
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 12 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={logoExit}
-            transition={tSplashEnter}
-            className="relative z-10"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={markExit}
+            transition={reduceMotion ? { duration: 0 } : { duration: FADE_MS / 1000, ease: easeSmooth }}
+            className={`${jakarta.className} relative z-10 flex items-center text-[clamp(2.6rem,8.5vw,5.25rem)] font-extrabold leading-none tracking-[-0.08em] text-[#161615]`}
           >
-            <div className="relative">
-              <motion.div
+            <motion.span
+              animate={{
+                x: clearSides ? '-55vw' : split ? '-0.45em' : 0,
+                opacity: clearSides ? 0 : 1,
+              }}
+              transition={clearSides ? sidesTransition : splitTransition}
+              className="relative z-[1] -mr-[0.04em]"
+            >
+              VA
+            </motion.span>
+            <span className="relative z-[2] inline-block">
+              <span className="invisible select-none" aria-hidden>
+                W
+              </span>
+              <motion.span
+                initial={false}
                 animate={
-                  reduceMotion
-                    ? { opacity: 0.28 }
-                    : {
-                        scale: [1, 1.1, 1],
-                        opacity: [0.18, 0.34, 0.18],
-                      }
+                  split
+                    ? { x: '-35%', y: '65vh', rotate: 20, opacity: 0 }
+                    : { x: '-50%', y: '-50%', rotate: 0, opacity: 1 }
                 }
-                transition={reduceMotion ? { duration: 0 } : tAmbient(2.6)}
-                className="absolute left-1/2 top-1/2 h-[min(78vw,18rem)] w-[min(78vw,18rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-emerald-500/22 to-teal-500/18 blur-3xl sm:h-[20rem] sm:w-[20rem] md:h-[27rem] md:w-[27rem] lg:h-[30rem] lg:w-[30rem]"
-              />
-
-              <div className="relative flex h-[15rem] w-[15rem] items-center justify-center sm:h-[17rem] sm:w-[17rem] md:h-[23rem] md:w-[23rem] lg:h-[26rem] lg:w-[26rem]">
+                transition={knockTransition}
+                className="absolute left-1/2 top-1/2"
+              >
+                W
+              </motion.span>
+              <motion.span
+                initial={false}
+                animate={
+                  split
+                    ? { x: '-50%', y: '-50%', scale: 2.2, opacity: 1 }
+                    : { x: '-50%', y: '-48vh', scale: 1.35, opacity: 0 }
+                }
+                transition={dropTransition}
+                className="absolute left-1/2 top-1/2 block"
+                aria-hidden
+              >
                 <Image
                   src="/logo.png"
-                  alt="VAWCOM Logo"
+                  alt=""
                   width={512}
                   height={512}
                   priority
                   unoptimized
-                  className="h-full w-full object-contain drop-shadow-2xl"
-                  style={{ imageRendering: 'crisp-edges' }}
+                  className="h-[1.2em] w-[1.2em] max-w-none object-contain"
                 />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6, transition: { duration: 0.28, ease: easeOut } }}
-            transition={{ ...tSplashEnter, delay: 0.22 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2"
-          >
-            <div className="flex gap-2">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  animate={
-                    reduceMotion
-                      ? { opacity: 0.7 }
-                      : {
-                          scale: [1, 1.12, 1],
-                          opacity: [0.4, 1, 0.4],
-                        }
-                  }
-                  transition={reduceMotion ? { duration: 0 } : tAmbient(0.95, i * 0.14)}
-                  className="h-2 w-2 rounded-full bg-emerald-500/90"
-                />
-              ))}
-            </div>
+              </motion.span>
+            </span>
+            <motion.span
+              animate={{
+                x: clearSides ? '55vw' : split ? '0.45em' : 0,
+                opacity: clearSides ? 0 : 1,
+              }}
+              transition={clearSides ? sidesTransition : splitTransition}
+              className="relative z-[1] -ml-[0.04em]"
+            >
+              COM
+            </motion.span>
           </motion.div>
         </motion.div>
       )}

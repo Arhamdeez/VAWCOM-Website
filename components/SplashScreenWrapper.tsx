@@ -3,15 +3,15 @@
 import { useState, useLayoutEffect, useCallback, useRef } from 'react';
 import SplashScreen from './SplashScreen';
 
-interface SplashScreenWrapperProps {
-  children: React.ReactNode;
-}
-
-const SPLASH_FAILSAFE_MS = 3600;
+/** Failsafe lives in lib/splashBoot.ts (pre-paint). This only mounts the React splash. */
 
 function hasSeenSplash(): boolean {
   if (typeof window === 'undefined') return true;
   try {
+    if (/(?:\?|&)splash(?:=|&|$)/.test(window.location.search)) {
+      sessionStorage.removeItem('hasSeenSplash');
+      return false;
+    }
     return sessionStorage.getItem('hasSeenSplash') === 'true';
   } catch {
     return true;
@@ -21,15 +21,12 @@ function hasSeenSplash(): boolean {
 function setSplashPending(pending: boolean) {
   const root = document.documentElement;
   root.classList.toggle('splash-pending', pending);
-  if (pending) {
-    root.classList.remove('splash-complete', 'splash-exiting');
-  }
+  if (pending) root.classList.remove('splash-complete', 'splash-exiting');
 }
 
 function setSplashExiting() {
-  const root = document.documentElement;
-  root.classList.remove('splash-pending');
-  root.classList.add('splash-exiting');
+  document.documentElement.classList.remove('splash-pending');
+  document.documentElement.classList.add('splash-exiting');
 }
 
 function setSplashComplete() {
@@ -39,7 +36,7 @@ function setSplashComplete() {
   document.body.style.overflow = '';
 }
 
-export default function SplashScreenWrapper({ children }: SplashScreenWrapperProps) {
+export default function SplashScreenWrapper({ children }: { children: React.ReactNode }) {
   const [showSplash, setShowSplash] = useState(false);
   const completedRef = useRef(false);
 
@@ -56,33 +53,22 @@ export default function SplashScreenWrapper({ children }: SplashScreenWrapperPro
   }, []);
 
   useLayoutEffect(() => {
-    const seen = hasSeenSplash();
-    if (seen) {
+    if (hasSeenSplash()) {
       finishSplash();
       return;
     }
-
     setSplashPending(true);
     setShowSplash(true);
-
-    const failsafe = window.setTimeout(finishSplash, SPLASH_FAILSAFE_MS);
-    return () => window.clearTimeout(failsafe);
   }, [finishSplash]);
-
-  const handleSplashExiting = useCallback(() => {
-    setSplashExiting();
-  }, []);
 
   return (
     <div className="relative min-h-screen bg-[#050a14]">
       <div className="splash-boot" aria-hidden="true" />
-
       <div id="vawcom-app" className="relative">
         {children}
       </div>
-
       {showSplash ? (
-        <SplashScreen onExiting={handleSplashExiting} onComplete={finishSplash} />
+        <SplashScreen onExiting={setSplashExiting} onComplete={finishSplash} />
       ) : null}
     </div>
   );

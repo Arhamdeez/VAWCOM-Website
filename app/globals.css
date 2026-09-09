@@ -2,13 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Pangram';
+  src: url('/fonts/Pangram-Black.otf') format('opentype');
+  font-weight: 900;
+  font-display: swap;
+}
+
 html {
-  @apply dark;
   background-color: #050a14;
   overflow-x: clip;
   /* Hide native scrollbar — keeps full width, no gutter jump between routes (scroll still works) */
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* Theme cursors (fine pointers only — leave touch alone) */
+@media (pointer: fine) {
+  :root {
+    --vaw-cursor-arrow: image-set(
+        url('/cursors/vaw-arrow.png') 1x,
+        url('/cursors/vaw-arrow@2x.png') 2x
+      )
+      0 0,
+      -webkit-image-set(
+        url('/cursors/vaw-arrow.png') 1x,
+        url('/cursors/vaw-arrow@2x.png') 2x
+      )
+      0 0,
+      url('/cursors/vaw-arrow.png') 0 0,
+      auto;
+    --vaw-cursor-hand: image-set(
+        url('/cursors/vaw-hand.png') 1x,
+        url('/cursors/vaw-hand@2x.png') 2x
+      )
+      4 0,
+      -webkit-image-set(
+        url('/cursors/vaw-hand.png') 1x,
+        url('/cursors/vaw-hand@2x.png') 2x
+      )
+      4 0,
+      url('/cursors/vaw-hand.png') 4 0,
+      pointer;
+  }
+
+  html,
+  body {
+    cursor: var(--vaw-cursor-arrow);
+  }
+
+  a,
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for],
+  select,
+  .cursor-pointer {
+    cursor: var(--vaw-cursor-hand);
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='button']):not([type='submit']):not([type='reset']),
+  textarea,
+  [contenteditable='true'] {
+    cursor: text;
+  }
+
+  :disabled,
+  [aria-disabled='true'],
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
 }
 
 html::-webkit-scrollbar,
@@ -47,9 +110,7 @@ html.splash-pending .splash-boot {
   inset: 0;
   z-index: 9998;
   opacity: 1;
-  background:
-    radial-gradient(ellipse 85% 60% at 50% 42%, rgba(16, 185, 129, 0.07) 0%, transparent 55%),
-    #050a14;
+  background: #f5f3ee;
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -223,37 +284,6 @@ html.splash-exiting .splash-boot {
     transform: none;
   }
 
-  .btn-glass-secondary {
-    border: 1px solid rgba(226, 232, 240, 0.14);
-    background: linear-gradient(180deg, rgba(51, 65, 85, 0.18) 0%, rgba(30, 41, 59, 0.22) 100%);
-    backdrop-filter: blur(6px) saturate(1.2);
-    -webkit-backdrop-filter: blur(6px) saturate(1.2);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
-      0 6px 24px rgba(0, 0, 0, 0.15);
-    color: rgba(248, 250, 252, 0.98);
-    transition:
-      border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-      background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .btn-glass-secondary:hover {
-    border-color: rgba(167, 243, 208, 0.32);
-    background: linear-gradient(180deg, rgba(71, 85, 105, 0.26) 0%, rgba(51, 65, 85, 0.32) 100%);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
-      0 10px 30px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-glass-secondary:focus-visible {
-    outline: none;
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
-      0 6px 24px rgba(0, 0, 0, 0.15),
-      0 0 0 3px rgba(148, 163, 184, 0.4);
-  }
-
   .btn-glass-muted {
     border: 1px solid rgba(203, 213, 225, 0.12);
     background: linear-gradient(180deg, rgba(51, 65, 85, 0.16) 0%, rgba(30, 41, 59, 0.18) 100%);
@@ -350,7 +380,6 @@ html.splash-exiting .splash-boot {
   .glass-inset,
   .glass-drawer,
   .btn-glass-primary,
-  .btn-glass-secondary,
   .btn-glass-muted {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -368,7 +397,6 @@ html.splash-exiting .splash-boot {
   .glass-dense,
   .glass-inset,
   .btn-glass-primary,
-  .btn-glass-secondary,
   .btn-glass-muted {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -406,117 +434,12 @@ html.splash-exiting .splash-boot {
   }
 }
 
-/* Smoother utility animations (replace default Tailwind bounce/pulse/spin feel) */
-@keyframes smooth-bounce {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -6px, 0);
-  }
-}
-
-@keyframes smooth-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes smooth-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-smooth-bounce {
-  animation: smooth-bounce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-.animate-smooth-pulse {
-  animation: smooth-pulse 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-.animate-smooth-spin {
-  animation: smooth-spin 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-smooth-bounce,
-  .animate-smooth-pulse,
-  .animate-smooth-spin {
-    animation: none;
-  }
-}
-
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-
-  * {
-    @apply border-border;
-  }
-  
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     background-color: #050a14;
+    color: #e2e8f0;
     min-height: 100dvh;
     overflow-x: clip;
     scrollbar-width: none;

@@ -7,7 +7,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { isServicesHashLink, scrollToServicesSection } from '@/lib/navigation';
 import { spring, tEnter, tExit } from '@/lib/motion';
 import { SiteContainer } from '@/components/SiteContainer';
-import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -47,7 +46,8 @@ const Navbar = () => {
   }, [mobileMenuOpen]);
 
   const navItems = [
-    { label: 'Demos', href: '/#demos' },
+    { label: 'Services', href: '/services' },
+    { label: 'Gallery', href: '/gallery' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
   ];
@@ -58,7 +58,7 @@ const Navbar = () => {
       if (pathname === '/') {
         setTimeout(() => scrollToServicesSection(), 120);
       } else {
-        router.push('/#services');
+        router.push('/services');
       }
     }
   };
@@ -71,8 +71,7 @@ const Navbar = () => {
   };
 
   const navLinkClass = (href: string) => {
-    const active =
-      pathname === href || (href === '/#demos' && pathname === '/');
+    const active = pathname === href;
     return `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-smooth ${
       active
         ? 'text-emerald-400'
@@ -84,14 +83,13 @@ const Navbar = () => {
     ? 'text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-300/95 to-teal-300/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold'
     : 'text-lg font-semibold tracking-tight bg-gradient-to-r from-emerald-400/95 to-teal-400/95 bg-clip-text text-transparent sm:text-xl md:text-2xl md:font-bold';
 
-  const barClass = cn(
+  const barClass = [
     'flex items-center justify-between gap-3 transition-[background-color,border-color,box-shadow,padding] duration-300 ease-smooth',
-    // Phone: always the same frosted pill as desktop scrolled state
     'max-md:rounded-2xl max-md:glass-nav max-md:px-3 max-md:py-2.5 max-md:[transform:translateZ(0)]',
     scrolled
       ? 'rounded-2xl glass-nav px-3 py-2.5 sm:px-4 sm:py-3'
       : 'px-0 py-1 sm:py-1.5',
-  );
+  ].join(' ');
 
   const desktopNav = (
     <nav className="hidden md:flex items-center gap-0.5" aria-label="Main">
@@ -118,7 +116,7 @@ const Navbar = () => {
       >
         <SiteContainer>
           <div className={barClass}>
-            <Link href="/" className={cn(logoClass, 'min-w-0 shrink-0')}>
+            <Link href="/" className={`${logoClass} min-w-0 shrink-0`}>
               VAWCOM
             </Link>
 
@@ -128,12 +126,12 @@ const Navbar = () => {
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-expanded={mobileMenuOpen}
-              className={cn(
+              className={[
                 'relative z-[60] inline-flex h-10 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-xl border text-slate-200 transition-colors duration-300 ease-smooth md:hidden',
                 mobileMenuOpen
                   ? 'border-emerald-500/35 bg-emerald-500/10 text-white'
                   : 'border-white/10 bg-slate-900/50 hover:border-white/20 hover:bg-white/10 hover:text-white',
-              )}
+              ].join(' ')}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? (
@@ -195,12 +193,12 @@ const Navbar = () => {
                     key={item.href}
                     href={item.href}
                     onClick={() => handleMobileNavClick(item.href)}
-                    className={cn(
+                    className={[
                       'flex min-h-[48px] touch-manipulation items-center rounded-xl px-3 text-[15px] font-medium transition-colors sm:min-h-[52px] sm:text-base',
-                      pathname === item.href || (item.href === '/#services' && pathname === '/')
+                      pathname === item.href
                         ? 'bg-emerald-500/10 text-emerald-400'
                         : 'text-slate-300 active:bg-white/5 hover:bg-white/5 hover:text-emerald-400',
-                    )}
+                    ].join(' ')}
                   >
                     {item.label}
                   </Link>

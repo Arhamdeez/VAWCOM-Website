@@ -2,19 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { scrollToServicesSection } from '@/lib/navigation';
-
-function getNavigationType(): string | undefined {
-  if (typeof performance === 'undefined') return undefined;
-  const nav = performance.getEntriesByType('navigation')[0] as
-    | PerformanceNavigationTiming
-    | undefined;
-  return nav?.type;
-}
 
 /**
- * Ensures /#services scrolls into view after client navigations and hash changes.
- * On full reload with a hash, strip hash and stay at hero (no jump).
+ * Leftover /#services bookmarks → /services.
+ * On full reload with a hash, strip hash and stay at hero.
  */
 export default function HomeHashScroll() {
   const pathname = usePathname();
@@ -22,13 +13,15 @@ export default function HomeHashScroll() {
 
   useLayoutEffect(() => {
     if (pathname !== '/') return;
-    if (getNavigationType() !== 'reload') {
+    const nav = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    if (nav?.type !== 'reload') {
       skipInitialHashScrollRef.current = false;
       return;
     }
 
     skipInitialHashScrollRef.current = true;
-
     if (typeof window.history.scrollRestoration === 'string') {
       window.history.scrollRestoration = 'manual';
     }
@@ -46,9 +39,9 @@ export default function HomeHashScroll() {
     if (pathname !== '/') return;
 
     const scrollToHash = () => {
-      const hash = window.location.hash.slice(1);
-      if (hash !== 'demos' && hash !== 'services') return;
-      scrollToServicesSection();
+      if (window.location.hash.slice(1) === 'services') {
+        window.location.replace('/services');
+      }
     };
 
     let t: number | undefined;

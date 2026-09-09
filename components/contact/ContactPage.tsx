@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Space_Grotesk, Bricolage_Grotesque } from 'next/font/google';
+import { motion, useReducedMotion } from 'framer-motion';
 import '@/components/home/home.css';
 import PillNav from '@/components/home/PillNav';
 import { CONTACT_EMAIL, SOCIAL, getMailtoHref } from '@/lib/site';
@@ -26,11 +27,11 @@ const bricolage = Bricolage_Grotesque({
 const SERVICES = [
   'Select a service',
   'Web Development',
-  'Mobile Apps',
-  'Voice Solutions',
-  'Chatbots',
-  'n8n & integrations',
-  'AI Integrations',
+  'App Development',
+  'Voice Agents',
+  'AI & Automation',
+  'E-commerce',
+  'Maintenance & Rescue',
   'Consultation',
   'Other',
 ] as const;
@@ -44,6 +45,8 @@ export default function ContactPage() {
   const splashRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const reduceMotion = useReducedMotion();
+  const [navExpanded, setNavExpanded] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -57,7 +60,27 @@ export default function ContactPage() {
   const [status, setStatus] = useState('');
   const [statusError, setStatusError] = useState(false);
 
+  useLayoutEffect(() => {
+    const wide =
+      !reduceMotion &&
+      typeof sessionStorage !== 'undefined' &&
+      sessionStorage.getItem('vaw-nav-wide') === '1';
+    setNavExpanded(!!wide);
+  }, [reduceMotion]);
+
   useEffect(() => {
+    if (!navExpanded) return;
+    sessionStorage.setItem('vaw-nav-wide', '0');
+    const id = window.setTimeout(() => setNavExpanded(false), 48);
+    return () => window.clearTimeout(id);
+  }, [navExpanded]);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('service');
+    if (q && (SERVICES as readonly string[]).includes(q)) {
+      setForm((f) => ({ ...f, service: q }));
+    }
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const splash = splashRef.current;
     if (splash) {
@@ -146,7 +169,16 @@ export default function ContactPage() {
       ref={rootRef}
       className={`vaw-home min-h-screen ${space.variable} ${bricolage.variable} ${space.className}`}
     >
-      <PillNav active="contact" />
+      <motion.div
+        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
+        initial={false}
+        animate={{ top: navExpanded ? 64 : 20 }}
+        transition={{ duration: reduceMotion ? 0 : 0.52, ease: [0.3, 0.9, 0.25, 1] }}
+      >
+        <div className="pointer-events-auto flex w-full justify-center">
+          <PillNav active="contact" expanded={navExpanded} embedded />
+        </div>
+      </motion.div>
 
       <section className="relative overflow-hidden pt-[150px]">
         <div
@@ -275,12 +307,12 @@ export default function ContactPage() {
                 </a>
               </div>
               <div className="flex flex-col gap-2.5 border-t border-[rgba(236,233,227,0.14)] pt-[22px]">
-                <span className="text-[13.5px] text-[#429f7f]">Rather see it working first?</span>
+                <span className="text-[13.5px] text-[#429f7f]">Want to see shipped work?</span>
                 <Link
-                  href="/#demos"
+                  href="/gallery"
                   className="self-start border-b border-[rgba(236,233,227,0.25)] text-[17.5px] leading-snug"
                 >
-                  Try the demos →
+                  Open gallery →
                 </Link>
               </div>
             </div>
@@ -304,9 +336,9 @@ export default function ContactPage() {
           </div>
           <div className="flex flex-col gap-2.5 text-[14.5px]">
             <span className="text-[13.5px] text-[rgba(236,233,227,0.45)]">Quick links</span>
-            <Link href="/#demos">Demos</Link>
-            <Link href="/#process">Services</Link>
-            <Link href="/#about">About Us</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/gallery">Gallery</Link>
+            <Link href="/about">About Us</Link>
           </div>
           <div className="flex flex-col gap-2.5 text-[14.5px]">
             <span className="text-[13.5px] text-[rgba(236,233,227,0.45)]">Connect</span>

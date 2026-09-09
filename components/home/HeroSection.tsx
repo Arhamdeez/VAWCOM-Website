@@ -1,191 +1,157 @@
 'use client';
 
-import Image from 'next/image';
-import { CHAT_SUGGESTIONS } from './data';
-import { useDocumentChat } from './demos/useDocumentChat';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { CONTACT_EMAIL, SOCIAL, getGmailComposeUrl } from '@/lib/site';
+import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
+import { CHAT_PROMPTS, HeroChatSlot, useSiteChat } from '@/components/chat/SiteChat';
+import VawcomBot from './VawcomBot';
 
-export default function HeroSection() {
-  const chat = useDocumentChat();
+const ACCENT = '#0cb78b';
+
+const HOOKS = ['idea', 'business', 'problem', 'next big thing'] as const;
+
+export function HeroBanner({ hidden }: { hidden: boolean }) {
+  const reduce = useReducedMotion();
+  const item =
+    'inline-flex items-center justify-center rounded-full p-1.5 text-[#161615]/70 transition-colors hover:text-[#0cb78b]';
 
   return (
-    <section id="top" className="relative">
-      <div data-zoom-wrap className="relative h-[260vh]">
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <div
-            data-device
-            className="absolute left-1/2 top-1/2 z-0 w-[min(62vw,860px)] origin-[50%_64%] -translate-x-1/2 -translate-y-[30%] will-change-transform"
-          >
-            <div className="rounded-[10px] border-2 border-[rgba(66,159,127,0.55)] bg-[#0f1412] p-3">
-              <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded bg-black">
-                <Image
-                  src="/vawcom-logo-3d.png"
-                  alt=""
-                  width={480}
-                  height={480}
-                  className="h-auto w-[56%] object-contain"
-                  priority
-                />
-              </div>
-            </div>
-            <div className="mx-auto mt-0 h-2 w-[38%] rounded-b-md bg-[rgba(66,159,127,0.35)]" />
-          </div>
+    <motion.div
+      initial={false}
+      animate={
+        hidden
+          ? { opacity: 0, y: -12, pointerEvents: 'none' as const }
+          : { opacity: 1, y: 0, pointerEvents: 'auto' as const }
+      }
+      transition={reduce ? { duration: 0 } : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-x-3 top-3 z-[61] flex h-10 items-center justify-between gap-3 rounded-[1.25rem] border border-black/[0.06] bg-[#f5f3ee]/55 px-4 backdrop-blur-[8px] sm:inset-x-4 sm:px-5"
+    >
+      <div className="flex items-center gap-1">
+        <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className={item} aria-label="Instagram">
+          <IconInstagram size={15} />
+        </a>
+        <a href={SOCIAL.linkedin} target="_blank" rel="noopener noreferrer" className={item} aria-label="LinkedIn">
+          <IconLinkedIn size={15} />
+        </a>
+        <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" className={item} aria-label="GitHub">
+          <IconGitHub size={15} />
+        </a>
+      </div>
+      <a
+        href={getGmailComposeUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[12.5px] text-[#161615]/70 hover:text-[#0cb78b]"
+      >
+        <IconMail size={15} />
+        <span className="hidden sm:inline">{CONTACT_EMAIL}</span>
+        <span className="sm:hidden">Email</span>
+      </a>
+    </motion.div>
+  );
+}
 
-          <div
-            data-hero-copy
-            className="pointer-events-none absolute inset-0 z-[1] mx-auto flex max-w-[1440px] flex-col justify-between px-8 pb-0 pt-[120px] will-change-transform"
-          >
-            <div>
-              <div className="relative mt-[22px] h-[26px]">
-                <div
-                  data-quip
-                  className="relative inline-block text-[15px] text-[rgba(236,233,227,0.5)] opacity-0"
-                >
-                  <span>Yeah, we&apos;re a dev agency.</span>
-                  <span
-                    data-strike
-                    className="absolute left-0 top-[52%] block h-0.5 w-0 bg-[#429f7f]"
-                  />
-                </div>
-              </div>
-              <h1
-                data-headline
-                className="vaw-display mt-3.5 max-w-[15ch] text-[clamp(46px,7.6vw,118px)] leading-[0.9]"
-              >
-                Transform Your Business with{' '}
-                <span className="text-[#429f7f]">AI-Powered</span> Innovation
-              </h1>
-              <p
-                data-subhead
-                className="mt-[34px] max-w-[46ch] text-lg leading-normal text-[rgba(236,233,227,0.72)]"
-              >
-                Watch it work. Then bring us the brief.
-              </p>
-            </div>
+export default function HeroSection() {
+  const { ask, typing } = useSiteChat();
+  const reduce = useReducedMotion();
 
-            <div className="relative flex justify-end pb-[55px] pr-[25px] pointer-events-auto">
-              <div data-cta className="flex flex-wrap gap-4">
-                <a
-                  href="#demos"
-                  className="vaw-wavy bg-[#429f7f] px-[34px] py-[26px] text-[15px] font-medium text-[#0b0d0c] hover:bg-[#429f7f]/85 hover:text-[#0b0d0c]"
-                >
-                  Try the demos
-                </a>
-                <a
-                  href="#process"
-                  className="vaw-wavy bg-[rgba(236,233,227,0.1)] px-[34px] py-[26px] text-[15px] text-[#ece9e3] hover:bg-[rgba(66,159,127,0.25)] hover:text-[#ece9e3]"
-                >
-                  What we do
-                </a>
-              </div>
-              <div className="absolute bottom-3.5 left-0 right-0 h-px bg-[rgba(236,233,227,0.18)]" />
-            </div>
-          </div>
+  return (
+    <section id="top" className="vaw-hero relative z-[2] overflow-visible">
+      <div className="relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pl-10 pb-20 pt-40 sm:px-8 sm:pl-14 sm:pb-24 sm:pt-52 lg:pl-20 lg:pt-56 xl:pl-24">
+        {/* Copy stacks vertically with chat; bot sits beside on large screens */}
+        <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
+          <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left">
+            <motion.h1
+              data-headline
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
+              className="vaw-display m-0 max-w-[11ch] text-[clamp(2.4rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
+            >
+              <span className="block">What if we</span>
+              <span className="block">
+                just <span style={{ color: ACCENT }}>built it?</span>
+              </span>
+            </motion.h1>
 
-          {/* Chatbot portal — overlays sticky viewport after zoom */}
-          <div
-            data-hero-screen
-            className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#0b0d0c] opacity-0 will-change-[transform,opacity]"
-          >
-            <div className="grid w-full max-w-[1240px] grid-cols-1 items-center gap-8 px-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-12">
-              <div>
-                <h2 className="vaw-display max-w-[14ch] text-[clamp(30px,4vw,64px)] leading-[0.94]">
-                  <span className="text-[#cf6a2c]">A chatbot</span> that reads your documents
-                </h2>
-                <p className="mt-[18px] max-w-[34ch] text-[16.5px] leading-snug text-[rgba(236,233,227,0.68)]">
-                  Hand it a contract and ask in plain words. It answers from your file. Upload, then
-                  type a question.
-                </p>
-                <div className="mt-[22px] flex flex-wrap gap-2.5">
-                  {CHAT_SUGGESTIONS.map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => chat.ask(label)}
-                      className="vaw-wavy border-0 bg-[rgba(66,159,127,0.22)] px-[22px] py-[18px] text-[13.5px] text-[#ece9e3] hover:bg-[rgba(66,159,127,0.45)]"
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex h-[min(66vh,420px)] flex-col gap-3 border border-[rgba(236,233,227,0.2)] bg-[#131816] p-[22px]">
-                <div className="flex items-center justify-between gap-3 text-[13.5px] text-[rgba(236,233,227,0.5)]">
-                  <label className="min-w-0 cursor-pointer truncate hover:text-[#429f7f]">
-                    <input
-                      type="file"
-                      accept=".txt,.pdf,.doc,.docx,.md"
-                      className="hidden"
-                      disabled={chat.uploading}
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) void chat.upload(f);
-                        e.target.value = '';
-                      }}
-                    />
-                    {chat.uploading
-                      ? 'Uploading…'
-                      : chat.file
-                        ? `${chat.file.name}`
-                        : 'Upload a document'}
-                  </label>
-                  <span className="flex shrink-0 items-center gap-2">
-                    {chat.file ? (
-                      <button
-                        type="button"
-                        onClick={() => void chat.clearDoc()}
-                        className="text-[rgba(236,233,227,0.45)] hover:text-[#cf6a2c]"
-                      >
-                        Clear
-                      </button>
-                    ) : null}
-                    <span className="text-[#429f7f]">{chat.file ? 'ready' : 'idle'}</span>
+            <motion.ul
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1, ease: [0.16, 1.1, 0.3, 1] }}
+              className="mt-5 m-0 list-none space-y-0.5 p-0 text-[clamp(1.05rem,1.9vw,1.3rem)] leading-[1.45] tracking-[-0.01em] text-[#161615]"
+            >
+              {HOOKS.map((word) => (
+                <li key={word}>
+                  Your{' '}
+                  <span className="font-semibold" style={{ color: ACCENT }}>
+                    {word}
                   </span>
-                </div>
+                  .
+                </li>
+              ))}
+            </motion.ul>
 
-                <div ref={chat.logRef} className="flex flex-1 flex-col gap-3 overflow-auto">
-                  {chat.messages.map((m, i) => (
-                    <div
-                      key={`${i}-${m.text.slice(0, 12)}`}
-                      className={`max-w-[86%] px-3.5 py-2.5 text-[15px] leading-snug ${
-                        m.role === 'user'
-                          ? 'self-end bg-[#429f7f] text-[#0b0d0c]'
-                          : 'self-start bg-[rgba(236,233,227,0.08)] text-[#ece9e3]'
-                      }`}
-                    >
-                      {m.text}
-                    </div>
-                  ))}
-                  {chat.typing ? (
-                    <div className="self-start bg-[rgba(236,233,227,0.08)] px-3.5 py-2.5 text-[15px] text-[rgba(236,233,227,0.5)]">
-                      …
-                    </div>
-                  ) : null}
-                </div>
+            <motion.p
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.16, ease: [0.16, 1.1, 0.3, 1] }}
+              className="mt-5 max-w-[34ch] text-[clamp(0.95rem,1.6vw,1.05rem)] leading-relaxed text-[#5c5a56]"
+            >
+              You think it. We build it —{' '}
+              <span className="font-medium" style={{ color: ACCENT }}>
+                start to finish
+              </span>
+              , whether you&apos;re a company or one person with an idea.
+            </motion.p>
 
-                <div className="flex items-center gap-2.5 border-t border-[rgba(236,233,227,0.18)] pt-3.5">
-                  <input
-                    value={chat.draft}
-                    onChange={(e) => chat.setDraft(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') void chat.ask();
-                    }}
-                    placeholder="Type a question…"
-                    className="min-w-0 flex-1 border-none bg-transparent text-[14.5px] text-[#ece9e3] outline-none placeholder:text-[rgba(236,233,227,0.35)]"
-                    disabled={chat.typing}
-                  />
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.2, ease: [0.16, 1.1, 0.3, 1] }}
+              className="mt-6"
+            >
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-5 py-3 text-[13.5px] font-semibold uppercase tracking-[0.06em] text-[#f5f3ee] transition-colors hover:bg-[#0a9d77]"
+              >
+                Start building
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.26, ease: [0.16, 1.1, 0.3, 1] }}
+              className="mt-7 flex w-full max-w-[28rem] flex-col items-center gap-2.5 lg:items-start"
+            >
+              <HeroChatSlot />
+              <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
+                {CHAT_PROMPTS.map((label) => (
                   <button
+                    key={label}
                     type="button"
-                    onClick={() => void chat.ask()}
-                    disabled={chat.typing || !chat.draft.trim()}
-                    className="flex-none rounded-sm bg-[#429f7f] px-4 py-2 text-sm font-medium text-[#0b0d0c] hover:bg-[#429f7f]/85 disabled:opacity-40"
+                    disabled={typing}
+                    onClick={() => void ask(label)}
+                    className="rounded-full border border-black/[0.08] bg-white/40 px-3.5 py-1.5 text-[13px] text-[#5c5a56] transition-colors hover:border-[#0cb78b]/50 hover:text-[#161615] disabled:opacity-40"
                   >
-                    Ask
+                    {label}
                   </button>
-                </div>
+                ))}
               </div>
-            </div>
+            </motion.div>
           </div>
+
+          <motion.div
+            initial={reduce ? false : { opacity: 0, scale: 0.92, y: 18 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1.1, 0.3, 1] }}
+            className="flex w-full items-center justify-center lg:justify-end"
+          >
+            <VawcomBot />
+          </motion.div>
         </div>
       </div>
     </section>

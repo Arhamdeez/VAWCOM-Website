@@ -2,6 +2,15 @@
 
 export const CONTACT_EMAIL = 'vawcomtechnologies@gmail.com';
 
+/** Pages the site assistant may link to. Keep hrefs exact — the model copies them. */
+export const CHAT_SITE_LINKS = [
+  { label: 'Services', href: '/services' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'Why us', href: '/#why' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+] as const;
+
 export const DEFAULT_MAIL_SUBJECT = 'Project inquiry from vawcom.com';
 
 /** Opens Gmail compose in the browser — use this for all “email us” links. */

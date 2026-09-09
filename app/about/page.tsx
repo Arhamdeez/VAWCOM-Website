@@ -18,6 +18,7 @@ import PremiumPageBackdrop from '@/components/PremiumPageBackdrop';
 import { tEnter, tReveal, tStagger } from '@/lib/motion';
 import { SiteCenter, SiteContainer } from '@/components/SiteContainer';
 import { SOCIAL } from '@/lib/site';
+import { FOUNDERS } from '@/components/home/data';
 
 const processSteps = [
   {
@@ -52,24 +53,10 @@ const processSteps = [
   },
 ] as const;
 
-const team = [
-  {
-    initials: 'AB',
-    name: 'Arham Babar',
-    role: 'Co-founder',
-    gradient: 'from-emerald-500 to-teal-600',
-    linkedin: 'https://www.linkedin.com/in/arham-babar-a9510630a/',
-    github: 'https://github.com/Arhamdeez',
-  },
-  {
-    initials: 'SK',
-    name: 'Shahbakht Khurram',
-    role: 'Co-founder',
-    gradient: 'from-teal-500 to-cyan-600',
-    linkedin: 'https://www.linkedin.com/in/shahbakht-khurram-b322a8329',
-    github: 'https://github.com/shahbakht11',
-  },
-];
+const FOUNDER_GRADIENT = [
+  'from-emerald-500 to-teal-600',
+  'from-teal-500 to-cyan-600',
+] as const;
 
 export default function About() {
   return (
@@ -187,7 +174,7 @@ export default function About() {
               </h2>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-6">
-                {team.map((person, i) => (
+                {FOUNDERS.map((person, i) => (
                   <motion.div
                     key={person.name}
                     initial={{ opacity: 0, y: 12 }}
@@ -197,7 +184,7 @@ export default function About() {
                     className="flex flex-col items-center rounded-xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-transparent px-5 py-6 text-center md:px-6 md:py-7"
                   >
                     <div
-                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${person.gradient} text-base font-semibold text-white shadow-lg shadow-emerald-950/20`}
+                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${FOUNDER_GRADIENT[i] ?? FOUNDER_GRADIENT[0]} text-base font-semibold text-white shadow-lg shadow-emerald-950/20`}
                     >
                       {person.initials}
                     </div>

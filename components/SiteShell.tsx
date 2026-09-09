@@ -4,9 +4,9 @@ import { useLayoutEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
-import PageTransition from '@/components/PageTransition';
+import { ChatProvider } from '@/components/chat/SiteChat';
+import CursorGlow from '@/components/CursorGlow';
 
 const STANDALONE_PREFIXES = ['/hisaab/'];
 
@@ -25,18 +25,18 @@ function StandaloneShell({ children }: { children: React.ReactNode }) {
   return <div className="min-h-screen bg-[#050a14]">{children}</div>;
 }
 
-export default function SiteShell({ children }: { children: React.ReactNode }) {
+function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  if (isStandalonePath(pathname)) {
-    return <StandaloneShell>{children}</StandaloneShell>;
-  }
-
-  /* Design home + contact own nav/footer/backdrop */
-  if (pathname === '/' || pathname === '/contact') {
+  /* Cream routes own nav/footer/backdrop */
+  if (
+    pathname === '/' ||
+    pathname === '/contact' ||
+    pathname.startsWith('/services') ||
+    pathname.startsWith('/gallery')
+  ) {
     return (
       <SplashScreenWrapper>
-        {/* overflow visible so sticky zoom / services pin work */}
         <main className="relative min-h-0 w-full bg-[#0b0d0c] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
           {children}
         </main>
@@ -46,12 +46,26 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SplashScreenWrapper>
-      <BackgroundEffectWrapper />
       <Navbar />
-      <main className="relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
-        <PageTransition>{children}</PageTransition>
+      <main className="page-enter relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
+        {children}
       </main>
       <Footer />
     </SplashScreenWrapper>
+  );
+}
+
+export default function SiteShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  if (isStandalonePath(pathname)) {
+    return <StandaloneShell>{children}</StandaloneShell>;
+  }
+
+  return (
+    <ChatProvider>
+      <CursorGlow />
+      <AppShell>{children}</AppShell>
+    </ChatProvider>
   );
 }
