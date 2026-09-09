@@ -17,12 +17,11 @@ export function openRouterApiKey() {
   return process.env.OPENROUTER_API_KEY?.trim() || '';
 }
 
-/** Prefer free-tier models (`:free`). Override with OPENROUTER_MODEL. */
+/** Prefer a stable free instruct model — avoid routers that may emit chain-of-thought. */
 export function openRouterModel() {
   return (
     process.env.OPENROUTER_MODEL?.trim() ||
-    // Auto-picks an available free model; override for a pinned id
-    'openrouter/free'
+    'meta-llama/llama-3.3-70b-instruct:free'
   );
 }
 

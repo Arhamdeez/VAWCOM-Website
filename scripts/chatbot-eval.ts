@@ -269,6 +269,19 @@ const FIXTURES: Fixture[] = [
       assertNoBrainstorm(reply);
     },
   },
+  {
+    name: 'i dont really know → browse local',
+    message: "i dont really know",
+    expectIntent: 'browse_services',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /\/services|site|app|store|goal/i, 'services or clarify');
+      assertNoMeta(reply);
+      if (/the user (just )?said|they('re| are) unsure/i.test(reply)) {
+        throw new Error(`CoT leak: ${reply}`);
+      }
+    },
+  },
 ];
 
 function resolveReply(f: Fixture) {
@@ -302,6 +315,17 @@ function runSanitizerChecks() {
   );
   assertNoMeta(meta);
   assertNoBrainstorm(meta);
+
+  const cot = applySafetyNets(
+    'Okay, the user just said "i dont really know" twice. They\'re unsure about what they need, which is common for people exploring options.',
+    'browse_services',
+    "i dont really know",
+    { chunks: [], primaryService: null, secondaryService: null, primaryScore: 0, catalogAsk: false }
+  );
+  assertNoMeta(cot);
+  if (/the user (just )?said|they('re| are) unsure/i.test(cot)) {
+    throw new Error(`CoT not stripped: ${cot}`);
+  }
 
   const brainstorm = applySafetyNets(
     'Here are some ideas:\n- A blog to share tips\n- Community forum\n- Resource page\n- Showcase your personality',

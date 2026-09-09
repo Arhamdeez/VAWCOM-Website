@@ -100,7 +100,7 @@ const SIDEWAYS_RE =
   /\b(sue|lawsuit|lawyer|liability|guarantee|guaranteed|millionaire|million dollars|get rich|makes? me rich|promise (me )?(it|that) will)\b/i;
 
 const EXPLORE_RE =
-  /\b(idk|i don'?t know|not sure|don'?t care|dont care|no idea|give me ideas|suggest ideas|website ideas|ideas for|suggest (something|one|a service)|what should i|aren'?t you going to suggest|are you going to suggest|recommend something|show me (what you|options)|just suggest)\b/i;
+  /\b(idk|i don'?t know|i don'?t really know|dont really know|don'?t really know|not sure|don'?t care|dont care|no idea|give me ideas|suggest ideas|website ideas|ideas for|suggest (something|one|a service)|what should i|aren'?t you going to suggest|are you going to suggest|recommend something|show me (what you|options)|just suggest)\b/i;
 
 const REJECT_SIGNAL_RE =
   /\b((i\s+)?(don'?t|do not|dont)\s+(need|want|like)|not\s+(looking for|interested)|no\s+thanks|wrong\s+(one|service|lane)|pass\s+on)\b/i;
@@ -769,9 +769,8 @@ function browseReply(message: string, history?: unknown): string {
 }
 
 /**
- * Local replies: greeting only (instant, predictable).
- * Everything else → Ollama; templates live in offlineFallbackForIntent when the model is down,
- * and in applySafetyNets when the model skips required links / breaks policy.
+ * Local replies: greeting + browse/unsure (hard guarantee — no CoT leaks).
+ * Everything else → LLM; templates also live in offlineFallbackForIntent / applySafetyNets.
  */
 export function localReplyForIntent(
   intent: ChatIntent,
@@ -781,8 +780,13 @@ export function localReplyForIntent(
 ): string | null {
   void retrieval;
   const t = message.trim();
+  const seed = `${t.toLowerCase()}|${historyLen(history)}|${intent}`;
   if (intent === 'greeting') {
-    return pickVariant(GREETINGS, `${t.toLowerCase()}|${historyLen(history)}|greeting`);
+    return pickVariant(GREETINGS, `${seed}|greeting`);
+  }
+  // Unsure / “I don’t know” / catalog — keep local so models can’t leak reasoning
+  if (intent === 'browse_services') {
+    return browseReply(t, history);
   }
   return null;
 }
@@ -843,6 +847,7 @@ const SHARED_TONE = `Tone: warm, casual, and clear — friendly, not stiff or ov
 Keep replies to one or two short sentences (list our services only when they ask what you offer).
 
 Hard rules:
+- Reply ONLY with the user-facing message. Never write chain-of-thought, analysis, or notes like “Okay, the user said…”, “They’re unsure…”, “Let me think…”.
 - Never narrate the chat (“I see what’s going on”, “I see a pattern”).
 - Never invent brainstorm lists. Never invent services. Never recommend Etsy/Shopify/Wix/etc.
 - Negation matters: “I don’t have anything to sell” is NOT an e-commerce ask.
@@ -973,9 +978,28 @@ export function looksLikeInventedBrainstorm(text: string): boolean {
 }
 
 export function looksLikeMetaNarration(text: string): boolean {
-  return /\b(i (think i )?see what'?s going on|you'?re having a bit of fun|keeping me on my toes|i see a pattern|you'?re not laughing|usual ["'].*["'] conversation)\b/i.test(
-    text
+  return (
+    /\b(i (think i )?see what'?s going on|you'?re having a bit of fun|keeping me on my toes|i see a pattern|you'?re not laughing|usual ["'].*["'] conversation)\b/i.test(
+      text
+    ) ||
+    /\b(okay,? the user|the user (just )?said|they('re| are) (unsure|exploring)|common for people|let me (think|analyze|reason)|as an ai|my (internal )?reasoning|chain[- ]of[- ]thought)\b/i.test(
+      text
+    ) ||
+    /<think>[\s\S]*?<\/think>/i.test(text) ||
+    /^thinking:/i.test(text.trim())
   );
+}
+
+/** Strip leaked model reasoning; keep only the user-facing answer when possible. */
+export function stripChainOfThought(text: string): string {
+  let out = text
+    .replace(/<think>[\s\S]*?<\/think>/gi, ' ')
+    .replace(/^(?:okay[,.]?\s*)?the user[\s\S]*?(?=\n\n|[A-Z][a-z]|$)/i, ' ')
+    .replace(/\b(they('re| are) unsure[^.]*\.)\s*/gi, ' ')
+    .replace(/\b(common for people[^.]*\.)\s*/gi, ' ')
+    .replace(/^thinking:\s*/i, '')
+    .trim();
+  return out;
 }
 
 export function clampReply(text: string, maxSentences = 2): string {
@@ -1059,6 +1083,8 @@ export function applySafetyNets(
 ): string {
   let out = text;
 
+  out = stripChainOfThought(out);
+
   if (intent === 'off_topic' && looksLikeOffTopicAnswer(out)) {
     out = offTopicReply(message, history);
   }
@@ -1089,11 +1115,13 @@ export function applySafetyNets(
     out = browseReply(message, history);
   }
 
-  if (looksLikeMetaNarration(out)) {
+  if (looksLikeMetaNarration(out) || !out.trim()) {
     out =
-      intent === 'browse_services' || JOB_PUSHBACK_RE.test(message)
+      intent === 'browse_services' || intent === 'general' || isExploreAsk(message) || JOB_PUSHBACK_RE.test(message)
         ? browseReply(message, history)
-        : 'Happy to help. Tell me what you’re trying to build, or browse [services](/services).';
+        : intent === 'off_topic'
+          ? offTopicReply(message, history)
+          : 'Happy to help. Tell me what you’re trying to build, or browse [services](/services).';
   }
 
   // Confident project ask but model forgot the service link → local redirect

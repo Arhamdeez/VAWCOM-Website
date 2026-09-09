@@ -39,7 +39,7 @@ Brand colors live in CSS (`app/globals.css`, `components/home/home.css`) — cre
 
 Flow: **classify intent** → **local greeting only** → otherwise **LLM** with a shared professional prompt + intent addendum + retrieval context. If the LLM is down or rate-limited, **offline fallback** templates answer.
 
-**Production (Vercel, $0):** set `OPENROUTER_API_KEY` and use a free model (`OPENROUTER_MODEL`, default `openrouter/free`). No VPS required.
+**Production (Vercel, $0):** set `OPENROUTER_API_KEY` (default model `meta-llama/llama-3.3-70b-instruct:free`). No VPS required.
 
 **Local dev:** omit the OpenRouter key and run [Ollama](https://ollama.com) (`ollama pull llama3.2`), or set both and prefer OpenRouter with `CHAT_PROVIDER=openrouter`.
 
@@ -65,7 +65,7 @@ API returns `{ response, meta }` with `provider` (`openrouter` | `ollama` | `loc
 | Variable | Role |
 |----------|------|
 | `OPENROUTER_API_KEY` | Prefer OpenRouter free models on Vercel |
-| `OPENROUTER_MODEL` | Default `openrouter/free` (pin any `:free` model id) |
+| `OPENROUTER_MODEL` | Default `meta-llama/llama-3.3-70b-instruct:free` |
 | `OPENROUTER_SITE_URL` / `OPENROUTER_APP_NAME` | Optional OpenRouter headers |
 | `CHAT_PROVIDER` | Force `openrouter` or `ollama` |
 | `OLLAMA_BASE_URL` | Default `http://127.0.0.1:11434` (local) |
