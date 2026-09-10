@@ -24,11 +24,6 @@ export function getGmailComposeUrl(subject: string = DEFAULT_MAIL_SUBJECT) {
   return `https://mail.google.com/mail/?${q.toString()}`;
 }
 
-/** Optional mailto for non-web contexts (e.g. server email HTML). */
-export function getMailtoHref(subject: string = DEFAULT_MAIL_SUBJECT) {
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
-}
-
 export const SOCIAL = {
   instagram: 'https://www.instagram.com/vawcom.tech/',
   linkedin: 'https://www.linkedin.com/company/vawcom',

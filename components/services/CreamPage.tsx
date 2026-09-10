@@ -1,38 +1,16 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { Space_Grotesk, Bricolage_Grotesque, Plus_Jakarta_Sans } from 'next/font/google';
 import { motion, useReducedMotion } from 'framer-motion';
 import PillNav from '@/components/home/PillNav';
 import CtaFooter from '@/components/home/CtaFooter';
 import '@/components/home/home.css';
 
-const space = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-space',
-  display: 'swap',
-});
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ['latin'],
-  weight: ['600', '800'],
-  variable: '--font-bricolage',
-  display: 'swap',
-});
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-jakarta',
-  display: 'swap',
-});
-
 const NAV_WIDE_KEY = 'vaw-nav-wide';
 
 type Props = {
   children: React.ReactNode;
-  nav?: 'services' | 'gallery';
+  nav?: 'services' | 'gallery' | 'about' | 'contact';
   footer?: boolean;
 };
 
@@ -56,11 +34,9 @@ export default function CreamPage({ children, nav = 'services', footer = true }:
   }, [expanded]);
 
   return (
-    <div
-      className={`vaw-home ${space.variable} ${bricolage.variable} ${jakarta.variable} ${space.className}`}
-    >
+    <div className="vaw-home bg-[#f5f3ee]">
       <motion.div
-        className={`${jakarta.className} pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4`}
+        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
         initial={false}
         animate={{ top: expanded ? 64 : 20 }}
         transition={{ duration: reduce ? 0 : 0.52, ease: [0.3, 0.9, 0.25, 1] }}

@@ -51,10 +51,6 @@ body:has(.vaw-home) {
 }
 
 /* Single green for copy; use opacity modifiers when softer */
-.vaw-green {
-  color: #429f7f;
-}
-
 .vaw-display {
   font-family: 'Pangram', var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
   font-weight: 900;
@@ -103,37 +99,28 @@ body:has(.vaw-home) {
   animation: vaw-globe-twinkle 2.8s ease-in-out infinite;
 }
 
-/* Organic CTA / box masks from the design prototype */
-.vaw-wavy {
-  border-radius: 0 !important;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 208 82' preserveAspectRatio='none'%3E%3Cpath d='M14 26 C14 11 30 4 52 7 C78 11 104 2 132 5 C158 8 184 1 194 13 C204 25 197 41 199 53 C201 68 180 77 152 74 C124 71 96 79 68 76 C42 73 16 80 8 67 C1 55 14 40 14 26 Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 208 82' preserveAspectRatio='none'%3E%3Cpath d='M14 26 C14 11 30 4 52 7 C78 11 104 2 132 5 C158 8 184 1 194 13 C204 25 197 41 199 53 C201 68 180 77 152 74 C124 71 96 79 68 76 C42 73 16 80 8 67 C1 55 14 40 14 26 Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-position: center;
-  mask-position: center;
+/* Transparent nav pill — clear center, glass only on the rim */
+.vaw-nav-glass {
+  position: relative;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 1px rgba(22, 22, 21, 0.06),
+    0 12px 36px rgba(22, 22, 21, 0.08);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
 }
 
-.vaw-wavybox {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 308 152' preserveAspectRatio='none'%3E%3Cpath d='M6 34 C6 14 26 6 58 8 C96 11 140 3 184 6 C226 9 268 2 288 12 C306 21 300 40 302 58 C304 78 298 96 300 116 C302 138 282 148 244 145 C202 142 158 150 116 147 C76 144 30 152 16 140 C4 130 8 110 6 90 C4 70 6 52 6 34 Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 308 152' preserveAspectRatio='none'%3E%3Cpath d='M6 34 C6 14 26 6 58 8 C96 11 140 3 184 6 C226 9 268 2 288 12 C306 21 300 40 302 58 C304 78 298 96 300 116 C302 138 282 148 244 145 C202 142 158 150 116 147 C76 144 30 152 16 140 C4 130 8 110 6 90 C4 70 6 52 6 34 Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-position: center;
-  mask-position: center;
-}
-
-.vaw-paint-mask {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 192'%3E%3Cpath d='M92 6 C104 22 118 14 128 24 C136 32 130 46 140 50 C152 55 168 34 178 44 C187 53 166 68 170 78 C174 89 196 88 196 100 C196 113 172 108 166 118 C160 128 176 146 165 154 C153 162 140 142 128 144 C114 146 112 168 98 168 C84 168 84 147 71 143 C57 139 44 160 34 152 C24 144 40 128 34 117 C28 107 4 112 4 98 C4 85 27 88 32 77 C37 66 16 52 26 43 C36 34 52 54 63 48 C73 42 66 27 75 19 C82 12 86 14 92 6 Z M186 22 C193 14 200 20 197 28 C195 34 189 36 186 33 C183 30 183 26 186 22 Z M12 44 C17 36 24 41 22 49 C20 55 15 57 12 54 C9 51 9 48 12 44 Z M158 176 C165 170 171 176 168 184 C166 190 160 191 157 187 C155 184 155 179 158 176 Z M38 178 C44 172 50 178 47 186 C45 191 40 192 37 188 C35 185 35 181 38 178 Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 192'%3E%3Cpath d='M92 6 C104 22 118 14 128 24 C136 32 130 46 140 50 C152 55 168 34 178 44 C187 53 166 68 170 78 C174 89 196 88 196 100 C196 113 172 108 166 118 C160 128 176 146 165 154 C153 162 140 142 128 144 C114 146 112 168 98 168 C84 168 84 147 71 143 C57 139 44 160 34 152 C24 144 40 128 34 117 C28 107 4 112 4 98 C4 85 27 88 32 77 C37 66 16 52 26 43 C36 34 52 54 63 48 C73 42 66 27 75 19 C82 12 86 14 92 6 Z M186 22 C193 14 200 20 197 28 C195 34 189 36 186 33 C183 30 183 26 186 22 Z M12 44 C17 36 24 41 22 49 C20 55 15 57 12 54 C9 51 9 48 12 44 Z M158 176 C165 170 171 176 168 184 C166 190 160 191 157 187 C155 184 155 179 158 176 Z M38 178 C44 172 50 178 47 186 C45 191 40 192 37 188 C35 185 35 181 38 178 Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
+.vaw-nav-glass-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
 }
 
 /* Resting plate. Hover lens is LiquidLens — displacement, not a white fill. */
@@ -152,6 +139,11 @@ body:has(.vaw-home) {
   box-shadow: 0 8px 24px rgba(22, 22, 21, 0.04);
   backdrop-filter: blur(8px) saturate(1.15);
   -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .vaw-liquid-lens {
@@ -184,6 +176,18 @@ body:has(.vaw-home) {
   mix-blend-mode: overlay;
 }
 
+/* Safari/WebKit: frosted glass. SVG backdrop warp is Chromium-only. */
+.vaw-liquid-lens.is-css {
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 22px 48px rgba(22, 22, 21, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(22px) saturate(1.85) brightness(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.85) brightness(1.08);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .vaw-glass:hover .vaw-glass-core,
   .vaw-glass.is-liquid-hot .vaw-glass-core {
@@ -194,12 +198,24 @@ body:has(.vaw-home) {
     -webkit-backdrop-filter: none;
   }
 
-  .vawcom-marquee .vaw-glass:hover .vaw-glass-core {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 24px rgba(22, 22, 21, 0.04);
-    backdrop-filter: blur(8px) saturate(1.15);
-    -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  .vawcom-marquee:not(.is-css-glass) .vaw-glass:hover .vaw-glass-core,
+  .vawcom-marquee:not(.is-css-glass) .vaw-glass.is-liquid-hot .vaw-glass-core {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .vawcom-marquee.is-css-glass .vaw-glass:hover .vaw-glass-core,
+  .vawcom-marquee.is-css-glass .vaw-glass.is-liquid-hot .vaw-glass-core {
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.32);
+    box-shadow:
+      0 10px 28px rgba(22, 22, 21, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(18px) saturate(1.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.7);
   }
 }
 
@@ -245,6 +261,11 @@ body:has(.vaw-home) {
 
 .vaw-tech-marquee-right {
   animation: vawcom-marquee-right 48s linear infinite;
+}
+
+.vaw-hero.is-offscreen .vaw-tech-marquee-left,
+.vaw-hero.is-offscreen .vaw-tech-marquee-right {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {

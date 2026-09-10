@@ -1,5 +1,3 @@
-import { getMailtoHref, SOCIAL } from '@/lib/site';
-
 export function IconLinkedIn({ size = 17 }: { size?: number }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} fill="none" aria-hidden>
@@ -49,37 +47,5 @@ export function IconMail({ size = 17 }: { size?: number }) {
         strokeLinecap="round"
       />
     </svg>
-  );
-}
-
-const linkClass = 'flex items-center gap-2.5';
-
-/** Footer connect column — matches Claude Design home/contact. */
-export function SocialConnectLinks() {
-  return (
-    <>
-      <a
-        href={SOCIAL.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={linkClass}
-      >
-        <IconLinkedIn /> LinkedIn
-      </a>
-      <a
-        href={SOCIAL.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={linkClass}
-      >
-        <IconInstagram /> Instagram
-      </a>
-      <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" className={linkClass}>
-        <IconGitHub /> GitHub
-      </a>
-      <a href={getMailtoHref()} className={linkClass}>
-        <IconMail /> Email
-      </a>
-    </>
   );
 }

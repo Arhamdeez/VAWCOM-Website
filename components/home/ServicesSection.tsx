@@ -100,7 +100,7 @@ export default function ServicesSection() {
                       background: `radial-gradient(ellipse 80% 70% at 30% 25%, ${svc.color}55, transparent 70%)`,
                     }}
                   />
-                  <LiquidLens active={open} />
+                  {open ? <LiquidLens active /> : null}
                   <div className="vaw-glass-core relative z-[1] flex flex-col rounded-[1.35rem] p-6 text-left">
                     <span
                       className="mb-5 block h-1.5 w-10 rounded-full"

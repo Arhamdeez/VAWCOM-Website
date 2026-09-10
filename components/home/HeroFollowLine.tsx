@@ -119,10 +119,23 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       const globeTop = sr.top - cr.top;
       const scale = Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
       const ox = (w - SKIPER_W * scale) / 2;
-      const cx = sr.left - cr.left + sr.width / 2;
-      // Land on the top of the ascii disk (centered in the slot).
-      const joinY = sr.top - cr.top + sr.height * 0.26;
       const stroke = Math.max(13, Math.min(18, 18 * scale));
+
+      // Join at the top of the ASCII pre (actual glyph disk), not the halo ring.
+      const ascii = slot.querySelector('[data-ascii-globe]');
+      let cx: number;
+      let joinY: number;
+      if (ascii instanceof HTMLElement && ascii.offsetWidth > 4) {
+        const ar = ascii.getBoundingClientRect();
+        cx = ar.left - cr.left + ar.width / 2;
+        // Round caps extend ~half stroke past the tip — light pullback so it kisses the rim.
+        joinY = ar.top - cr.top - stroke * 0.12;
+      } else {
+        // Fallback: AsciiGlobe sizes the pre to 72% of the slot, centered.
+        const box = Math.min(sr.width, sr.height) * 0.72;
+        cx = sr.left - cr.left + sr.width / 2;
+        joinY = sr.top - cr.top + (sr.height - box) / 2 - stroke * 0.12;
+      }
       const join: Pt = [cx, joinY];
 
       let skiper = trimLastCommands(scaleSkiper(scale, scale, ox, 0), 2);
@@ -139,7 +152,11 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
     if (root) {
       ro.observe(root);
       const slot = globeSlotRef.current ?? root.querySelector('[data-globe-slot]');
-      if (slot) ro.observe(slot);
+      if (slot) {
+        ro.observe(slot);
+        const ascii = slot.querySelector('[data-ascii-globe]');
+        if (ascii) ro.observe(ascii);
+      }
     }
     window.addEventListener('resize', measure);
     return () => {
@@ -157,43 +174,46 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
     }
     lutRef.current = null;
     let raf = 0;
-    let drawn = skiperLen.get();
-    let readySent = false;
 
-    const tick = () => {
+    const update = () => {
+      raf = 0;
       const path = skiperPathRef.current;
+      if (!path) return;
+      if (!lutRef.current) lutRef.current = buildLut(path);
       const y = window.scrollY;
-      if (path) {
-        if (!lutRef.current) lutRef.current = buildLut(path);
-        const penY = window.innerHeight * PEN_VH - (rootDocTopRef.current - y);
-        const target = Math.min(0.999, Math.max(0.38, tAtY(lutRef.current, penY)));
-        const blend = Math.min(1, 0.22 + Math.abs(target - drawn) * 1.8);
-        drawn += (target - drawn) * blend;
-        if (Math.abs(drawn - skiperLen.get()) > 0.0002) skiperLen.set(drawn);
+      const penY = window.innerHeight * PEN_VH - (rootDocTopRef.current - y);
+      const target = Math.min(1, Math.max(0.38, tAtY(lutRef.current, penY)));
+      const drawn = skiperLen.get();
+      const blend = Math.min(1, 0.22 + Math.abs(target - drawn) * 1.8);
+      const next = drawn + (target - drawn) * blend;
+      if (Math.abs(next - drawn) > 0.0002) skiperLen.set(next);
 
-        const slot = globeSlotRef.current;
-        if (slot) {
-          const arrived = drawn >= 0.97;
-          if (arrived && !readySent) {
-            readySent = true;
-            slot.setAttribute('data-line-ready', '');
-          } else if (!arrived && readySent) {
-            readySent = false;
-            slot.removeAttribute('data-line-ready');
-          }
-        }
+      const slot = globeSlotRef.current;
+      if (slot) {
+        if (next >= 0.97) slot.setAttribute('data-line-ready', '');
+        else slot.removeAttribute('data-line-ready');
       }
-      raf = requestAnimationFrame(tick);
+
+      if (Math.abs(target - next) > 0.0002) raf = requestAnimationFrame(update);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, [frame.skiper, globeSlotRef, reduce, skiperLen]);
 
   return (
     <div
       ref={overlayRef}
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-[1] overflow-visible"
+      className="pointer-events-none absolute inset-0 z-0 overflow-visible"
     >
       <svg
         width={frame.w}

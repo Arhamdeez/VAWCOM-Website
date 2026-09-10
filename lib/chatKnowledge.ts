@@ -422,7 +422,7 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
   chunks.push({
     id: 'process',
     terms: ['process', 'how you work', 'phases', 'wireframes', 'deploy', 'planning'],
-    text: 'Process: idea → planning → wireframes → build → deploy. Details on [/about](/about).',
+    text: 'Process: Idea → Planning → Wireframes → Structure → Development → Deploy. Details on [/about](/about).',
   });
 
   chunks.push({

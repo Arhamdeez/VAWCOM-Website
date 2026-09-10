@@ -2,16 +2,22 @@
 
 import { useLayoutEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 import { ChatProvider } from '@/components/chat/SiteChat';
 import CursorGlow from '@/components/CursorGlow';
 
-const STANDALONE_PREFIXES = ['/hisaab/'];
-
 function isStandalonePath(pathname: string) {
-  return STANDALONE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  return pathname === '/email' || pathname.startsWith('/hisaab/');
+}
+
+function isCreamPath(pathname: string) {
+  return (
+    pathname === '/' ||
+    pathname === '/contact' ||
+    pathname === '/about' ||
+    pathname.startsWith('/services') ||
+    pathname.startsWith('/gallery')
+  );
 }
 
 function StandaloneShell({ children }: { children: React.ReactNode }) {
@@ -25,36 +31,6 @@ function StandaloneShell({ children }: { children: React.ReactNode }) {
   return <div className="min-h-screen bg-[#050a14]">{children}</div>;
 }
 
-function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  /* Cream routes own nav/footer/backdrop */
-  if (
-    pathname === '/' ||
-    pathname === '/contact' ||
-    pathname.startsWith('/services') ||
-    pathname.startsWith('/gallery')
-  ) {
-    return (
-      <SplashScreenWrapper>
-        <main className="relative min-h-0 w-full bg-[#0b0d0c] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
-          {children}
-        </main>
-      </SplashScreenWrapper>
-    );
-  }
-
-  return (
-    <SplashScreenWrapper>
-      <Navbar />
-      <main className="page-enter relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
-        {children}
-      </main>
-      <Footer />
-    </SplashScreenWrapper>
-  );
-}
-
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -62,10 +38,20 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     return <StandaloneShell>{children}</StandaloneShell>;
   }
 
+  const cream = isCreamPath(pathname);
+
   return (
     <ChatProvider>
       <CursorGlow />
-      <AppShell>{children}</AppShell>
+      <SplashScreenWrapper>
+        <main
+          className={`relative min-h-0 w-full supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))] ${
+            cream ? 'bg-[#f5f3ee]' : 'overflow-x-hidden bg-[#050a14]'
+          }`}
+        >
+          {children}
+        </main>
+      </SplashScreenWrapper>
     </ChatProvider>
   );
 }

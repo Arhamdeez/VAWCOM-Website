@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import SiteShell from '@/components/SiteShell';
-import { SPLASH_BOOT_SCRIPT } from '@/lib/splashBoot';
+import { SPLASH_COOKIE } from '@/lib/splashBoot';
 
-const inter = Inter({ 
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
   display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-  adjustFontFallback: true,
 });
 
 export const viewport = {
@@ -56,22 +57,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const jar = await cookies();
+  const seen = jar.get(SPLASH_COOKIE)?.value === '1';
+
   return (
     <html
       lang="en"
-      className="bg-[#050a14]"
+      className={`${jakarta.variable} bg-[#050a14] ${seen ? 'splash-complete' : 'splash-pending'}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
-      </head>
-      <body className={`${inter.className} bg-[#050a14]`}>
+      <body className={`${jakarta.className} bg-[#050a14]`}>
+        <noscript>
+          <style>{`html.splash-pending,html.splash-pending body{overflow:auto!important}html.splash-pending .splash-boot{display:none!important}`}</style>
+        </noscript>
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

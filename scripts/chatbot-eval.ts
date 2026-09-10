@@ -19,6 +19,7 @@ import {
   sanitizeAssistantReply,
   type ChatIntent,
 } from '../lib/chatKnowledge';
+import { asFreeModel, openRouterFreeModelChain } from '../lib/chatLlm';
 
 type HistoryMsg = { role: 'user' | 'ai' | 'assistant'; text: string };
 
@@ -336,6 +337,18 @@ function runSanitizerChecks() {
   assertNoBrainstorm(brainstorm);
 }
 
+function runFreeModelChecks() {
+  if (asFreeModel('') !== 'openrouter/free') throw new Error('empty slug should use free router');
+  if (asFreeModel('meta-llama/llama-3.3-70b-instruct') !== 'meta-llama/llama-3.3-70b-instruct:free') {
+    throw new Error('paid slug must be coerced to :free');
+  }
+  const chain = openRouterFreeModelChain('meta-llama/llama-3.3-70b-instruct');
+  if (!chain.every((id) => id === 'openrouter/free' || id.endsWith(':free'))) {
+    throw new Error(`non-free slug in chain: ${chain.join(', ')}`);
+  }
+  if (!chain.includes('openrouter/free')) throw new Error('chain must fall back to openrouter/free');
+}
+
 function main() {
   let failed = 0;
   const results: { name: string; ok: boolean; detail?: string }[] = [];
@@ -347,6 +360,18 @@ function main() {
     failed += 1;
     results.push({
       name: 'sanitize / safety nets',
+      ok: false,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+  }
+
+  try {
+    runFreeModelChecks();
+    results.push({ name: 'openrouter free-only chain', ok: true });
+  } catch (e) {
+    failed += 1;
+    results.push({
+      name: 'openrouter free-only chain',
       ok: false,
       detail: e instanceof Error ? e.message : String(e),
     });

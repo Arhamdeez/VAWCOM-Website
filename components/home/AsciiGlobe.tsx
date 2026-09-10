@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { ASCII_COLS, ASCII_ROWS, renderAsciiGlobe, renderAsciiGlobePlain } from './globeAscii';
+import { ASCII_COLS, ASCII_ROWS, renderAsciiGlobePlain } from './globeAscii';
 
 const TILT = 0.42;
 const SPIN = 0.32; // rad/sec after type-in
@@ -18,7 +18,7 @@ const TWINKLES = [
 
 /**
  * ASCII globe (adamsky/globe-style): fades in when the scroll line arrives,
- * types characters in place, then slowly rotates.
+ * types each row left to right, then slowly rotates.
  */
 export default function AsciiGlobe() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -35,8 +35,10 @@ export default function AsciiGlobe() {
     let typing = false;
     let spinning = false;
     let typed = false;
-    let typeIdx = 0;
-    let fullPlain = '';
+    let visible = true;
+    let lineIdx = 0;
+    let colIdx = 0;
+    let lines: string[] = [];
     let lastSpin = 0;
     let lastType = 0;
 
@@ -48,26 +50,81 @@ export default function AsciiGlobe() {
       pre.style.letterSpacing = `${box / ASCII_COLS - (box / ASCII_ROWS) * 0.55}px`;
     };
 
-    const start = () => {
-      if (typed || typing) return;
-      root.dataset.lit = '1';
-      sizePre();
-      fullPlain = renderAsciiGlobePlain(yawRef.current, TILT);
-      if (reduce) {
-        pre.innerHTML = renderAsciiGlobe(yawRef.current, TILT);
-        typed = true;
-        spinning = true;
-        return;
-      }
-      typing = true;
-      typeIdx = 0;
-      pre.textContent = '';
-      lastType = performance.now();
+    const painted = () => {
+      if (!lines.length) return '';
+      const done = lines.slice(0, lineIdx).join('\n');
+      const current = lines[lineIdx]?.slice(0, colIdx) ?? '';
+      if (lineIdx === 0) return current;
+      if (lineIdx >= lines.length) return lines.join('\n');
+      return `${done}\n${current}`;
     };
 
     const onReady = () => {
       const slot = root.closest('[data-globe-slot]');
       if (slot?.hasAttribute('data-line-ready')) start();
+    };
+
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    const tick = (now: number) => {
+      raf = 0;
+      if (!visible && !typing) return;
+
+      if (typing) {
+        if (now - lastType > 6) {
+          let step = 22;
+          while (step > 0 && lineIdx < lines.length) {
+            const line = lines[lineIdx];
+            const take = Math.min(step, line.length - colIdx);
+            colIdx += take;
+            step -= take;
+            if (colIdx >= line.length) {
+              lineIdx += 1;
+              colIdx = 0;
+            }
+          }
+          pre.textContent = painted();
+          lastType = now;
+          if (lineIdx >= lines.length) {
+            typing = false;
+            typed = true;
+            pre.textContent = renderAsciiGlobePlain(yawRef.current, TILT);
+            spinning = true;
+            lastSpin = now;
+          }
+        }
+        kick();
+      } else if (spinning && !reduce && visible) {
+        if (now - lastSpin > 140) {
+          const dt = (now - lastSpin) / 1000;
+          yawRef.current += dt * SPIN;
+          pre.textContent = renderAsciiGlobePlain(yawRef.current, TILT);
+          lastSpin = now;
+        }
+        kick();
+      }
+    };
+
+    const start = () => {
+      if (typed || typing) return;
+      root.dataset.lit = '1';
+      sizePre();
+      const fullPlain = renderAsciiGlobePlain(yawRef.current, TILT);
+      if (reduce) {
+        pre.textContent = fullPlain;
+        typed = true;
+        spinning = true;
+        return;
+      }
+      lines = fullPlain.split('\n');
+      lineIdx = 0;
+      colIdx = 0;
+      typing = true;
+      pre.textContent = '';
+      lastType = performance.now();
+      kick();
     };
 
     const mo = new MutationObserver(onReady);
@@ -79,45 +136,27 @@ export default function AsciiGlobe() {
     ro.observe(root);
     sizePre();
 
-    const tick = (now: number) => {
-      if (typing) {
-        // Type ~2–3 chars per frame burst for a terminal feel
-        if (now - lastType > 12) {
-          const step = 3;
-          typeIdx = Math.min(fullPlain.length, typeIdx + step);
-          pre.textContent = fullPlain.slice(0, typeIdx);
-          lastType = now;
-          if (typeIdx >= fullPlain.length) {
-            typing = false;
-            typed = true;
-            pre.innerHTML = renderAsciiGlobe(yawRef.current, TILT);
-            spinning = true;
-            lastSpin = now;
-          }
-        }
-      } else if (spinning && !reduce) {
-        if (now - lastSpin > 80) {
-          const dt = (now - lastSpin) / 1000;
-          yawRef.current += dt * SPIN;
-          pre.innerHTML = renderAsciiGlobe(yawRef.current, TILT);
-          lastSpin = now;
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && (typing || spinning)) kick();
+      },
+      { rootMargin: '80px' },
+    );
+    io.observe(root);
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       mo.disconnect();
       ro.disconnect();
+      io.disconnect();
     };
   }, []);
 
   return (
     <div
       ref={rootRef}
-      className="group/globe relative flex h-full w-full items-center justify-center"
+      className="group/globe relative z-[3] flex h-full w-full items-center justify-center"
     >
       {/* Halo */}
       <div
@@ -157,7 +196,7 @@ export default function AsciiGlobe() {
       <pre
         ref={preRef}
         data-ascii-globe
-        className="relative z-[2] m-0 select-none overflow-hidden whitespace-pre text-center font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
+        className="relative z-[2] m-0 select-none overflow-hidden whitespace-pre text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
       />
     </div>
   );

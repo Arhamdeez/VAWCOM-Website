@@ -26,12 +26,31 @@ export default function CursorGlow() {
       wrap.style.opacity = '0';
     };
 
+    const tick = () => {
+      raf = 0;
+      const now = performance.now();
+      while (pts.length && now - pts[0].t > LIFE_MS) pts.shift();
+      if (dragging && pts.length > 1) {
+        let d = `M${pts[0].x} ${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) d += ` L${pts[i].x} ${pts[i].y}`;
+        path.setAttribute('d', d);
+      } else if (!dragging) {
+        path.setAttribute('d', '');
+      }
+      if (dragging || pts.length) raf = requestAnimationFrame(tick);
+    };
+
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
     const onDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
       dragging = true;
       pts.length = 0;
       pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
       wrap.style.opacity = '1';
+      kick();
     };
 
     const onMove = (e: PointerEvent) => {
@@ -44,28 +63,14 @@ export default function CursorGlow() {
       clear();
     };
 
-    const tick = () => {
-      const now = performance.now();
-      while (pts.length && now - pts[0].t > LIFE_MS) pts.shift();
-      if (dragging && pts.length > 1) {
-        let d = `M${pts[0].x} ${pts[0].y}`;
-        for (let i = 1; i < pts.length; i++) d += ` L${pts[i].x} ${pts[i].y}`;
-        path.setAttribute('d', d);
-      } else if (!dragging) {
-        path.setAttribute('d', '');
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
     window.addEventListener('pointerdown', onDown, { passive: true });
     window.addEventListener('pointermove', onMove, { passive: true });
     window.addEventListener('pointerup', onUp, { passive: true });
     window.addEventListener('pointercancel', onUp, { passive: true });
     document.documentElement.addEventListener('mouseleave', onUp);
-    raf = requestAnimationFrame(tick);
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);

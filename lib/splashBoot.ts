@@ -1,2 +1,8 @@
-/** Runs before first paint — avoids homepage flash before splash; includes a no-JS/React failsafe. */
-export const SPLASH_BOOT_SCRIPT = `(function(){try{var force=/(?:\\?|&)splash(?:=|&|$)/.test(location.search);if(force){try{sessionStorage.removeItem('hasSeenSplash');}catch(e){}}var s=!force&&sessionStorage.getItem('hasSeenSplash')==='true';var r=document.documentElement;r.classList.toggle('splash-complete',s);r.classList.toggle('splash-pending',!s);if(!s){setTimeout(function(){if(!r.classList.contains('splash-complete')){r.classList.remove('splash-pending','splash-exiting','splash-react-ready');r.classList.add('splash-complete');try{sessionStorage.setItem('hasSeenSplash','true');}catch(e){}document.body.style.overflow='';}},5500);}}catch(e){document.documentElement.classList.add('splash-complete');}})();`;
+/** Cookie + session flag so SSR can paint splash state without an inline <script>. */
+export const SPLASH_COOKIE = 'vaw_splash';
+
+export function splashCookieHeader(seen: boolean) {
+  return seen
+    ? `${SPLASH_COOKIE}=1; Path=/; Max-Age=31536000; SameSite=Lax`
+    : `${SPLASH_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+}

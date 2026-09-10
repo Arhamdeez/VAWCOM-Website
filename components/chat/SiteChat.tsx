@@ -12,18 +12,11 @@ import {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Send, X } from 'lucide-react';
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-});
-
-export type ChatMsg = { role: 'user' | 'ai'; text: string };
+type ChatMsg = { role: 'user' | 'ai'; text: string };
 
 type ChatContextValue = {
   messages: ChatMsg[];
@@ -38,6 +31,7 @@ type ChatContextValue = {
   close: () => void;
   reopen: () => void;
   dockNow: () => void;
+  openHref: (href: string) => void;
 };
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -49,7 +43,7 @@ const GREETING: ChatMsg = {
 
 const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
-function ChatRichText({ text, onNavigate }: { text: string; onNavigate: () => void }) {
+function ChatRichText({ text, onNavigate }: { text: string; onNavigate: (href: string) => void }) {
   const nodes: ReactNode[] = [];
   let last = 0;
   let i = 0;
@@ -62,7 +56,15 @@ function ChatRichText({ text, onNavigate }: { text: string; onNavigate: () => vo
     const cls = 'font-medium text-[#0cb78b] underline decoration-[#0cb78b]/70 underline-offset-[3px] hover:text-[#0a9d77]';
     nodes.push(
       internal ? (
-        <Link key={i} href={href} onClick={onNavigate} className={cls}>
+        <Link
+          key={i}
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate(href);
+          }}
+          className={cls}
+        >
           {label}
         </Link>
       ) : (
@@ -80,6 +82,7 @@ function ChatRichText({ text, onNavigate }: { text: string; onNavigate: () => vo
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMsg[]>([GREETING]);
   const [draft, setDraft] = useState('');
   const [typing, setTyping] = useState(false);
@@ -146,13 +149,48 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           { role: 'ai', text: data.response || 'Something went wrong. Try again.' },
         ]);
       } catch {
-        setMessages((m) => [...m, { role: 'ai', text: 'Couldn’t reach the assistant. Try again.' }]);
+        setMessages((m) => [...m, { role: 'ai', text: 'Couldn’t reach VawBot. Try again.' }]);
       } finally {
         setTyping(false);
       }
     },
     [draft, typing, docked, messages],
   );
+
+  const openHref = useCallback((href: string) => {
+    setClosed(false);
+    setDockOpen(true);
+    router.push(href);
+  }, [router]);
+
+  const reopen = useCallback(() => {
+    setClosed(false);
+    setDockOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+      if (e.key !== ' ' && e.key.length !== 1) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (target?.closest('a, button, [role="button"]')) return;
+
+      e.preventDefault();
+      setClosed(false);
+      if (docked) setDockOpen(true);
+      setDraft((d) => d + e.key);
+      requestAnimationFrame(() => {
+        const el =
+          document.querySelector<HTMLInputElement>('#vaw-chat-input-dock') ??
+          document.querySelector<HTMLInputElement>('#vaw-chat-input-hero');
+        el?.focus();
+        el?.setSelectionRange(el.value.length, el.value.length);
+      });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [docked]);
 
   const value = useMemo<ChatContextValue>(
     () => ({
@@ -166,16 +204,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setDockOpen,
       ask,
       close: () => setClosed(true),
-      reopen: () => {
-        setClosed(false);
-        setDockOpen(true);
-      },
+      reopen,
       dockNow: () => {
         setForceDock(true);
         setDockOpen(true);
       },
+      openHref,
     }),
-    [messages, draft, typing, closed, docked, dockOpen, ask],
+    [messages, draft, typing, closed, docked, dockOpen, ask, reopen, openHref],
   );
 
   return (
@@ -193,10 +229,11 @@ export function useSiteChat() {
 }
 
 function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
-  const { messages, draft, setDraft, typing, ask, close, dockOpen, setDockOpen, dockNow } =
+  const { messages, draft, setDraft, typing, ask, close, dockOpen, setDockOpen, openHref } =
     useSiteChat();
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevTyping = useRef(typing);
   const active = placement === 'hero' || dockOpen;
   const hasThread = messages.length > 1;
 
@@ -204,6 +241,20 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
     const el = logRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, typing, active]);
+
+  useEffect(() => {
+    const was = prevTyping.current;
+    prevTyping.current = typing;
+    if (was && !typing && active) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, [typing, active]);
+
+  useEffect(() => {
+    if (placement === 'dock' && dockOpen) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, [placement, dockOpen]);
 
   if (placement === 'dock' && !dockOpen) {
     return (
@@ -229,7 +280,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
 
   return (
     <div
-      className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] shadow-[0_12px_40px_rgba(22,22,21,0.1)] ${jakarta.className} ${
+      className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] shadow-[0_12px_40px_rgba(22,22,21,0.1)] ${
         placement === 'hero'
           ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[28px]'
           : 'w-[min(22.5rem,calc(100vw-2rem))] rounded-[24px]'
@@ -280,12 +331,19 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
                   : 'self-start bg-[#f0eee8] text-[#161615]'
               }`}
             >
-              {m.role === 'ai' ? <ChatRichText text={m.text} onNavigate={dockNow} /> : m.text}
+              {m.role === 'ai' ? <ChatRichText text={m.text} onNavigate={openHref} /> : m.text}
             </div>
           ))}
           {typing ? (
-            <div className="self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[14.5px] text-[#8a8882]">
-              …
+            <div
+              className="self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2.5"
+              aria-label="Vawbot is typing"
+            >
+              <span className="inline-flex h-4 items-center gap-[5px]" aria-hidden>
+                <span className="vaw-typing-dot h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
+                <span className="vaw-typing-dot vaw-typing-dot-2 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
+                <span className="vaw-typing-dot vaw-typing-dot-3 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
+              </span>
             </div>
           ) : null}
         </div>
@@ -307,7 +365,6 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Ask what we do, or describe an idea…"
-          disabled={typing}
           className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-[15px] text-[#161615] outline-none placeholder:text-[#8a8882]"
         />
         <button
@@ -329,7 +386,7 @@ export function HeroChatSlot() {
   return <ChatPanel placement="hero" />;
 }
 
-export function DockedChat() {
+function DockedChat() {
   const { docked, closed, reopen } = useSiteChat();
 
   return (

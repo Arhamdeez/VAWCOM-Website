@@ -1,12 +1,14 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { CONTACT_EMAIL, SOCIAL, getGmailComposeUrl } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
 import { CHAT_PROMPTS, HeroChatSlot, useSiteChat } from '@/components/chat/SiteChat';
-import VawcomBot from './VawcomBot';
+
+const VawcomBot = dynamic(() => import('./VawcomBot'), { ssr: false });
 
 const ACCENT = '#0cb78b';
 
@@ -64,7 +66,6 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
           <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left">
             <motion.h1
-              data-headline
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
@@ -148,7 +149,7 @@ export default function HeroSection() {
             initial={reduce ? false : { opacity: 0, scale: 0.92, y: 18 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1.1, 0.3, 1] }}
-            className="flex w-full items-center justify-center lg:justify-end"
+            className="flex h-[20rem] w-full max-w-[24rem] items-center justify-center sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:justify-end"
           >
             <VawcomBot />
           </motion.div>

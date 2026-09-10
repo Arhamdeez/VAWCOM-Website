@@ -1,5 +1,5 @@
 /** Shared horizontal gutters + max width — use on every page section. */
-export const SITE_CONTAINER_CLASS =
+const SITE_CONTAINER_CLASS =
   'relative z-10 mx-auto w-full max-w-7xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8';
 
 const INNER_MAX = {
@@ -9,7 +9,7 @@ const INNER_MAX = {
   '4xl': 'max-w-4xl',
 } as const;
 
-export type SiteInnerMax = keyof typeof INNER_MAX;
+type SiteInnerMax = keyof typeof INNER_MAX;
 
 type SiteContainerProps = React.ComponentPropsWithoutRef<'div'> & {
   center?: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import LiquidLens from './LiquidLens';
+import LiquidLens, { supportsSvgBackdrop } from './LiquidLens';
 
 type Tech = {
   name: string;
@@ -74,7 +74,12 @@ function MarqueeRow({
   const mouseRef = useRef({ x: 0, y: 0 });
   const stuckRef = useRef<HTMLElement | null>(null);
   const [hot, setHot] = useState(false);
+  const [warp, setWarp] = useState(false);
   const loop = [...items, ...items];
+
+  useEffect(() => {
+    setWarp(supportsSvgBackdrop());
+  }, []);
 
   useEffect(() => {
     if (!hot) return;
@@ -86,7 +91,7 @@ function MarqueeRow({
       const wrap = wrapRef.current;
       const track = trackRef.current;
       const lens = lensRef.current;
-      if (!wrap || !track || !lens) {
+      if (!wrap || !track) {
         raf = requestAnimationFrame(tick);
         return;
       }
@@ -105,15 +110,16 @@ function MarqueeRow({
         }
       });
       stuckRef.current = best;
+      pills.forEach((el) => {
+        el.classList.toggle('is-liquid-hot', el === best);
+      });
 
-      if (best) {
+      if (best && lens) {
         const wr = wrap.getBoundingClientRect();
         const pr = best.getBoundingClientRect();
-        const cx = pr.left - wr.left + pr.width / 2;
-        const cy = pr.top - wr.top + pr.height / 2;
         const pullX = Math.max(-PULL, Math.min(PULL, (mx - (pr.left + pr.width / 2)) * 0.22));
-        lens.style.left = `${cx + pullX}px`;
-        lens.style.top = `${cy}px`;
+        lens.style.left = `${pr.left - wr.left + pr.width / 2 + pullX}px`;
+        lens.style.top = `${pr.top - wr.top + pr.height / 2}px`;
         lens.style.width = `${pr.width + 28}px`;
         lens.style.height = `${pr.height + 24}px`;
       }
@@ -121,13 +127,18 @@ function MarqueeRow({
     };
 
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      trackRef.current
+        ?.querySelectorAll<HTMLElement>('.vaw-glass.is-liquid-hot')
+        .forEach((el) => el.classList.remove('is-liquid-hot'));
+    };
   }, [hot]);
 
   return (
     <div
       ref={wrapRef}
-      className="vawcom-marquee"
+      className={`vawcom-marquee${warp ? '' : ' is-css-glass'}`}
       onMouseEnter={() => setHot(true)}
       onMouseMove={(e) => {
         mouseRef.current = { x: e.clientX, y: e.clientY };
@@ -135,6 +146,9 @@ function MarqueeRow({
       }}
       onMouseLeave={() => {
         stuckRef.current = null;
+        trackRef.current
+          ?.querySelectorAll<HTMLElement>('.vaw-glass.is-liquid-hot')
+          .forEach((el) => el.classList.remove('is-liquid-hot'));
         setHot(false);
       }}
     >
@@ -148,7 +162,7 @@ function MarqueeRow({
           <TechPill key={`${direction}-${tech.name}-${i}`} tech={tech} />
         ))}
       </div>
-      {hot ? (
+      {hot && warp ? (
         <div ref={lensRef} className="vaw-marquee-lens">
           <LiquidLens />
         </div>
@@ -158,8 +172,24 @@ function MarqueeRow({
 }
 
 export default function TechStackSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.classList.toggle('is-offscreen', !entry.isIntersecting);
+      },
+      { rootMargin: '120px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       aria-label="Technologies we work with"
       className="vaw-hero relative z-[2] overflow-hidden border-t border-black/[0.06] pb-12 pt-10 sm:pb-16 sm:pt-14"
     >

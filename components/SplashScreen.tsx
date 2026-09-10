@@ -3,14 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Plus_Jakarta_Sans } from 'next/font/google';
-import { easeSmooth, easeOut } from '@/lib/motion';
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['800'],
-  display: 'swap',
-});
+const easeSmooth = [0.22, 1, 0.36, 1] as const;
+const easeOut = [0.33, 1, 0.68, 1] as const;
 
 interface SplashScreenProps {
   onExiting: () => void;
@@ -129,7 +124,7 @@ export default function SplashScreen({ onExiting, onComplete }: SplashScreenProp
             animate={{ opacity: 1 }}
             exit={markExit}
             transition={reduceMotion ? { duration: 0 } : { duration: FADE_MS / 1000, ease: easeSmooth }}
-            className={`${jakarta.className} relative z-10 flex items-center text-[clamp(2.6rem,8.5vw,5.25rem)] font-extrabold leading-none tracking-[-0.08em] text-[#161615]`}
+            className="relative z-10 flex items-center text-[clamp(2.6rem,8.5vw,5.25rem)] font-extrabold leading-none tracking-[-0.08em] text-[#161615]"
           >
             <motion.span
               animate={{

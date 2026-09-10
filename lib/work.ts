@@ -10,6 +10,8 @@ export type Project = {
   title: string;
   summary: string;
   details?: string;
+  highlights?: string[];
+  demo?: string;
   url?: string;
   review?: WorkReview;
 };
@@ -38,7 +40,21 @@ export const PROJECTS: Project[] = [
     title: 'Voice line',
     summary: 'A phone agent that answers, checks a calendar, and confirms the booking.',
     details:
-      'The line on the homepage is a live voice agent. It picks up, checks availability, and confirms. Same pattern we use when a business needs the phone answered after hours.',
+      'The line on the homepage is a live voice agent. It picks up, checks availability, and confirms bookings without a human on the desk. Same pattern we use when a business needs the phone answered after hours, across time zones, or through a rush.\n\nCallers hear a natural greeting, answer a few questions, and get a confirmed slot — or a clean handoff if the request is out of scope. The stack hooks into the calendar you already use, so nothing gets double-booked.',
+    highlights: [
+      'Answers in under two rings with a branded greeting',
+      'Checks live calendar availability before confirming',
+      'Sends SMS confirmation and logs the call summary',
+      'Escalates edge cases to a human inbox',
+    ],
+    demo: 'Sample walkthrough — placeholder video and mock call flow for design review.',
+    url: '/#voice',
+    review: {
+      type: 'video',
+      src: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      name: 'Amina R.',
+      role: 'Ops lead (sample)',
+    },
   },
 ];
 
@@ -51,7 +67,7 @@ export function youtubeEmbed(src: string): string | null {
   return id ? `https://www.youtube.com/embed/${id}` : null;
 }
 
-export type SlideKind = 'browser' | 'phone' | 'voice' | 'chat' | 'store' | 'care';
+type SlideKind = 'browser' | 'phone' | 'voice' | 'chat' | 'store' | 'care';
 
 export type WorkSlide = Project & { kind: SlideKind };
 

@@ -1,53 +1,26 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Space_Grotesk, Bricolage_Grotesque } from 'next/font/google';
-import { motion, useReducedMotion } from 'framer-motion';
-import '@/components/home/home.css';
-import PillNav from '@/components/home/PillNav';
-import { CONTACT_EMAIL, SOCIAL, getMailtoHref } from '@/lib/site';
-import { IconInstagram, SocialConnectLinks } from '@/components/home/SocialIcons';
+import { ArrowUpRight } from 'lucide-react';
+import CreamPage from '@/components/services/CreamPage';
+import CtaFooter from '@/components/home/CtaFooter';
+import { CONTACT_EMAIL, getGmailComposeUrl } from '@/lib/site';
+import { SERVICES } from '@/lib/services';
 
-const space = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-space',
-  display: 'swap',
-});
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ['latin'],
-  weight: ['600', '800'],
-  variable: '--font-bricolage',
-  display: 'swap',
-});
-
-const SERVICES = [
+const SERVICE_OPTIONS = [
   'Select a service',
-  'Web Development',
-  'App Development',
-  'Voice Agents',
-  'AI & Automation',
-  'E-commerce',
-  'Maintenance & Rescue',
+  ...SERVICES.map((s) => s.title),
   'Consultation',
   'Other',
 ] as const;
 
-const fieldLabel = 'text-[13.5px] text-[rgba(236,233,227,0.5)]';
-const underlineInput =
-  'border-none border-b border-[rgba(236,233,227,0.25)] bg-transparent px-0 py-2.5 text-lg text-[#ece9e3] outline-none focus:border-[#429f7f]';
+const label = 'mb-2 block text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8a8882]';
+const input =
+  'w-full rounded-xl border-0 bg-[#f5f3ee] px-4 py-3.5 text-[15px] text-[#161615] outline-none ring-0 placeholder:text-[#8a8882] focus:bg-white focus:shadow-[0_0_0_2px_rgba(12,183,139,0.35)]';
 
 export default function ContactPage() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const splashRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const reduceMotion = useReducedMotion();
-  const [navExpanded, setNavExpanded] = useState(false);
-
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -60,53 +33,10 @@ export default function ContactPage() {
   const [status, setStatus] = useState('');
   const [statusError, setStatusError] = useState(false);
 
-  useLayoutEffect(() => {
-    const wide =
-      !reduceMotion &&
-      typeof sessionStorage !== 'undefined' &&
-      sessionStorage.getItem('vaw-nav-wide') === '1';
-    setNavExpanded(!!wide);
-  }, [reduceMotion]);
-
-  useEffect(() => {
-    if (!navExpanded) return;
-    sessionStorage.setItem('vaw-nav-wide', '0');
-    const id = window.setTimeout(() => setNavExpanded(false), 48);
-    return () => window.clearTimeout(id);
-  }, [navExpanded]);
-
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get('service');
-    if (q && (SERVICES as readonly string[]).includes(q)) {
+    if (q && (SERVICE_OPTIONS as readonly string[]).includes(q)) {
       setForm((f) => ({ ...f, service: q }));
-    }
-
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const splash = splashRef.current;
-    if (splash) {
-      if (reduce) {
-        splash.style.opacity = '0.3';
-        splash.style.transform = 'scale(1)';
-      } else {
-        splash.animate(
-          [
-            { opacity: 0, transform: 'scale(0.2) rotate(-18deg)' },
-            { opacity: 0.38, transform: 'scale(1.08) rotate(4deg)', offset: 0.6 },
-            { opacity: 0.3, transform: 'scale(1) rotate(0deg)' },
-          ],
-          { duration: 900, delay: 160, easing: 'cubic-bezier(.16,1.1,.3,1)', fill: 'both' }
-        );
-      }
-    }
-    const h = headingRef.current;
-    if (h && !reduce) {
-      h.animate(
-        [
-          { opacity: 0, transform: 'translateY(22px)' },
-          { opacity: 1, transform: 'translateY(0)' },
-        ],
-        { duration: 620, easing: 'cubic-bezier(.16,1.05,.3,1)', fill: 'both' }
-      );
     }
   }, []);
 
@@ -134,7 +64,7 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error || 'Failed to send message');
       setStatus('Got it. We will reply within a business day.');
       setForm({
@@ -145,17 +75,6 @@ export default function ContactPage() {
         service: 'Select a service',
         message: '',
       });
-      const formEl = formRef.current;
-      if (formEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        formEl.animate(
-          [
-            { transform: 'translateY(0)' },
-            { transform: 'translateY(-6px)', offset: 0.4 },
-            { transform: 'translateY(0)' },
-          ],
-          { duration: 420, easing: 'cubic-bezier(.2,1.3,.35,1)' }
-        );
-      }
     } catch (err) {
       setStatusError(true);
       setStatus(err instanceof Error ? err.message : 'Failed to send. Please try again.');
@@ -165,190 +84,163 @@ export default function ContactPage() {
   };
 
   return (
-    <div
-      ref={rootRef}
-      className={`vaw-home min-h-screen ${space.variable} ${bricolage.variable} ${space.className}`}
-    >
-      <motion.div
-        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
-        initial={false}
-        animate={{ top: navExpanded ? 64 : 20 }}
-        transition={{ duration: reduceMotion ? 0 : 0.52, ease: [0.3, 0.9, 0.25, 1] }}
-      >
-        <div className="pointer-events-auto flex w-full justify-center">
-          <PillNav active="contact" expanded={navExpanded} embedded />
-        </div>
-      </motion.div>
-
-      <section className="relative overflow-hidden pt-[150px]">
-        <div
-          ref={splashRef}
-          className="vaw-paint-mask pointer-events-none absolute right-[-8%] top-[4%] w-[46vw] origin-center scale-0 bg-[#cf6a2c] pb-[34vw] opacity-0"
-        />
-
-        <div className="relative mx-auto max-w-[1440px] px-8">
-          <h1
-            ref={headingRef}
-            className="vaw-display m-0 max-w-[18ch] text-[clamp(46px,7.6vw,120px)] leading-[0.88] tracking-[-0.03em]"
-          >
-            Tell us what you&apos;re <span className="text-[#cf6a2c]">building</span>
-          </h1>
-          <p className="mt-[26px] max-w-[44ch] text-[19px] leading-normal text-[rgba(236,233,227,0.72)]">
-            Send the form, or email us directly. We usually reply within a business day.
+    <CreamPage nav="contact" footer={false}>
+      <div className="vaw-hero">
+        <header className="mx-auto max-w-[1100px] px-6 pt-28 sm:px-8 lg:px-10 lg:pt-32">
+          <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+            Contact
           </p>
+          <h1 className="vaw-display m-0 max-w-[14ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
+            Tell us what you are
+            <span className="text-[#0cb78b]"> building.</span>
+          </h1>
+          <p className="mt-5 max-w-[42ch] text-[17px] leading-relaxed text-[#5c5a56]">
+            Use the form or email us. We usually reply within a business day.
+          </p>
+        </header>
 
-          <div className="mt-16 grid grid-cols-1 items-start gap-12 md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-16">
-            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-7">
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-[rgba(236,233,227,0.18)] pb-3.5">
-                <h2 className="vaw-display m-0 text-[clamp(24px,2.4vw,34px)] leading-none">
-                  Project details
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 gap-[26px] sm:grid-cols-2">
-                <label className="flex flex-col gap-2.5">
-                  <span className={fieldLabel}>Name *</span>
-                  <input
-                    required
-                    value={form.name}
-                    onChange={onChange('name')}
-                    className={underlineInput}
-                  />
-                </label>
-                <label className="flex flex-col gap-2.5">
-                  <span className={fieldLabel}>Email *</span>
-                  <input
-                    required
-                    type="email"
-                    value={form.email}
-                    onChange={onChange('email')}
-                    className={underlineInput}
-                  />
-                </label>
-                <label className="flex flex-col gap-2.5">
-                  <span className={fieldLabel}>Company</span>
-                  <input value={form.company} onChange={onChange('company')} className={underlineInput} />
-                </label>
-                <label className="flex flex-col gap-2.5">
-                  <span className={fieldLabel}>Phone</span>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={onChange('phone')}
-                    className={underlineInput}
-                  />
-                </label>
-              </div>
-
-              <label className="relative flex max-w-[420px] flex-col gap-2.5">
-                <span className={fieldLabel}>Service interest</span>
-                <span className="pointer-events-none absolute bottom-5 right-4 block h-2.5 w-2.5 rotate-45 border-b-[1.6px] border-r-[1.6px] border-[rgba(236,233,227,0.6)]" />
-                <select
-                  value={form.service}
-                  onChange={onChange('service')}
-                  className="appearance-none rounded-sm border border-[rgba(236,233,227,0.25)] bg-[#131816] py-[15px] pl-4 pr-11 text-[17px] text-[#ece9e3] outline-none"
-                >
-                  {SERVICES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="flex flex-col gap-2.5">
-                <span className={fieldLabel}>Message *</span>
-                <textarea
+        <div className="mx-auto grid max-w-[1100px] gap-8 px-6 pb-4 pt-12 sm:px-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.75fr)] lg:gap-10 lg:px-10 lg:pb-2 lg:pt-14">
+          <form
+            ref={formRef}
+            onSubmit={onSubmit}
+            className="rounded-[1.5rem] bg-white p-6 shadow-[0_12px_32px_rgba(22,22,21,0.06)] sm:p-8"
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className={label}>Name *</span>
+                <input
                   required
-                  rows={5}
-                  value={form.message}
-                  onChange={onChange('message')}
-                  placeholder="What you're building, who it's for, and any date you're working towards."
-                  className="resize-y border border-[rgba(236,233,227,0.25)] bg-transparent p-4 text-[17px] leading-normal text-[#ece9e3] outline-none placeholder:text-[rgba(236,233,227,0.35)] focus:border-[#429f7f]"
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={onChange('name')}
+                  className={input}
                 />
               </label>
-
-              <div className="flex flex-wrap items-center gap-x-[26px] gap-y-5">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="vaw-wavy border-0 bg-[#429f7f] px-[38px] py-7 text-[15px] font-medium text-[#0b0d0c] hover:bg-[#429f7f]/85 disabled:opacity-50"
-                >
-                  {submitting ? 'Sending…' : status && !statusError ? 'Sent' : 'Send'}
-                </button>
-                {status ? (
-                  <span
-                    className={`text-[14.5px] ${statusError ? 'text-[#cf6a2c]' : 'text-[#429f7f]'}`}
-                  >
-                    {status}
-                  </span>
-                ) : null}
-              </div>
-            </form>
-
-            <div className="flex flex-col gap-[34px]">
-              <div className="flex flex-col gap-3">
-                <span className="text-[13.5px] text-[rgba(236,233,227,0.5)]">
-                  Prefer email? Same reply window as the form.
-                </span>
-                <a
-                  href={getMailtoHref()}
-                  className="break-words text-[clamp(18px,1.7vw,24px)] font-medium leading-tight"
-                >
-                  {CONTACT_EMAIL}
-                </a>
-                <a
-                  href={SOCIAL.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 self-start border-b border-[rgba(236,233,227,0.25)] text-[15px]"
-                >
-                  <IconInstagram /> Instagram
-                </a>
-              </div>
-              <div className="flex flex-col gap-2.5 border-t border-[rgba(236,233,227,0.14)] pt-[22px]">
-                <span className="text-[13.5px] text-[#429f7f]">Want to see shipped work?</span>
-                <Link
-                  href="/gallery"
-                  className="self-start border-b border-[rgba(236,233,227,0.25)] text-[17.5px] leading-snug"
-                >
-                  Open gallery →
-                </Link>
-              </div>
+              <label className="block">
+                <span className={label}>Email *</span>
+                <input
+                  required
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={onChange('email')}
+                  className={input}
+                />
+              </label>
+              <label className="block">
+                <span className={label}>Company</span>
+                <input
+                  autoComplete="organization"
+                  value={form.company}
+                  onChange={onChange('company')}
+                  className={input}
+                />
+              </label>
+              <label className="block">
+                <span className={label}>Phone</span>
+                <input
+                  type="tel"
+                  autoComplete="tel"
+                  value={form.phone}
+                  onChange={onChange('phone')}
+                  className={input}
+                />
+              </label>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <footer className="mx-auto mt-[104px] max-w-[1440px] px-8 pb-10">
-        <div className="grid grid-cols-1 gap-10 border-t border-[rgba(236,233,227,0.14)] pt-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
-          <div className="flex flex-col gap-3">
-            <Image
-              src="/vawcom-logo-3d.png"
-              alt="VAWCOM"
-              width={44}
-              height={44}
-              className="h-11 w-11 rounded-full object-cover"
-            />
-            <p className="m-0 max-w-[34ch] text-[15px] leading-normal text-[rgba(236,233,227,0.6)]">
-              Web, mobile, voice, and AI, delivered end to end from product thinking to launch.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2.5 text-[14.5px]">
-            <span className="text-[13.5px] text-[rgba(236,233,227,0.45)]">Quick links</span>
-            <Link href="/services">Services</Link>
-            <Link href="/gallery">Gallery</Link>
-            <Link href="/about">About Us</Link>
-          </div>
-          <div className="flex flex-col gap-2.5 text-[14.5px]">
-            <span className="text-[13.5px] text-[rgba(236,233,227,0.45)]">Connect</span>
-            <SocialConnectLinks />
-          </div>
+            <label className="mt-5 block">
+              <span className={label}>Service</span>
+              <select
+                value={form.service}
+                onChange={onChange('service')}
+                className={`${input} appearance-none pr-10`}
+              >
+                {SERVICE_OPTIONS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="mt-5 block">
+              <span className={label}>Message *</span>
+              <textarea
+                required
+                rows={5}
+                value={form.message}
+                onChange={onChange('message')}
+                placeholder="What you are building, who it is for, and any date you are working towards."
+                className={`${input} min-h-[8.5rem] resize-y`}
+              />
+            </label>
+
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-7 py-3.5 text-[15px] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] disabled:opacity-50"
+              >
+                {submitting ? 'Sending…' : status && !statusError ? 'Sent' : 'Send message'}
+              </button>
+              {status ? (
+                <p
+                  role="status"
+                  className={`m-0 text-[14.5px] ${
+                    statusError ? 'text-[#c45c3a]' : 'text-[#0a9d77]'
+                  }`}
+                >
+                  {status}
+                </p>
+              ) : null}
+            </div>
+          </form>
+
+          <aside className="flex flex-col gap-4">
+            <div className="rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
+              <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
+                Email us
+              </p>
+              <a
+                href={getGmailComposeUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 block whitespace-nowrap text-[clamp(13px,1.55vw,17px)] font-semibold tracking-[-0.015em] text-[#ece9e3] hover:text-[#0cb78b]"
+              >
+                {CONTACT_EMAIL}
+              </a>
+            </div>
+
+            <div className="flex min-h-[9rem] flex-col justify-between rounded-[1.5rem] bg-[#0cb78b] p-6 sm:p-7">
+              <div>
+                <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
+                  See shipped work
+                </h2>
+                <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#0b0d0c]/75]">
+                  Browse projects before you write.
+                </p>
+              </div>
+              <Link
+                href="/gallery"
+                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[13.5px] font-medium text-[#ece9e3] hover:bg-[#161615]"
+              >
+                Open gallery
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-1.5 self-start text-[14px] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
+            >
+              Compare services
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </aside>
         </div>
-        <div className="mt-[34px] text-[13.5px] text-[rgba(236,233,227,0.45)]">
-          © {new Date().getFullYear()} VAWCOM. All rights reserved.
-        </div>
-      </footer>
-    </div>
+      </div>
+
+      <CtaFooter />
+    </CreamPage>
   );
 }

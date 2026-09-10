@@ -39,7 +39,7 @@ Brand colors live in CSS (`app/globals.css`, `components/home/home.css`) — cre
 
 Flow: **classify intent** → **local greeting only** → otherwise **LLM** with a shared professional prompt + intent addendum + retrieval context. If the LLM is down or rate-limited, **offline fallback** templates answer.
 
-**Production (Vercel, $0):** set `OPENROUTER_API_KEY` (default model `meta-llama/llama-3.3-70b-instruct:free`). No VPS required.
+**Production (Vercel, $0):** set `OPENROUTER_API_KEY` (default `openrouter/free`, with a $0 price cap). If the LLM is down, chat uses local templates — never provider error text. No VPS required.
 
 **Local dev:** omit the OpenRouter key and run [Ollama](https://ollama.com) (`ollama pull llama3.2`), or set both and prefer OpenRouter with `CHAT_PROVIDER=openrouter`.
 
@@ -65,12 +65,10 @@ API returns `{ response, meta }` with `provider` (`openrouter` | `ollama` | `loc
 | Variable | Role |
 |----------|------|
 | `OPENROUTER_API_KEY` | Prefer OpenRouter free models on Vercel |
-| `OPENROUTER_MODEL` | Default `meta-llama/llama-3.3-70b-instruct:free` |
-| `OPENROUTER_SITE_URL` / `OPENROUTER_APP_NAME` | Optional OpenRouter headers |
+| `OPENROUTER_MODEL` | Default `openrouter/free` (paid slugs coerced to `:free`) |
 | `CHAT_PROVIDER` | Force `openrouter` or `ollama` |
 | `OLLAMA_BASE_URL` | Default `http://127.0.0.1:11434` (local) |
 | `OLLAMA_MODEL` | Chat model (default `llama3.2`) |
-| `OLLAMA_KEEP_ALIVE` | Keep model in RAM (default `60m`) |
 | `OLLAMA_TIMEOUT_MS` / `OPENROUTER_TIMEOUT_MS` | Optional timeouts |
 | `SMTP_*` / `RESEND_*` / `CONTACT_EMAIL` | Contact form |
 
@@ -87,15 +85,15 @@ Put secrets in `.env.local` and Vercel env (never commit).
 ```
 app/            routes + API
 components/     UI (home, services, work, chat, …)
-lib/            chatLlm, ollama, chatKnowledge, services, work, site, motion, …
+lib/            chatLlm, chatKnowledge, services, work, site, …
 public/         fonts, cursors, models, logos
 ```
 
 ## Deploy (Vercel)
 
 1. Set `OPENROUTER_API_KEY` (and contact env vars) in Vercel Project Settings  
-2. Optional: pin `OPENROUTER_MODEL` to a specific `:free` model  
-3. Deploy — chat hits OpenRouter; rate-limit / errors fall back to local templates  
+2. Optional: pin `OPENROUTER_MODEL` to a `:free` slug (paid ids are coerced; vanished free models fall back to `openrouter/free`)  
+3. Deploy — chat hits OpenRouter; any LLM error falls back to local templates  
 
 ## Deploy (Hostinger / Node host)
 

@@ -2,19 +2,29 @@
 
 import { useState, useLayoutEffect, useCallback, useRef } from 'react';
 import SplashScreen from './SplashScreen';
-
-/** Failsafe lives in lib/splashBoot.ts (pre-paint). This only mounts the React splash. */
+import { splashCookieHeader } from '@/lib/splashBoot';
 
 function hasSeenSplash(): boolean {
   if (typeof window === 'undefined') return true;
   try {
     if (/(?:\?|&)splash(?:=|&|$)/.test(window.location.search)) {
+      document.cookie = splashCookieHeader(false);
       sessionStorage.removeItem('hasSeenSplash');
       return false;
     }
+    if (document.cookie.split('; ').includes('vaw_splash=1')) return true;
     return sessionStorage.getItem('hasSeenSplash') === 'true';
   } catch {
     return true;
+  }
+}
+
+function markSplashSeen() {
+  try {
+    document.cookie = splashCookieHeader(true);
+    sessionStorage.setItem('hasSeenSplash', 'true');
+  } catch {
+    /* ignore */
   }
 }
 
@@ -44,11 +54,7 @@ export default function SplashScreenWrapper({ children }: { children: React.Reac
     if (completedRef.current) return;
     completedRef.current = true;
     setShowSplash(false);
-    try {
-      sessionStorage.setItem('hasSeenSplash', 'true');
-    } catch {
-      /* ignore */
-    }
+    markSplashSeen();
     setSplashComplete();
   }, []);
 
@@ -59,6 +65,8 @@ export default function SplashScreenWrapper({ children }: { children: React.Reac
     }
     setSplashPending(true);
     setShowSplash(true);
+    const failsafe = window.setTimeout(finishSplash, 5500);
+    return () => window.clearTimeout(failsafe);
   }, [finishSplash]);
 
   return (

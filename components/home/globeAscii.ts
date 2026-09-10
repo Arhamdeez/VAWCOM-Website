@@ -65,26 +65,3 @@ export function renderAsciiGlobePlain(yaw: number, tilt: number) {
   }
   return out;
 }
-
-/** HTML frame with land/ocean opacity. */
-export function renderAsciiGlobe(yaw: number, tilt: number) {
-  const cy = Math.cos(yaw);
-  const sy = Math.sin(yaw);
-  const ct = Math.cos(tilt);
-  const st = Math.sin(tilt);
-  let out = '';
-  for (let row = 0; row < ASCII_ROWS; row++) {
-    const ny = ((row + 0.5) / ASCII_ROWS) * 2 - 1;
-    for (let col = 0; col < ASCII_COLS; col++) {
-      const nx = ((col + 0.5) / ASCII_COLS) * 2 - 1;
-      const { ch, land: isLand } = sampleChar(nx, ny, cy, sy, ct, st);
-      if (ch === ' ') {
-        out += ' ';
-        continue;
-      }
-      out += `<span style="opacity:${isLand ? 1 : 0.45}">${ch}</span>`;
-    }
-    if (row < ASCII_ROWS - 1) out += '\n';
-  }
-  return out;
-}

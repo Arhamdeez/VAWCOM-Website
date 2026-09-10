@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import type { RefObject } from 'react';
-import AsciiGlobe from './AsciiGlobe';
+
+const AsciiGlobe = dynamic(() => import('./AsciiGlobe'), { ssr: false });
 
 const POINTS = [
   {
@@ -31,7 +33,7 @@ export default function WhyChooseUs({
           ref={slotRef}
           data-globe-slot
           aria-hidden
-          className="relative mx-auto aspect-square w-[min(100%,22rem)] sm:w-[min(100%,28rem)] lg:w-full lg:max-w-[38rem]"
+          className="relative z-[3] mx-auto aspect-square w-[min(100%,22rem)] sm:w-[min(100%,28rem)] lg:w-full lg:max-w-[38rem]"
         >
           <AsciiGlobe />
         </div>

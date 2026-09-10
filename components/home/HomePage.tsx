@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus_Jakarta_Sans } from 'next/font/google';
 import { motion } from 'framer-motion';
 import './home.css';
 import PillNav from './PillNav';
@@ -10,19 +9,16 @@ import HeroFollowLine from './HeroFollowLine';
 import ServicesSection from './ServicesSection';
 import TechStackSection from './TechStackSection';
 import WhyChooseUs from './WhyChooseUs';
-import { useHomeMotion } from './useHomeMotion';
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-jakarta',
-  display: 'swap',
-});
+import CtaFooter from './CtaFooter';
 
 function HomeChrome() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    if (window.location.hash.slice(1) === 'services') {
+      window.location.replace('/services');
+      return;
+    }
     const onScroll = () => {
       const next = window.scrollY > 20;
       sessionStorage.setItem('vaw-nav-wide', next ? '0' : '1');
@@ -34,7 +30,7 @@ function HomeChrome() {
   }, []);
 
   return (
-    <div className={jakarta.className}>
+    <>
       <HeroBanner hidden={scrolled} />
       <motion.div
         className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
@@ -46,18 +42,16 @@ function HomeChrome() {
           <PillNav collapsible expanded={!scrolled} active="home" embedded />
         </div>
       </motion.div>
-    </div>
+    </>
   );
 }
 
 export default function HomePage() {
-  const rootRef = useRef<HTMLDivElement>(null);
   const followSpanRef = useRef<HTMLDivElement>(null);
   const globeSlotRef = useRef<HTMLDivElement>(null);
-  useHomeMotion(rootRef);
 
   return (
-    <div ref={rootRef} className={`vaw-home ${jakarta.variable} ${jakarta.className}`}>
+    <div className="vaw-home">
       <HomeChrome />
       <div ref={followSpanRef} className="vaw-follow-span relative overflow-visible">
         <HeroFollowLine containerRef={followSpanRef} globeSlotRef={globeSlotRef} />
@@ -66,6 +60,7 @@ export default function HomePage() {
         <TechStackSection />
         <WhyChooseUs slotRef={globeSlotRef} />
       </div>
+      <CtaFooter />
     </div>
   );
 }

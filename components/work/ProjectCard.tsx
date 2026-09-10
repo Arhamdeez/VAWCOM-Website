@@ -7,25 +7,25 @@ export function ReviewBlock({ review }: { review: WorkReview }) {
   if (review.type === 'video') {
     const yt = youtubeEmbed(review.src);
     return (
-      <div className="mt-4">
+      <div className="vaw-review-video mt-4">
         {yt ? (
           <iframe
             src={yt}
             title={review.name}
-            className="aspect-video w-full rounded-[1.1rem] border-0"
+            className="vaw-review-frame aspect-video w-full rounded-[1.1rem] border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         ) : (
           <video
-            className="aspect-video w-full rounded-[1.1rem] bg-black/5"
+            className="vaw-review-frame aspect-video w-full rounded-[1.1rem] bg-black/5"
             controls
             playsInline
             poster={review.poster}
             src={review.src}
           />
         )}
-        <p className="mt-2 mb-0 text-[13px] text-[#8a8882]">
+        <p className="vaw-review-by mt-2 mb-0 text-[13px] text-[#8a8882]">
           {review.name}
           {review.role ? `, ${review.role}` : ''}
         </p>
@@ -34,7 +34,7 @@ export function ReviewBlock({ review }: { review: WorkReview }) {
   }
 
   return (
-    <blockquote className="mt-4 mb-0">
+    <blockquote className="vaw-review-quote mt-4 mb-0">
       <p className="m-0 text-[15px] leading-relaxed text-[#161615]">&ldquo;{review.quote}&rdquo;</p>
       <footer className="mt-2 text-[13px] text-[#8a8882]">
         {review.name}

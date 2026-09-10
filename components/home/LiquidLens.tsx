@@ -55,14 +55,34 @@ function makeBezelMap(width: number, height: number, radius: number, bezel: numb
   return canvas.toDataURL('image/png');
 }
 
+/** Chromium yes; Safari/WebKit no — url() backdrop filters are unsupported there. */
+export function supportsSvgBackdrop() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  if (/Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR|CriOS|EdgiOS/i.test(ua)) {
+    return false;
+  }
+  if (typeof CSS === 'undefined' || !CSS.supports) return false;
+  return (
+    CSS.supports('backdrop-filter', 'url(#a)') ||
+    CSS.supports('-webkit-backdrop-filter', 'url(#a)')
+  );
+}
+
 export default function LiquidLens({ active = true }: { active?: boolean }) {
   const rawId = useId();
   const fid = `vawlg${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const wrapRef = useRef<HTMLDivElement>(null);
   const turbRef = useRef<SVGFETurbulenceElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0, r: 38 });
+  const [svgWarp, setSvgWarp] = useState(false);
 
   useLayoutEffect(() => {
+    setSvgWarp(supportsSvgBackdrop());
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!svgWarp) return;
     const el = wrapRef.current;
     if (!el) return;
     const sync = () => {
@@ -78,10 +98,10 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
     const ro = new ResizeObserver(sync);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [svgWarp]);
 
   useLayoutEffect(() => {
-    if (!active) return;
+    if (!active || !svgWarp) return;
     const node = turbRef.current;
     if (!node) return;
     let t = 0;
@@ -96,19 +116,19 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [active, box.w]);
+  }, [active, svgWarp, box.w]);
 
   const map = useMemo(() => {
-    if (box.w < 2 || box.h < 2) return '';
+    if (!svgWarp || box.w < 2 || box.h < 2) return '';
     return makeBezelMap(box.w, box.h, box.r, 26);
-  }, [box]);
+  }, [box, svgWarp]);
 
   return (
     <div
       ref={wrapRef}
-      className="vaw-liquid-lens"
+      className={`vaw-liquid-lens${svgWarp ? '' : ' is-css'}`}
       style={
-        active
+        active && svgWarp
           ? {
               backdropFilter: `url(#${fid})`,
               WebkitBackdropFilter: `url(#${fid})`,
@@ -117,7 +137,7 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
       }
       aria-hidden
     >
-      {map ? (
+      {svgWarp && map ? (
         <svg width="0" height="0" className="absolute overflow-hidden">
           <filter
             id={fid}

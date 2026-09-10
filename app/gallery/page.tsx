@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import WorkPage from '@/components/work/WorkPage';
+import CreamPage from '@/components/services/CreamPage';
+import WorkRoom from '@/components/work/WorkRoom';
 
 export const metadata: Metadata = {
   title: 'Gallery | VAWCOM',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Gallery() {
-  return <WorkPage />;
+  return (
+    <CreamPage nav="gallery" footer={false}>
+      <WorkRoom />
+    </CreamPage>
+  );
 }

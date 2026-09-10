@@ -6,7 +6,7 @@ import {
   offlineFallbackForIntent,
   planChatTurn,
 } from '@/lib/chatKnowledge';
-import { activeChatModel, generateChatReply } from '@/lib/chatLlm';
+import { generateChatReply } from '@/lib/chatLlm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,26 +59,14 @@ export async function POST(request: NextRequest) {
       const detail = e instanceof Error ? e.message : 'Unknown chat provider error';
       console.error('[chatbot] generate failed:', detail);
 
-      const offline =
-        /fetch failed|ECONNREFUSED|timed out|unreachable|429|rate limit|quota|OpenRouter|Ollama|API key/i.test(
-          detail
-        );
-
-      if (offline || intent === 'off_topic' || retrieval.primaryService) {
-        return NextResponse.json({
-          response: offlineFallbackForIntent(intent, trimmed, retrieval, history),
-          meta: {
-            provider: 'local',
-            model: `${intent}-fallback`,
-            intent,
-            ms: Date.now() - started,
-          },
-        });
-      }
-
       return NextResponse.json({
-        response: `Assistant error: ${detail.length > 180 ? `${detail.slice(0, 180)}…` : detail}`,
-        meta: { provider: 'error', model: activeChatModel(), intent, ms: Date.now() - started },
+        response: offlineFallbackForIntent(intent, trimmed, retrieval, history),
+        meta: {
+          provider: 'local',
+          model: `${intent}-fallback`,
+          intent,
+          ms: Date.now() - started,
+        },
       });
     }
   } catch (error) {

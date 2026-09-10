@@ -10,8 +10,8 @@ import './work-room.css';
 
 const SLIDES = workSlides();
 const N = SLIDES.length;
-const ORBIT_MS = 3200;
-const SETTLE_MS = 340;
+const ORBIT_MS = 1100;
+const SETTLE_MS = 280;
 
 function wrap(i: number) {
   if (N < 1) return 0;
@@ -39,6 +39,23 @@ function orbitTransform(index: number, spin: number) {
   return `rotateY(${a}deg) translateZ(var(--orbit-r))`;
 }
 
+function MockChrome({ kind }: { kind: WorkSlide['kind'] }) {
+  return (
+    <div className={`vaw-pop-mock is-${kind}`} aria-hidden>
+      <div className="vaw-pop-mock-bar">
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="vaw-pop-mock-screen">
+        <div className="vaw-pop-mock-line" />
+        <div className="vaw-pop-mock-line is-short" />
+        <div className="vaw-pop-mock-blob" />
+      </div>
+    </div>
+  );
+}
+
 function Panel({
   slide,
   onClose,
@@ -47,31 +64,78 @@ function Panel({
   onClose: () => void;
 }) {
   const service = getService(slide.service);
+  const hasVideo = slide.review?.type === 'video';
+  const body = (slide.details ?? slide.summary).split(/\n\n+/);
+
   return (
-    <div className="vaw-pop" onClick={(e) => e.stopPropagation()}>
+    <div
+      className={`vaw-pop${hasVideo ? ' is-video' : ' is-wide'}`}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="vaw-pop-core">
         <button type="button" className="vaw-pop-x" onClick={onClose} aria-label="Close">
           <X className="h-4 w-4" strokeWidth={2} />
         </button>
-        <p className="vaw-pop-kicker">
-          <Link href={`/services/${slide.service}`}>{service?.nav ?? slide.service}</Link>
-        </p>
-        <h2 id="vaw-monitor-title" className="vaw-display">
-          {slide.title}
-        </h2>
-        <p className="vaw-pop-body">{slide.details ?? slide.summary}</p>
-        {slide.review ? (
-          <div className="vaw-pop-review">
-            <p className="vaw-pop-review-label">Client</p>
-            <ReviewBlock review={slide.review} />
+        <div className="vaw-pop-main">
+          <div className="vaw-pop-copy">
+            <p className="vaw-pop-kicker">
+              <Link href={`/services/${slide.service}`}>{service?.nav ?? slide.service}</Link>
+            </p>
+            <h2 id="vaw-monitor-title" className="vaw-display">
+              {slide.title}
+            </h2>
+            {body.map((para) => (
+              <p key={para.slice(0, 24)} className="vaw-pop-body">
+                {para}
+              </p>
+            ))}
+            <dl className="vaw-pop-meta">
+              <div>
+                <dt>Domain</dt>
+                <dd>{service?.nav ?? slide.service}</dd>
+              </div>
+              <div>
+                <dt>Format</dt>
+                <dd>{slide.kind}</dd>
+              </div>
+            </dl>
+            {slide.highlights?.length ? (
+              <div className="vaw-pop-highlights">
+                <p className="vaw-pop-review-label">What it does</p>
+                <ul>
+                  {slide.highlights.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {slide.review && !hasVideo ? (
+              <div className="vaw-pop-review">
+                <p className="vaw-pop-review-label">Client</p>
+                <ReviewBlock review={slide.review} />
+              </div>
+            ) : null}
+            {slide.url ? (
+              <Link href={slide.url} className="vaw-pop-open">
+                Open
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            ) : null}
           </div>
-        ) : null}
-        {slide.url ? (
-          <Link href={slide.url} className="vaw-pop-open">
-            Open
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        ) : null}
+          <div className="vaw-pop-stage">
+            <section className="vaw-pop-demo">
+              <p className="vaw-pop-review-label">Demo</p>
+              {slide.demo ? <p className="vaw-pop-demo-note">{slide.demo}</p> : null}
+              <MockChrome kind={slide.kind} />
+            </section>
+            {hasVideo && slide.review ? (
+              <section className="vaw-pop-demo">
+                <p className="vaw-pop-review-label">Client review</p>
+                <ReviewBlock review={slide.review} />
+              </section>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -168,26 +232,29 @@ export default function WorkRoom() {
 
   useEffect(() => {
     if (mode !== 'orbit' || reduce.current) return;
-    let spin = 0;
     let raf = 0;
     let live = true;
-    const tick = () => {
+    const start = performance.now();
+    const tick = (now: number) => {
       if (!live || modeRef.current !== 'orbit') return;
-      spin += 1.65;
+      const t = Math.min(1, (now - start) / ORBIT_MS);
+      const spin = t * 360;
       cards.current.forEach((el, n) => {
         if (!el) return;
         const a = ((360 / Math.max(N, 1)) * n + spin) * (Math.PI / 180);
         el.style.transform = orbitTransform(n, spin);
         el.style.zIndex = String(Math.round(40 + Math.cos(a) * 40));
       });
-      raf = requestAnimationFrame(tick);
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      settle();
     };
     raf = requestAnimationFrame(tick);
-    const t = window.setTimeout(() => settle(), ORBIT_MS);
     return () => {
       live = false;
       cancelAnimationFrame(raf);
-      window.clearTimeout(t);
     };
   }, [mode, settle]);
 
@@ -277,7 +344,7 @@ export default function WorkRoom() {
   return (
     <div
       ref={scene}
-      className={`vaw-cover${mode === 'orbit' ? ' is-orbit' : ' is-walk'}${fading ? ' is-fading' : ''}`}
+      className={`vaw-cover${mode === 'orbit' ? ' is-orbit' : ' is-walk'}${fading ? ' is-fading' : ''}${panel != null ? ' is-open' : ''}`}
     >
       <p className="vaw-cover-ghost vaw-display" aria-hidden>
         Gallery

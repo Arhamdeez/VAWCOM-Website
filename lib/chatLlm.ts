@@ -1,36 +1,38 @@
 /**
- * Chat LLM provider: OpenRouter (prod / free) → Ollama (local) → throw for route fallbacks.
+ * Chat LLM: OpenRouter (prod / free) → Ollama (local) → throw for route fallbacks.
  * Intent / RAG / safety nets stay in chatKnowledge; this is generation only.
  */
 
-import {
-  ollamaChat,
-  ollamaChatModel,
-  warmOllama,
-  type OllamaChatMessage,
-  withTimeout,
-} from '@/lib/ollama';
+export type ChatMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
 
-export type ChatMessage = OllamaChatMessage;
+const FREE_ROUTER = 'openrouter/free';
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1';
+const FETCH_MS = () =>
+  Number(process.env.OPENROUTER_TIMEOUT_MS || process.env.OLLAMA_TIMEOUT_MS) || 45000;
 
 export function openRouterApiKey() {
   return process.env.OPENROUTER_API_KEY?.trim() || '';
 }
 
-/** Prefer a stable free instruct model — avoid routers that may emit chain-of-thought. */
+/** Paid slugs become `:free`; empty / router stay on the live free pool. */
+export function asFreeModel(id: string): string {
+  const m = id.trim();
+  if (!m || m === FREE_ROUTER) return FREE_ROUTER;
+  return m.endsWith(':free') ? m : `${m}:free`;
+}
+
+/** Preferred free slug, then the free router so a vanished `:free` model is not a hard fail. */
+export function openRouterFreeModelChain(pinned = process.env.OPENROUTER_MODEL): string[] {
+  const primary = asFreeModel(pinned?.trim() || FREE_ROUTER);
+  return primary === FREE_ROUTER ? [primary] : [primary, FREE_ROUTER];
+}
+
 export function openRouterModel() {
-  return (
-    process.env.OPENROUTER_MODEL?.trim() ||
-    'meta-llama/llama-3.3-70b-instruct:free'
-  );
+  return openRouterFreeModelChain()[0];
 }
-
-export function openRouterBaseUrl() {
-  return (process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/$/, '');
-}
-
-const FETCH_MS = () =>
-  Number(process.env.OPENROUTER_TIMEOUT_MS || process.env.OLLAMA_TIMEOUT_MS) || 45000;
 
 export type ChatProviderId = 'openrouter' | 'ollama';
 
@@ -38,53 +40,114 @@ export function activeChatProvider(): ChatProviderId {
   const forced = process.env.CHAT_PROVIDER?.trim().toLowerCase();
   if (forced === 'ollama') return 'ollama';
   if (forced === 'openrouter') return 'openrouter';
-  // Prefer OpenRouter when keyed (Vercel / free); else local Ollama for dev
   if (openRouterApiKey()) return 'openrouter';
   return 'ollama';
 }
 
-export function activeChatModel(): string {
-  return activeChatProvider() === 'openrouter' ? openRouterModel() : ollamaChatModel();
+function ollamaBaseUrl() {
+  return (process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434').replace(/\/$/, '');
 }
 
-async function openRouterChat(messages: ChatMessage[]): Promise<string> {
+function ollamaChatModel() {
+  return (process.env.OLLAMA_MODEL || 'llama3.2').trim();
+}
+
+async function timedFetch(url: string, init: RequestInit, label: string): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, signal: AbortSignal.timeout(FETCH_MS()) });
+  } catch (e) {
+    if (e instanceof Error && (e.name === 'TimeoutError' || e.name === 'AbortError')) {
+      throw new Error(`${label} timed out after ${FETCH_MS()}ms`);
+    }
+    throw e;
+  }
+}
+
+function openRouterError(data: unknown, status: number): string {
+  const rec = data && typeof data === 'object' ? (data as Record<string, unknown>) : {};
+  const nested = rec.error;
+  const nestedMsg =
+    nested && typeof nested === 'object' && nested !== null && 'message' in nested
+      ? (nested as { message?: unknown }).message
+      : nested;
+  const err = nestedMsg || (typeof rec.message === 'string' ? rec.message : null) || `OpenRouter HTTP ${status}`;
+  return typeof err === 'string' ? err : JSON.stringify(err);
+}
+
+async function openRouterChatOnce(messages: ChatMessage[], model: string): Promise<string> {
   const key = openRouterApiKey();
   if (!key) throw new Error('OPENROUTER_API_KEY missing');
 
-  const res = await withTimeout(
-    fetch(`${openRouterBaseUrl()}/chat/completions`, {
+  const res = await timedFetch(
+    `${OPENROUTER_URL}/chat/completions`,
+    {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.OPENROUTER_SITE_URL?.trim() || 'https://vawcom.com',
-        'X-Title': process.env.OPENROUTER_APP_NAME?.trim() || 'VAWCOM Chat',
+        'HTTP-Referer': 'https://vawcom.com',
+        'X-Title': 'VAWCOM Chat',
       },
       body: JSON.stringify({
-        model: openRouterModel(),
+        model,
         messages,
         temperature: 0.2,
         max_tokens: 120,
+        provider: { max_price: { prompt: 0, completion: 0 } },
       }),
-    }),
-    FETCH_MS(),
+    },
     'OpenRouter chat'
   );
 
   const data = await res.json().catch(() => ({}));
   const text = data?.choices?.[0]?.message?.content;
   if (!res.ok || typeof text !== 'string' || !text.trim()) {
-    const err =
-      data?.error?.message ||
-      data?.error ||
-      (typeof data?.message === 'string' ? data.message : null) ||
-      `OpenRouter HTTP ${res.status}`;
-    throw new Error(typeof err === 'string' ? err : JSON.stringify(err));
+    throw new Error(openRouterError(data, res.status));
   }
   return text.trim();
 }
 
-/** Generate a reply via OpenRouter if keyed, else Ollama. */
+async function openRouterChat(messages: ChatMessage[]): Promise<{ text: string; model: string }> {
+  const chain = openRouterFreeModelChain();
+  let lastErr: unknown;
+  for (const model of chain) {
+    try {
+      const text = await openRouterChatOnce(messages, model);
+      return { text, model };
+    } catch (e) {
+      lastErr = e;
+      const detail = e instanceof Error ? e.message : String(e);
+      console.warn(`[chatbot] free model ${model} failed: ${detail}`);
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error('OpenRouter free models unavailable');
+}
+
+async function ollamaChat(messages: ChatMessage[]): Promise<string> {
+  const res = await timedFetch(
+    `${ollamaBaseUrl()}/api/chat`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: ollamaChatModel(),
+        stream: false,
+        keep_alive: '60m',
+        messages,
+        options: { temperature: 0.15, num_predict: 55, num_ctx: 4096 },
+      }),
+    },
+    'Ollama chat'
+  );
+
+  const data = await res.json();
+  const text = data.message?.content;
+  if (!res.ok || typeof text !== 'string' || !text.trim()) {
+    throw new Error(data.error || `Ollama chat HTTP ${res.status}`);
+  }
+  return text.trim();
+}
+
 export async function generateChatReply(params: {
   messages: ChatMessage[];
 }): Promise<{ text: string; provider: ChatProviderId; model: string }> {
@@ -93,25 +156,44 @@ export async function generateChatReply(params: {
     if (!openRouterApiKey()) {
       throw new Error('CHAT_PROVIDER=openrouter but OPENROUTER_API_KEY is missing');
     }
-    const text = await openRouterChat(params.messages);
-    return { text, provider: 'openrouter', model: openRouterModel() };
+    const { text, model } = await openRouterChat(params.messages);
+    return { text, provider: 'openrouter', model };
   }
-  const text = await ollamaChat({ messages: params.messages });
+  const text = await ollamaChat(params.messages);
   return { text, provider: 'ollama', model: ollamaChatModel() };
 }
 
-/** Warm path: no-op success for OpenRouter; preload Ollama when that’s the provider. */
 export async function warmChat(): Promise<
   { ok: true; provider: ChatProviderId; model: string; ms: number } | { ok: false; error: string }
 > {
-  const provider = activeChatProvider();
-  if (provider === 'openrouter') {
-    if (!openRouterApiKey()) {
-      return { ok: false, error: 'OPENROUTER_API_KEY missing' };
-    }
+  if (activeChatProvider() === 'openrouter') {
+    if (!openRouterApiKey()) return { ok: false, error: 'OPENROUTER_API_KEY missing' };
     return { ok: true, provider: 'openrouter', model: openRouterModel(), ms: 0 };
   }
-  const result = await warmOllama();
-  if (!result.ok) return { ok: false, error: result.error };
-  return { ok: true, provider: 'ollama', model: ollamaChatModel(), ms: result.ms };
+
+  const started = Date.now();
+  try {
+    const res = await timedFetch(
+      `${ollamaBaseUrl()}/api/chat`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: ollamaChatModel(),
+          stream: false,
+          keep_alive: '60m',
+          messages: [{ role: 'user', content: 'ping' }],
+          options: { num_predict: 1, temperature: 0, num_ctx: 512 },
+        }),
+      },
+      'Ollama warm'
+    );
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: false, error: (data as { error?: string }).error || `HTTP ${res.status}` };
+    }
+    return { ok: true, provider: 'ollama', model: ollamaChatModel(), ms: Date.now() - started };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Warm failed' };
+  }
 }

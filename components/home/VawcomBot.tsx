@@ -14,6 +14,7 @@ export default function VawcomBot() {
     const host = hostRef.current;
     if (!host) return;
     let dead = false;
+    let visible = true;
     let renderer: import('three').WebGLRenderer | undefined;
     let raf = 0;
     let pmrem: import('three').PMREMGenerator | undefined;
@@ -32,10 +33,8 @@ export default function VawcomBot() {
         alpha: true,
         antialias: true,
         powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
       });
-      // Sharper on retina — was capped at 2
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.12;
@@ -175,12 +174,28 @@ export default function VawcomBot() {
 
       const loop = () => {
         if (dead || !renderer) return;
+        if (!visible) {
+          raf = 0;
+          return;
+        }
         renderer.render(scene, camera);
         raf = requestAnimationFrame(loop);
       };
       loop();
 
-      return () => ro.disconnect();
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting;
+          if (visible && renderer && !dead && !raf) raf = requestAnimationFrame(loop);
+        },
+        { rootMargin: '60px' },
+      );
+      io.observe(host);
+
+      return () => {
+        io.disconnect();
+        ro.disconnect();
+      };
     };
 
     const extra = run();
