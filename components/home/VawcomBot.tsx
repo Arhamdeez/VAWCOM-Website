@@ -1,10 +1,18 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 
 /** Brand green from the site outline PDF */
 const BRAND = 0x0cb78b;
+
+const threeReady = Promise.all([
+  import('three'),
+  import('three/examples/jsm/loaders/GLTFLoader.js'),
+  import('three/examples/jsm/libs/meshopt_decoder.module.js'),
+  import('three/examples/jsm/environments/RoomEnvironment.js'),
+]);
 
 export default function VawcomBot() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -16,25 +24,22 @@ export default function VawcomBot() {
     let dead = false;
     let visible = true;
     let renderer: import('three').WebGLRenderer | undefined;
-    let raf = 0;
     let pmrem: import('three').PMREMGenerator | undefined;
 
     const run = async () => {
-      const THREE = await import('three');
-      const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-      const { MeshoptDecoder } = await import('three/examples/jsm/libs/meshopt_decoder.module.js');
-      const { RoomEnvironment } = await import('three/examples/jsm/environments/RoomEnvironment.js');
+      const [THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }] = await threeReady;
       if (dead || !host) return;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
 
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true,
+        antialias: dpr < 1.25,
         powerPreference: 'high-performance',
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(dpr);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.12;
@@ -168,25 +173,26 @@ export default function VawcomBot() {
         camera.lookAt(0, -size.y * 0.06, 0);
         camera.updateProjectionMatrix();
       };
-      fit();
-      const ro = new ResizeObserver(fit);
-      ro.observe(host);
-
-      const loop = () => {
-        if (dead || !renderer) return;
-        if (!visible) {
-          raf = 0;
-          return;
-        }
+      const paint = () => {
+        if (dead || !renderer || !visible) return;
         renderer.render(scene, camera);
-        raf = requestAnimationFrame(loop);
       };
-      loop();
+
+      fit();
+      const ro = new ResizeObserver(() => {
+        fit();
+        paint();
+      });
+      ro.observe(host);
+      renderer.domElement.style.position = 'relative';
+      renderer.domElement.style.zIndex = '1';
+      paint();
+      host.querySelector('[data-bot-ph]')?.setAttribute('hidden', '');
 
       const io = new IntersectionObserver(
         ([entry]) => {
           visible = entry.isIntersecting;
-          if (visible && renderer && !dead && !raf) raf = requestAnimationFrame(loop);
+          if (visible) paint();
         },
         { rootMargin: '60px' },
       );
@@ -199,9 +205,9 @@ export default function VawcomBot() {
     };
 
     const extra = run();
+
     return () => {
       dead = true;
-      cancelAnimationFrame(raf);
       void extra.then((cleanup) => cleanup?.());
       pmrem?.dispose();
       renderer?.dispose();
@@ -216,12 +222,11 @@ export default function VawcomBot() {
     >
       <motion.div
         className="relative flex h-full w-full flex-col items-center"
-        initial={reduce ? false : { opacity: 0, y: 16 }}
+        initial={false}
         animate={
           reduce
-            ? { opacity: 1, y: 0, rotate: 0 }
+            ? { y: 0, rotate: 0 }
             : {
-                opacity: 1,
                 y: [0, -14, 0],
                 rotate: [0, -2.5, 2.5, 0],
               }
@@ -230,23 +235,30 @@ export default function VawcomBot() {
           reduce
             ? { duration: 0 }
             : {
-                opacity: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
                 y: {
                   duration: 2.4,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  delay: 0.4,
                 },
                 rotate: {
                   duration: 3.6,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  delay: 0.4,
                 },
               }
         }
       >
-        <div ref={hostRef} className="relative z-[1] h-[86%] w-full shrink-0" />
+        <div ref={hostRef} className="relative z-[1] h-[86%] w-full shrink-0">
+          <Image
+            src="/bothead.png"
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 36rem, 24rem"
+            data-bot-ph
+            className="object-contain p-[8%]"
+            priority
+          />
+        </div>
 
         <motion.div
           className="relative z-[2] -mt-[9%] h-[12%] w-[54%] shrink-0 rounded-[100%] bg-[#0cb78b]/35"

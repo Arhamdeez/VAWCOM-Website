@@ -7,7 +7,7 @@ import { SPLASH_COOKIE } from '@/lib/splashBoot';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-jakarta',
   display: 'swap',
 });
@@ -72,7 +72,7 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className={`${jakarta.className} bg-[#050a14]`}>
+      <body className={`${jakarta.className} bg-[#050a14]`} suppressHydrationWarning>
         <noscript>
           <style>{`html.splash-pending,html.splash-pending body{overflow:auto!important}html.splash-pending .splash-boot{display:none!important}`}</style>
         </noscript>

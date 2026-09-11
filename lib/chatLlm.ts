@@ -1,6 +1,6 @@
 /**
  * Chat LLM: OpenRouter (prod / free) → Ollama (local) → throw for route fallbacks.
- * Intent / RAG / safety nets stay in chatKnowledge; this is generation only.
+ * Intent classify + reply generation both go through here; RAG/safety stay in chatKnowledge.
  */
 
 export type ChatMessage = {
@@ -28,10 +28,6 @@ export function asFreeModel(id: string): string {
 export function openRouterFreeModelChain(pinned = process.env.OPENROUTER_MODEL): string[] {
   const primary = asFreeModel(pinned?.trim() || FREE_ROUTER);
   return primary === FREE_ROUTER ? [primary] : [primary, FREE_ROUTER];
-}
-
-export function openRouterModel() {
-  return openRouterFreeModelChain()[0];
 }
 
 export type ChatProviderId = 'openrouter' | 'ollama';
@@ -74,7 +70,11 @@ function openRouterError(data: unknown, status: number): string {
   return typeof err === 'string' ? err : JSON.stringify(err);
 }
 
-async function openRouterChatOnce(messages: ChatMessage[], model: string): Promise<string> {
+async function openRouterChatOnce(
+  messages: ChatMessage[],
+  model: string,
+  maxTokens: number
+): Promise<string> {
   const key = openRouterApiKey();
   if (!key) throw new Error('OPENROUTER_API_KEY missing');
 
@@ -91,8 +91,9 @@ async function openRouterChatOnce(messages: ChatMessage[], model: string): Promi
       body: JSON.stringify({
         model,
         messages,
-        temperature: 0.2,
-        max_tokens: 120,
+        temperature: maxTokens <= 24 ? 0 : 0.2,
+        // Room for 2–3 short sentences + links; classify calls pass a tiny cap.
+        max_tokens: maxTokens,
         provider: { max_price: { prompt: 0, completion: 0 } },
       }),
     },
@@ -107,12 +108,15 @@ async function openRouterChatOnce(messages: ChatMessage[], model: string): Promi
   return text.trim();
 }
 
-async function openRouterChat(messages: ChatMessage[]): Promise<{ text: string; model: string }> {
+async function openRouterChat(
+  messages: ChatMessage[],
+  maxTokens: number
+): Promise<{ text: string; model: string }> {
   const chain = openRouterFreeModelChain();
   let lastErr: unknown;
   for (const model of chain) {
     try {
-      const text = await openRouterChatOnce(messages, model);
+      const text = await openRouterChatOnce(messages, model, maxTokens);
       return { text, model };
     } catch (e) {
       lastErr = e;
@@ -123,7 +127,7 @@ async function openRouterChat(messages: ChatMessage[]): Promise<{ text: string; 
   throw lastErr instanceof Error ? lastErr : new Error('OpenRouter free models unavailable');
 }
 
-async function ollamaChat(messages: ChatMessage[]): Promise<string> {
+async function ollamaChat(messages: ChatMessage[], maxTokens: number): Promise<string> {
   const res = await timedFetch(
     `${ollamaBaseUrl()}/api/chat`,
     {
@@ -134,7 +138,11 @@ async function ollamaChat(messages: ChatMessage[]): Promise<string> {
         stream: false,
         keep_alive: '60m',
         messages,
-        options: { temperature: 0.15, num_predict: 55, num_ctx: 4096 },
+        options: {
+          temperature: maxTokens <= 24 ? 0 : 0.15,
+          num_predict: maxTokens,
+          num_ctx: 4096,
+        },
       }),
     },
     'Ollama chat'
@@ -150,25 +158,29 @@ async function ollamaChat(messages: ChatMessage[]): Promise<string> {
 
 export async function generateChatReply(params: {
   messages: ChatMessage[];
+  /** Completion budget. Default leaves room for INTENT line + short reply. */
+  maxTokens?: number;
 }): Promise<{ text: string; provider: ChatProviderId; model: string }> {
+  const maxTokens = params.maxTokens ?? 300;
   const provider = activeChatProvider();
   if (provider === 'openrouter') {
     if (!openRouterApiKey()) {
       throw new Error('CHAT_PROVIDER=openrouter but OPENROUTER_API_KEY is missing');
     }
-    const { text, model } = await openRouterChat(params.messages);
+    const { text, model } = await openRouterChat(params.messages, maxTokens);
     return { text, provider: 'openrouter', model };
   }
-  const text = await ollamaChat(params.messages);
+  const text = await ollamaChat(params.messages, maxTokens);
   return { text, provider: 'ollama', model: ollamaChatModel() };
 }
 
+/** Warm OpenRouter (no-op) or preload Ollama so the first chat isn’t cold. */
 export async function warmChat(): Promise<
   { ok: true; provider: ChatProviderId; model: string; ms: number } | { ok: false; error: string }
 > {
   if (activeChatProvider() === 'openrouter') {
     if (!openRouterApiKey()) return { ok: false, error: 'OPENROUTER_API_KEY missing' };
-    return { ok: true, provider: 'openrouter', model: openRouterModel(), ms: 0 };
+    return { ok: true, provider: 'openrouter', model: openRouterFreeModelChain()[0]!, ms: 0 };
   }
 
   const started = Date.now();

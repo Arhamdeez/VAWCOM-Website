@@ -18,7 +18,7 @@ body:has(.vaw-home) {
   position: relative;
   /* Must stay visible — overflow-x clip/hidden on an ancestor kills position:sticky */
   overflow: visible;
-  background: var(--vaw-bg);
+  background: #f5f3ee;
   color: var(--vaw-ink);
   font-family: var(--font-jakarta), 'Plus Jakarta Sans', Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -26,6 +26,14 @@ body:has(.vaw-home) {
 
 .vaw-home a:hover {
   color: var(--vaw-green);
+}
+
+/* Solid green controls: white type on hover so it doesn't vanish into the fill */
+.vaw-home :is(a, button)[class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover,
+.vaw-home :is(a, button)[class*='hover:bg-[#0cb78b]']:not([class*='hover:bg-[#0cb78b]/']):hover,
+.vaw-home :is(a, button)[class*='hover:bg-[#0a9d77]']:hover,
+.vaw-home a [class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover {
+  color: #fff !important;
 }
 
 /* Revamp palette — hero first; other sections keep the existing dark tokens */
@@ -43,6 +51,13 @@ body:has(.vaw-home) {
 
 .vaw-hero a:hover {
   color: var(--brand);
+}
+
+.vaw-hero :is(a, button)[class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover,
+.vaw-hero :is(a, button)[class*='hover:bg-[#0cb78b]']:not([class*='hover:bg-[#0cb78b]/']):hover,
+.vaw-hero :is(a, button)[class*='hover:bg-[#0a9d77]']:hover,
+.vaw-hero a [class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover {
+  color: #fff !important;
 }
 
 .vaw-home ::selection {
@@ -111,8 +126,8 @@ body:has(.vaw-home) {
     inset 1px 0 0 rgba(255, 255, 255, 0.4),
     inset -1px 0 1px rgba(22, 22, 21, 0.06),
     0 12px 36px rgba(22, 22, 21, 0.08);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.25);
+  -webkit-backdrop-filter: blur(10px) saturate(1.25);
 }
 
 .vaw-nav-glass-inner {
@@ -176,21 +191,8 @@ body:has(.vaw-home) {
   mix-blend-mode: overlay;
 }
 
-/* Safari/WebKit: frosted glass. SVG backdrop warp is Chromium-only. */
-.vaw-liquid-lens.is-css {
-  border: 1px solid rgba(255, 255, 255, 0.58);
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow:
-    0 22px 48px rgba(22, 22, 21, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(22px) saturate(1.85) brightness(1.08);
-  -webkit-backdrop-filter: blur(22px) saturate(1.85) brightness(1.08);
-}
-
 @media (hover: hover) and (pointer: fine) {
-  .vaw-glass:hover .vaw-glass-core,
-  .vaw-glass.is-liquid-hot .vaw-glass-core {
+  .vaw-glass:has(> .vaw-liquid-lens) .vaw-glass-core {
     border-color: transparent;
     background: transparent;
     box-shadow: none;
@@ -198,25 +200,20 @@ body:has(.vaw-home) {
     -webkit-backdrop-filter: none;
   }
 
-  .vawcom-marquee:not(.is-css-glass) .vaw-glass:hover .vaw-glass-core,
-  .vawcom-marquee:not(.is-css-glass) .vaw-glass.is-liquid-hot .vaw-glass-core {
+  .vawcom-marquee.is-svg-lens .vaw-glass:hover .vaw-glass-core,
+  .vawcom-marquee.is-svg-lens .vaw-glass.is-liquid-hot .vaw-glass-core {
     border-color: rgba(255, 255, 255, 0.45);
     background: rgba(255, 255, 255, 0.06);
     box-shadow: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+}
 
-  .vawcom-marquee.is-css-glass .vaw-glass:hover .vaw-glass-core,
-  .vawcom-marquee.is-css-glass .vaw-glass.is-liquid-hot .vaw-glass-core {
-    border-color: rgba(255, 255, 255, 0.55);
-    background: rgba(255, 255, 255, 0.32);
-    box-shadow:
-      0 10px 28px rgba(22, 22, 21, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(18px) saturate(1.7);
-    -webkit-backdrop-filter: blur(18px) saturate(1.7);
-  }
+/* Safari: no lens, and blur under a moving track is expensive / broken. */
+.vawcom-marquee:not(.is-svg-lens) .vaw-glass-core {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .vaw-hero .vawcom-marquee {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, List } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,6 +19,9 @@ type Props = {
   mobileWhenVisible?: boolean;
 };
 
+const RAIL_BOTTOM = 32; // bottom-8
+const FOOTER_GAP = 24;
+
 export default function ServiceJump({
   active,
   open,
@@ -29,6 +33,26 @@ export default function ServiceJump({
 }: Props) {
   const showMobile = mobileWhenVisible ? visible : true;
   const href = (id: string) => `/services/${id}`;
+  const [bottom, setBottom] = useState(RAIL_BOTTOM);
+
+  useEffect(() => {
+    const sync = () => {
+      const footer = document.querySelector('footer');
+      if (!footer) {
+        setBottom(RAIL_BOTTOM);
+        return;
+      }
+      const top = footer.getBoundingClientRect().top;
+      setBottom(Math.max(RAIL_BOTTOM, window.innerHeight - top + FOOTER_GAP));
+    };
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    return () => {
+      window.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+    };
+  }, []);
 
   return (
     <>
@@ -58,7 +82,10 @@ export default function ServiceJump({
         </div>
       ) : null}
 
-      <div className="pointer-events-none fixed bottom-8 left-4 top-28 z-30 hidden lg:flex">
+      <div
+        className="pointer-events-none fixed left-4 top-28 z-30 hidden lg:flex"
+        style={{ bottom }}
+      >
         <AnimatePresence>
           {visible ? (
             <motion.div
@@ -67,7 +94,7 @@ export default function ServiceJump({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className={`pointer-events-auto flex max-h-[min(70vh,32rem)] overflow-hidden rounded-2xl bg-[#fbf6ec]/95 shadow-[0_12px_40px_rgba(22,22,21,0.1)] backdrop-blur-md transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-[#161615]/92 shadow-[0_12px_40px_rgba(22,22,21,0.28)] backdrop-blur-md transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 open ? 'w-[11.5rem]' : 'w-11'
               }`}
             >
@@ -76,7 +103,7 @@ export default function ServiceJump({
                 aria-expanded={open}
                 aria-label={open ? 'Collapse service guide' : 'Open service guide'}
                 onClick={() => setOpen((v) => !v)}
-                className="flex w-11 flex-none flex-col items-center gap-2 py-3 text-[#5c5a56] hover:text-[#0cb78b]"
+                className="flex w-11 flex-none flex-col items-center gap-2 py-3 text-[#a8a69f] hover:text-[#0cb78b]"
               >
                 <List className="h-4 w-4" strokeWidth={2} />
                 <span
@@ -103,8 +130,8 @@ export default function ServiceJump({
                   {SERVICES.map((s) => {
                     const itemClass = `block w-full rounded-lg px-3 py-1.5 text-left text-[13px] transition-colors ${
                       active === s.id
-                        ? 'bg-[#0cb78b]/12 font-medium text-[#0cb78b]'
-                        : 'text-[#5c5a56] hover:bg-black/[0.04] hover:text-[#161615]'
+                        ? 'bg-[#0cb78b]/20 font-medium text-[#0cb78b]'
+                        : 'text-[#c4c2bb] hover:bg-white/[0.06] hover:text-white'
                     }`;
                     return (
                       <li key={s.id}>

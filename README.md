@@ -30,7 +30,7 @@ Requires **Node ≥ 20.9.0**.
 | Motion / 3D | Framer Motion, `three` (hero bot) |
 | Icons | `lucide-react` (+ a few custom SVGs in `SocialIcons`) |
 | Chat | **OpenRouter** free models (prod) or local **Ollama** (dev) — lexical RAG + intent + safety nets |
-| Contact mail | Nodemailer SMTP first, then Resend if SMTP fails |
+| Contact mail | Resend |
 | Fonts | Plus Jakarta Sans + Pangram Black (`public/fonts/`) |
 
 Brand colors live in CSS (`app/globals.css`, `components/home/home.css`) — cream `#f5f3ee`, brand green `#0cb78b`, glass shell `#050a14`.
@@ -70,7 +70,7 @@ API returns `{ response, meta }` with `provider` (`openrouter` | `ollama` | `loc
 | `OLLAMA_BASE_URL` | Default `http://127.0.0.1:11434` (local) |
 | `OLLAMA_MODEL` | Chat model (default `llama3.2`) |
 | `OLLAMA_TIMEOUT_MS` / `OPENROUTER_TIMEOUT_MS` | Optional timeouts |
-| `SMTP_*` / `RESEND_*` / `CONTACT_EMAIL` | Contact form |
+| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` / `CONTACT_EMAIL` | Contact form |
 
 Put secrets in `.env.local` and Vercel env (never commit).
 
@@ -78,7 +78,6 @@ Put secrets in `.env.local` and Vercel env (never commit).
 
 - `POST /api/chatbot` — local RAG site assistant (`components/chat/SiteChat.tsx`)
 - `POST /api/contact` — contact form email
-- `/email` — opens Gmail compose (shareable shortcut)
 
 ## Layout
 

@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, MessageSquare, Rocket, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import CreamPage from './CreamPage';
-import MiniContactForm from './MiniContactForm';
 import ServiceDeck from './ServiceDeck';
 import ServiceJump from './ServiceJump';
 import { SERVICES, SERVICE_FAQS } from '@/lib/services';
@@ -14,17 +13,14 @@ const START = [
   {
     title: 'Talk',
     body: 'A short call or the form. You talk to the people who will build it.',
-    Icon: MessageSquare,
   },
   {
     title: 'Lock a slice',
     body: 'We lock a first slice with a date, not a vague phase.',
-    Icon: Sparkles,
   },
   {
     title: 'Ship & decide',
     body: 'We build that slice, you use it, then we decide the next one.',
-    Icon: Rocket,
   },
 ] as const;
 
@@ -147,15 +143,20 @@ export default function ServicesHub() {
               {START.map((step, i) => (
                 <li
                   key={step.title}
-                  className="flex flex-col rounded-[1.5rem] bg-white p-6 shadow-[0_12px_32px_rgba(22,22,21,0.06)]"
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 rounded-[1.5rem] bg-white px-5 py-6 shadow-[0_12px_32px_rgba(22,22,21,0.06)]"
                 >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0cb78b]/12 text-[#0cb78b]">
-                    <step.Icon className="h-5 w-5" strokeWidth={1.75} />
+                  <span
+                    aria-hidden
+                    className="vaw-display select-none text-[3.25rem] leading-none tracking-[-0.06em] text-[#0cb78b]/30"
+                  >
+                    {String(i + 1).padStart(2, '0')}
                   </span>
-                  <p className="mt-5 m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
-                    {String(i + 1).padStart(2, '0')} · {step.title}
-                  </p>
-                  <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">{step.body}</p>
+                  <div className="min-w-0">
+                    <p className="m-0 text-[15px] font-semibold text-[#161615]">{step.title}</p>
+                    <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">
+                      {step.body}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ol>
@@ -187,14 +188,22 @@ export default function ServicesHub() {
           </motion.section>
 
           <motion.section className="mt-20" {...anim}>
-            <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
-              If you are not sure
-            </h2>
-            <p className="mt-4 max-w-[46ch] text-[15px] leading-relaxed text-[#5c5a56]">
-              Tell us what you are trying to get done. We will point you to the right service, or say
-              if it is not a fit.
-            </p>
-            <MiniContactForm />
+            <div className="rounded-[1.5rem] bg-white p-7 shadow-[0_12px_32px_rgba(22,22,21,0.06)] sm:p-9">
+              <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
+                Still stuck?
+              </h2>
+              <p className="mt-4 mb-0 max-w-[46ch] text-[15px] leading-relaxed text-[#5c5a56]">
+                Tell us what you are trying to get done. We will point you to the right service, or say
+                if it is not a fit.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-6 py-3 text-[14px] font-medium text-[#0b0d0c] hover:bg-[#0a9d77]"
+              >
+                Get in touch
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
           </motion.section>
 
           <Link

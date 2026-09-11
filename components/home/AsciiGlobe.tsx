@@ -145,11 +145,22 @@ export default function AsciiGlobe() {
     );
     io.observe(root);
 
+    const onVis = () => {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        return;
+      }
+      if (visible && (typing || spinning)) kick();
+    };
+    document.addEventListener('visibilitychange', onVis);
+
     return () => {
       if (raf) cancelAnimationFrame(raf);
       mo.disconnect();
       ro.disconnect();
       io.disconnect();
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 

@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useLayoutEffect, useCallback, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import SplashScreen from './SplashScreen';
-import { splashCookieHeader } from '@/lib/splashBoot';
+import { clearSplashCookieHeader, splashCookieHeader } from '@/lib/splashBoot';
+
+function wantsForcedSplash(pathname: string, search: string): boolean {
+  if (pathname === '/splash') return true;
+  return /(?:\?|&)splash(?:=|&|$)/.test(search);
+}
 
 function hasSeenSplash(): boolean {
   if (typeof window === 'undefined') return true;
   try {
-    if (/(?:\?|&)splash(?:=|&|$)/.test(window.location.search)) {
-      document.cookie = splashCookieHeader(false);
-      sessionStorage.removeItem('hasSeenSplash');
-      return false;
-    }
-    if (document.cookie.split('; ').includes('vaw_splash=1')) return true;
-    return sessionStorage.getItem('hasSeenSplash') === 'true';
+    return document.cookie.split('; ').includes('vaw_splash=1');
   } catch {
     return true;
   }
@@ -21,8 +21,15 @@ function hasSeenSplash(): boolean {
 
 function markSplashSeen() {
   try {
-    document.cookie = splashCookieHeader(true);
-    sessionStorage.setItem('hasSeenSplash', 'true');
+    document.cookie = splashCookieHeader();
+  } catch {
+    /* ignore */
+  }
+}
+
+function clearSplashSeen() {
+  try {
+    document.cookie = clearSplashCookieHeader();
   } catch {
     /* ignore */
   }
@@ -46,31 +53,61 @@ function setSplashComplete() {
   document.body.style.overflow = '';
 }
 
-export default function SplashScreenWrapper({ children }: { children: React.ReactNode }) {
+export default function SplashScreenWrapper({
+  children,
+  cream = false,
+}: {
+  children: React.ReactNode;
+  cream?: boolean;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [showSplash, setShowSplash] = useState(false);
   const completedRef = useRef(false);
+  const forcedRef = useRef(false);
 
   const finishSplash = useCallback(() => {
+    markSplashSeen();
+    // Stay on cream overlay until home is mounted. Unmounting on /splash
+    // shows the navy html/body shell.
+    if (forcedRef.current && window.location.pathname === '/splash') {
+      router.replace('/');
+      return;
+    }
     if (completedRef.current) return;
     completedRef.current = true;
     setShowSplash(false);
-    markSplashSeen();
     setSplashComplete();
-  }, []);
+  }, [router]);
 
   useLayoutEffect(() => {
+    const forced = wantsForcedSplash(pathname, window.location.search);
+    forcedRef.current = forced;
+
+    if (forced) {
+      completedRef.current = false;
+      clearSplashSeen();
+      setSplashPending(true);
+      setShowSplash(true);
+      const failsafe = window.setTimeout(finishSplash, 2200);
+      return () => window.clearTimeout(failsafe);
+    }
+
+    if (completedRef.current) return;
+
     if (hasSeenSplash()) {
       finishSplash();
       return;
     }
+
     setSplashPending(true);
     setShowSplash(true);
-    const failsafe = window.setTimeout(finishSplash, 5500);
+    const failsafe = window.setTimeout(finishSplash, 2200);
     return () => window.clearTimeout(failsafe);
-  }, [finishSplash]);
+  }, [finishSplash, pathname]);
 
   return (
-    <div className="relative min-h-screen bg-[#050a14]">
+    <div className={`relative min-h-screen ${cream ? 'bg-[#f5f3ee]' : 'bg-[#050a14]'}`}>
       <div className="splash-boot" aria-hidden="true" />
       <div id="vawcom-app" className="relative">
         {children}

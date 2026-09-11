@@ -127,7 +127,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (!text || typing) return;
       setDraft('');
       setClosed(false);
-      if (docked) setDockOpen(true);
       const nextHistory = [...messages, { role: 'user' as const, text }];
       setMessages(nextHistory);
       setTyping(true);
@@ -137,7 +136,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             message: text,
-            history: nextHistory.slice(-8).map((m) => ({
+            path: pathname,
+            history: nextHistory.slice(-4).map((m) => ({
               role: m.role === 'ai' ? 'assistant' : 'user',
               text: m.text,
             })),
@@ -154,7 +154,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setTyping(false);
       }
     },
-    [draft, typing, docked, messages],
+    [draft, typing, messages, pathname],
   );
 
   const openHref = useCallback((href: string) => {
@@ -336,10 +336,10 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           ))}
           {typing ? (
             <div
-              className="self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2.5"
+              className="self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[14.5px] leading-snug"
               aria-label="Vawbot is typing"
             >
-              <span className="inline-flex h-4 items-center gap-[5px]" aria-hidden>
+              <span className="inline-flex h-[1.25em] items-center gap-[5px]" aria-hidden>
                 <span className="vaw-typing-dot h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
                 <span className="vaw-typing-dot vaw-typing-dot-2 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
                 <span className="vaw-typing-dot vaw-typing-dot-3 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />

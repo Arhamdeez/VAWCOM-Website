@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  experimental: {
+    staleTimes: {
+      dynamic: 60,
+      static: 300,
+    },
+  },
   /**
    * Pin tracing to this app directory (not process.cwd()). Avoids wrong roots when multiple
    * lockfiles exist, and matches Vercel single-package checkout without Turbopack path issues.

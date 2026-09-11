@@ -15,11 +15,23 @@ import {
   looksLikeInventedBrainstorm,
   looksLikeMetaNarration,
   offlineFallbackForIntent,
+  parseIntentLabel,
   planChatTurn,
+  resolvePageContext,
   sanitizeAssistantReply,
+  splitIntentAndReply,
   type ChatIntent,
 } from '../lib/chatKnowledge';
 import { asFreeModel, openRouterFreeModelChain } from '../lib/chatLlm';
+
+const EMPTY_RETRIEVAL = {
+  chunks: [],
+  primaryService: null,
+  secondaryService: null,
+  primaryScore: 0,
+  catalogAsk: false,
+  page: resolvePageContext('/'),
+};
 
 type HistoryMsg = { role: 'user' | 'ai' | 'assistant'; text: string };
 
@@ -261,6 +273,87 @@ const FIXTURES: Fixture[] = [
     },
   },
   {
+    name: 'best software company → promote VAWCOM, not off_topic',
+    message: "whats the best software company?",
+    expectIntent: 'general',
+    assert: (reply) => {
+      if (/I stay on VAWCOM projects|Outside my lane|not general Q&A/i.test(reply)) {
+        throw new Error(`deflected vendor ask: ${reply}`);
+      }
+      assertHas(reply, /right place|already|VAWCOM|that'?s (us|what)/i, 'promote studio');
+      assertHas(reply, /\/(services|contact)/i, 'services or contact');
+      assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'best place for website + app → promote both lanes',
+    message: 'whats the best place to get a website and app built',
+    expectIntent: 'general',
+    assert: (reply) => {
+      if (/I stay on VAWCOM projects|Outside my lane/i.test(reply)) {
+        throw new Error(`deflected vendor ask: ${reply}`);
+      }
+      assertHas(reply, /right place|already|VAWCOM|that'?s (us|what)|builds that/i, 'promote');
+      assertHas(reply, /\/services\/(web|apps)/, 'web or apps');
+      assertHas(reply, /\/contact|\/services/, 'path forward');
+      assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'hru → chitchat',
+    message: 'hru',
+    expectIntent: 'chitchat',
+    assert: (reply) => {
+      assertHas(reply, /\/services|build|launch|project/i, 'steer back');
+      assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'assumption pushback → correction, not same browse line',
+    message: 'when did i say im trying to build something',
+    history: [
+      {
+        role: 'ai',
+        text: 'Happy to help narrow it down. Browse [services](/services), or tell me the goal in one line.',
+      },
+      { role: 'user', text: 'narrow what down' },
+      {
+        role: 'ai',
+        text: "Just figuring out which of our services fits what you're after. What are you hoping to build or get off the ground?",
+      },
+    ],
+    expectIntent: 'correction',
+    assert: (reply) => {
+      if (/Happy to help narrow it down/i.test(reply)) {
+        throw new Error(`repeated browse line: ${reply}`);
+      }
+      assertHas(reply, /services|build|site|app|store|project|idea/i, 'steer');
+      assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'browse repeat avoided after same canned line',
+    message: 'not sure',
+    history: [
+      {
+        role: 'ai',
+        text: 'Happy to help narrow it down. Browse [services](/services), or tell me the goal in one line.',
+      },
+    ],
+    expectIntent: 'browse_services',
+    useLocalFirst: true,
+    assert: (reply) => {
+      if (/Happy to help narrow it down/i.test(reply)) {
+        throw new Error(`repeated browse line: ${reply}`);
+      }
+      assertHas(reply, /\/services|site|app|store|goal|launch/i, 'services or clarify');
+    },
+  },
+  {
     name: 'what do you offer → catalog',
     message: 'What do you offer?',
     expectIntent: 'browse_services',
@@ -300,6 +393,28 @@ function resolveReply(f: Fixture) {
   };
 }
 
+function runParseIntentChecks() {
+  const cases: [string, ChatIntent][] = [
+    ['chitchat', 'chitchat'],
+    ['project_need', 'project_need'],
+    ['Intent: correction', 'correction'],
+    ['general\nBecause they asked who to hire', 'general'],
+    ['  OFF_TOPIC  ', 'off_topic'],
+  ];
+  for (const [raw, want] of cases) {
+    const got = parseIntentLabel(raw);
+    if (got !== want) throw new Error(`parseIntentLabel(${JSON.stringify(raw)}) → ${got} !== ${want}`);
+  }
+  if (parseIntentLabel('nope') !== null) throw new Error('expected null for unknown label');
+
+  const split = splitIntentAndReply(
+    'INTENT chitchat\nAll good — peek at [services](/services) when you want to build.'
+  );
+  if (split.intent !== 'chitchat') throw new Error(`split intent ${split.intent}`);
+  if (/^INTENT/i.test(split.reply)) throw new Error(`intent leaked into reply: ${split.reply}`);
+  if (!/services/i.test(split.reply)) throw new Error(`split reply missing body: ${split.reply}`);
+}
+
 function runSanitizerChecks() {
   const vendor = sanitizeAssistantReply(
     'You should try Shopify or Etsy for that store.',
@@ -312,7 +427,7 @@ function runSanitizerChecks() {
     'I see a pattern here — you’re keeping me on my toes!',
     'general',
     "isn't it your job",
-    { chunks: [], primaryService: null, secondaryService: null, primaryScore: 0, catalogAsk: false }
+    EMPTY_RETRIEVAL
   );
   assertNoMeta(meta);
   assertNoBrainstorm(meta);
@@ -321,7 +436,7 @@ function runSanitizerChecks() {
     'Okay, the user just said "i dont really know" twice. They\'re unsure about what they need, which is common for people exploring options.',
     'browse_services',
     "i dont really know",
-    { chunks: [], primaryService: null, secondaryService: null, primaryScore: 0, catalogAsk: false }
+    EMPTY_RETRIEVAL
   );
   assertNoMeta(cot);
   if (/the user (just )?said|they('re| are) unsure/i.test(cot)) {
@@ -332,9 +447,47 @@ function runSanitizerChecks() {
     'Here are some ideas:\n- A blog to share tips\n- Community forum\n- Resource page\n- Showcase your personality',
     'browse_services',
     'give me ideas',
-    { chunks: [], primaryService: null, secondaryService: null, primaryScore: 0, catalogAsk: false }
+    EMPTY_RETRIEVAL
   );
   assertNoBrainstorm(brainstorm);
+}
+
+function runPageContextChecks() {
+  const apps = resolvePageContext('/services/apps');
+  if (apps.serviceId !== 'apps') throw new Error(`expected apps page, got ${apps.serviceId}`);
+  if (!/App Development|iPhone|Android/i.test(apps.blurb)) {
+    throw new Error(`apps blurb too thin: ${apps.blurb}`);
+  }
+  const about = resolvePageContext('/about');
+  if (!about.chunkIds.includes('founders')) throw new Error('about should pin founders');
+  const { retrieval } = planChatTurn('what does this include?', undefined, '/services/apps');
+  if (retrieval.page.serviceId !== 'apps') throw new Error('retrieval page not apps');
+  if (retrieval.primaryService?.id !== 'apps') throw new Error('primary should prefer apps page');
+  if (!retrieval.chunks.some((c) => c.id === 'current-page')) {
+    throw new Error('missing current-page chunk');
+  }
+  const loc = planChatTurn('what page am i on', undefined, '/about');
+  if (loc.localResponse !== 'You’re on the About page.') {
+    throw new Error(`location reply: ${loc.localResponse}`);
+  }
+  const aboutWhat = planChatTurn('what is this about', undefined, '/about');
+  if (aboutWhat.localResponse !== resolvePageContext('/about').summary) {
+    throw new Error(`about summary: ${aboutWhat.localResponse}`);
+  }
+  if (/[—–]/.test(aboutWhat.localResponse || '')) {
+    throw new Error(`em dash in summary: ${aboutWhat.localResponse}`);
+  }
+  const sum = planChatTurn('summarise this page', undefined, '/about');
+  if (sum.localResponse !== resolvePageContext('/about').summary) {
+    throw new Error(`summarise reply: ${sum.localResponse}`);
+  }
+  const cleaned = sanitizeAssistantReply(
+    'You’re on About — founders and process.',
+    null,
+    false,
+    2,
+  );
+  if (/[—–]/.test(cleaned)) throw new Error(`em dash survived sanitize: ${cleaned}`);
 }
 
 function runFreeModelChecks() {
@@ -352,6 +505,30 @@ function runFreeModelChecks() {
 function main() {
   let failed = 0;
   const results: { name: string; ok: boolean; detail?: string }[] = [];
+
+  try {
+    runParseIntentChecks();
+    results.push({ name: 'parseIntentLabel', ok: true });
+  } catch (e) {
+    failed += 1;
+    results.push({
+      name: 'parseIntentLabel',
+      ok: false,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+  }
+
+  try {
+    runPageContextChecks();
+    results.push({ name: 'page context', ok: true });
+  } catch (e) {
+    failed += 1;
+    results.push({
+      name: 'page context',
+      ok: false,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+  }
 
   try {
     runSanitizerChecks();

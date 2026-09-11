@@ -36,8 +36,7 @@ function makeBezelMap(width: number, height: number, radius: number, bezel: numb
       const inside = Math.max(0, -sd);
       let mag = 0;
       if (inside > 0 && inside < bz) {
-        const t = inside / bz;
-        mag = Math.pow(1 - t, 1.15);
+        mag = Math.pow(1 - inside / bz, 1.15);
       }
       const nx =
         sdRoundRect(px + e, py, hw, hh, rad) - sdRoundRect(px - e, py, hw, hh, rad);
@@ -73,16 +72,15 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
   const rawId = useId();
   const fid = `vawlg${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const wrapRef = useRef<HTMLDivElement>(null);
-  const turbRef = useRef<SVGFETurbulenceElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0, r: 38 });
-  const [svgWarp, setSvgWarp] = useState(false);
+  const [on, setOn] = useState(false);
 
   useLayoutEffect(() => {
-    setSvgWarp(supportsSvgBackdrop());
+    setOn(supportsSvgBackdrop());
   }, []);
 
   useLayoutEffect(() => {
-    if (!svgWarp) return;
+    if (!on) return;
     const el = wrapRef.current;
     if (!el) return;
     const sync = () => {
@@ -98,37 +96,21 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
     const ro = new ResizeObserver(sync);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [svgWarp]);
-
-  useLayoutEffect(() => {
-    if (!active || !svgWarp) return;
-    const node = turbRef.current;
-    if (!node) return;
-    let t = 0;
-    let raf = 0;
-    const tick = () => {
-      t += 0.012;
-      node.setAttribute(
-        'baseFrequency',
-        `${(0.011 + Math.sin(t) * 0.005).toFixed(4)} ${(0.02 + Math.cos(t * 0.85) * 0.007).toFixed(4)}`,
-      );
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [active, svgWarp, box.w]);
+  }, [on]);
 
   const map = useMemo(() => {
-    if (!svgWarp || box.w < 2 || box.h < 2) return '';
+    if (!on || box.w < 2 || box.h < 2) return '';
     return makeBezelMap(box.w, box.h, box.r, 26);
-  }, [box, svgWarp]);
+  }, [box, on]);
+
+  if (!on) return null;
 
   return (
     <div
       ref={wrapRef}
-      className={`vaw-liquid-lens${svgWarp ? '' : ' is-css'}`}
+      className="vaw-liquid-lens"
       style={
-        active && svgWarp
+        active
           ? {
               backdropFilter: `url(#${fid})`,
               WebkitBackdropFilter: `url(#${fid})`,
@@ -137,7 +119,7 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
       }
       aria-hidden
     >
-      {svgWarp && map ? (
+      {map ? (
         <svg width="0" height="0" className="absolute overflow-hidden">
           <filter
             id={fid}
@@ -166,7 +148,6 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
               result="lens"
             />
             <feTurbulence
-              ref={turbRef}
               type="fractalNoise"
               baseFrequency="0.012 0.02"
               numOctaves="3"

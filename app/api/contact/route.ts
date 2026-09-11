@@ -81,38 +81,6 @@ export async function POST(request: NextRequest) {
       message,
     });
 
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      try {
-        const nodemailer = await import('nodemailer');
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT || '587'),
-          secure: process.env.SMTP_PORT === '465',
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-
-        const info = await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER,
-          to: recipientEmail,
-          replyTo: email,
-          subject: emailSubject,
-          text: emailBody,
-          html,
-        });
-
-        return NextResponse.json({
-          success: true,
-          message: 'Message sent successfully to ' + recipientEmail,
-          id: info.messageId,
-        });
-      } catch (error) {
-        console.error('SMTP error:', error);
-      }
-    }
-
     if (process.env.RESEND_API_KEY) {
       try {
         const { Resend } = await import('resend');

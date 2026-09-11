@@ -89,7 +89,22 @@ body::-webkit-scrollbar {
 
 /* ─── Splash boot (overlay covers app — never hide #vawcom-app or a stuck splash blanks the page) ─── */
 
-html.splash-pending body {
+html.splash-pending,
+html.splash-exiting,
+html.splash-complete:has(.vaw-home),
+html.splash-complete:has(.vaw-hero) {
+  background-color: #f5f3ee !important;
+}
+
+html.splash-pending body,
+html.splash-exiting body,
+html.splash-complete:has(.vaw-home) body,
+html.splash-complete:has(.vaw-hero) body {
+  background-color: #f5f3ee !important;
+}
+
+html.splash-pending body,
+html.splash-exiting body {
   overflow: hidden !important;
 }
 

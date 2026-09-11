@@ -49,12 +49,6 @@ export const PROJECTS: Project[] = [
     ],
     demo: 'Sample walkthrough — placeholder video and mock call flow for design review.',
     url: '/#voice',
-    review: {
-      type: 'video',
-      src: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
-      name: 'Amina R.',
-      role: 'Ops lead (sample)',
-    },
   },
 ];
 

@@ -11,16 +11,12 @@ const INNER_MAX = {
 
 type SiteInnerMax = keyof typeof INNER_MAX;
 
-type SiteContainerProps = React.ComponentPropsWithoutRef<'div'> & {
-  center?: boolean;
-};
+type SiteContainerProps = React.ComponentPropsWithoutRef<'div'>;
 
-export function SiteContainer({ className, center, children, ...props }: SiteContainerProps) {
+export function SiteContainer({ className, children, ...props }: SiteContainerProps) {
   return (
     <div
-      className={[SITE_CONTAINER_CLASS, center ? 'flex justify-center' : '', className]
-        .filter(Boolean)
-        .join(' ')}
+      className={[SITE_CONTAINER_CLASS, className].filter(Boolean).join(' ')}
       {...props}
     >
       {children}

@@ -145,14 +145,9 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          <motion.div
-            initial={reduce ? false : { opacity: 0, scale: 0.92, y: 18 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1.1, 0.3, 1] }}
-            className="flex h-[20rem] w-full max-w-[24rem] items-center justify-center sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:justify-end"
-          >
+          <div className="flex h-[20rem] w-full max-w-[24rem] items-center justify-center sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:justify-end">
             <VawcomBot />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

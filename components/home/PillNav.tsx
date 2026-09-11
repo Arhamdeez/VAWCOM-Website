@@ -51,7 +51,7 @@ export default function PillNav({
           expanded ? 'justify-between gap-4 sm:gap-6' : 'gap-[22px]'
         }`}
       >
-        <Link href="/" className="flex flex-none items-center gap-2.5 text-inherit">
+        <Link href="/" prefetch className="flex flex-none items-center gap-2.5 text-inherit">
           <Image
             src="/logo-mark.png"
             alt="VAWCOM"
@@ -82,6 +82,7 @@ export default function PillNav({
             <div className="inline-flex items-center gap-0.5">
               <Link
                 href="/services"
+                prefetch
                 className={`${active === 'services' ? on : primary} group-hover/svc:text-[#0cb78b]`}
               >
                 Services
@@ -125,14 +126,14 @@ export default function PillNav({
               </div>
             </div>
           </div>
-          <Link href="/gallery" className={active === 'gallery' ? on : link}>
+          <Link href="/gallery" prefetch className={active === 'gallery' ? on : link}>
             Gallery
           </Link>
-          <Link href="/about" className={active === 'about' ? on : link}>
+          <Link href="/about" prefetch className={active === 'about' ? on : link}>
             About
           </Link>
           {active === 'home' ? (
-            <Link href="/contact" className={link}>
+            <Link href="/contact" prefetch className={link}>
               Contact
             </Link>
           ) : null}
@@ -140,7 +141,7 @@ export default function PillNav({
         {active === 'contact' ? (
           <span className={cta}>Contact</span>
         ) : (
-          <Link href="/contact" className={cta}>
+          <Link href="/contact" prefetch className={cta}>
             Get Started
           </Link>
         )}
