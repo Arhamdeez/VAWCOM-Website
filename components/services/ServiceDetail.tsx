@@ -9,38 +9,13 @@ import ProjectCard from '@/components/work/ProjectCard';
 import type { Service } from '@/lib/services';
 import { PROCESS_STEPS } from '@/lib/process';
 import { projectsFor } from '@/lib/work';
+import { STACK_ICONS, stackIconUrl } from '@/lib/stackIcons';
 
 const shell = 'mx-auto w-full max-w-[1100px] px-6 sm:px-8 lg:px-10 lg:pl-24';
 
-const ICON_BASE = 'https://cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons';
-
-/** simple-icons slug + brand color for service.stack labels */
-const STACK_ICON: Record<string, { slug: string; color: string }> = {
-  'Next.js': { slug: 'nextdotjs', color: '#0b0d0c' },
-  React: { slug: 'react', color: '#087ea4' },
-  TypeScript: { slug: 'typescript', color: '#3178C6' },
-  Tailwind: { slug: 'tailwindcss', color: '#0b6e75' },
-  Postgres: { slug: 'postgresql', color: '#336791' },
-  'React Native': { slug: 'react', color: '#087ea4' },
-  Flutter: { slug: 'flutter', color: '#02569B' },
-  Kotlin: { slug: 'kotlin', color: '#7F52FF' },
-  Swift: { slug: 'swift', color: '#F05138' },
-  Firebase: { slug: 'firebase', color: '#DD2C00' },
-  Twilio: { slug: 'twilio', color: '#F22F46' },
-  OpenAI: { slug: 'openai', color: '#0b0d0c' },
-  n8n: { slug: 'n8n', color: '#EA4B71' },
-  'Calendar APIs': { slug: 'googlecalendar', color: '#1A73E8' },
-  Claude: { slug: 'anthropic', color: '#8B5E3C' },
-  Python: { slug: 'python', color: '#3776AB' },
-  'Node.js': { slug: 'nodedotjs', color: '#339933' },
-  Stripe: { slug: 'stripe', color: '#635BFF' },
-  AWS: { slug: 'amazonaws', color: '#C45500' },
-  Docker: { slug: 'docker', color: '#2496ED' },
-};
-
 function StackItem({ name }: { name: string }) {
-  const meta = STACK_ICON[name];
-  const mask = meta ? `url(${ICON_BASE}/${meta.slug}.svg)` : undefined;
+  const meta = STACK_ICONS[name];
+  const mask = meta ? `url(${stackIconUrl(meta.slug)})` : undefined;
 
   return (
     <li className="flex items-center gap-2.5 rounded-full bg-[#0b0d0c]/10 px-3.5 py-2">
@@ -124,7 +99,10 @@ export default function ServiceDetail({ service }: { service: Service }) {
             </div>
           </section>
 
-          <section className="mt-12 rounded-[1.35rem] bg-[#161615] p-6 sm:p-8">
+          <section
+            data-nav-contrast="dark"
+            className="mt-12 rounded-[1.35rem] bg-[#161615] p-6 sm:p-8"
+          >
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="vaw-display m-0 text-[clamp(1.4rem,2.5vw,1.85rem)] tracking-[-0.03em] text-[#ece9e3]">

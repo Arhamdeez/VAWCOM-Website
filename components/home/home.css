@@ -114,6 +114,32 @@ body:has(.vaw-home) {
   animation: vaw-globe-twinkle 2.8s ease-in-out infinite;
 }
 
+@keyframes vaw-globe-pin {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(22, 22, 21, 0.35);
+  }
+  50% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 5px rgba(22, 22, 21, 0);
+  }
+}
+
+.vaw-globe-pin {
+  visibility: hidden;
+}
+
+.vaw-globe-pin-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #161615;
+  box-shadow: 0 0 0 2px #f5f3ee;
+  animation: vaw-globe-pin 2.2s ease-in-out infinite;
+}
+
 /* Transparent nav pill — clear center, glass only on the rim */
 .vaw-nav-glass {
   position: relative;
@@ -128,6 +154,15 @@ body:has(.vaw-home) {
     0 12px 36px rgba(22, 22, 21, 0.08);
   backdrop-filter: blur(10px) saturate(1.25);
   -webkit-backdrop-filter: blur(10px) saturate(1.25);
+}
+
+.vaw-nav-glass-on-dark {
+  background: rgba(11, 13, 12, 0.42);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 12px 36px rgba(0, 0, 0, 0.28);
 }
 
 .vaw-nav-glass-inner {

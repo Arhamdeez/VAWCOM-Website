@@ -94,7 +94,7 @@ export default function ServiceJump({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-[#161615]/92 shadow-[0_12px_40px_rgba(22,22,21,0.28)] backdrop-blur-md transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 open ? 'w-[11.5rem]' : 'w-11'
               }`}
             >

@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { ASCII_COLS, ASCII_ROWS, renderAsciiGlobePlain } from './globeAscii';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { ArrowUpRight, X } from 'lucide-react';
+import { globeGrid, projectGlobePoint, renderAsciiGlobePlain } from './globeAscii';
+import { GLOBE_PLACES, projectsForPlace, type GlobePlace } from './globePlaces';
 
-const TILT = 0.42;
-const SPIN = 0.32; // rad/sec after type-in
+const SPIN = 0.32;
 const TWINKLES = [
   { t: '8%', l: '18%', d: '0s', s: 3 },
   { t: '14%', l: '78%', d: '0.4s', s: 2 },
@@ -17,18 +19,28 @@ const TWINKLES = [
 ] as const;
 
 /**
- * ASCII globe (adamsky/globe-style): fades in when the scroll line arrives,
- * types each row left to right, then slowly rotates.
+ * ASCII globe (adamsky/globe): real land outlines, drag to look around, click a pin for work.
  */
 export default function AsciiGlobe() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const diskRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
-  const yawRef = useRef(0.55);
+  const pinRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const yawRef = useRef(0.4);
+  const tiltRef = useRef(0.38);
+  const openRef = useRef<GlobePlace | null>(null);
+  const setOpenRef = useRef<(p: GlobePlace | null) => void>(() => {});
+  const kickRef = useRef<() => void>(() => {});
+  const placePinsRef = useRef<() => void>(() => {});
+  const [open, setOpen] = useState<GlobePlace | null>(null);
+  openRef.current = open;
+  setOpenRef.current = setOpen;
 
   useEffect(() => {
     const root = rootRef.current;
+    const disk = diskRef.current;
     const pre = preRef.current;
-    if (!root || !pre) return;
+    if (!root || !disk || !pre) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let raf = 0;
@@ -36,18 +48,119 @@ export default function AsciiGlobe() {
     let spinning = false;
     let typed = false;
     let visible = true;
+    let dragging = false;
+    let dragDist = 0;
+    let lastPtrX = 0;
+    let lastPtrY = 0;
+    let cols = 80;
+    let rows = 40;
     let lineIdx = 0;
     let colIdx = 0;
     let lines: string[] = [];
     let lastSpin = 0;
     let lastType = 0;
 
+    const frame = () => renderAsciiGlobePlain(yawRef.current, tiltRef.current, cols, rows);
+
+    const pinXY: Record<string, { x: number; y: number }> = {};
+
+    const layoutPins = () => {
+      const box = disk.getBoundingClientRect();
+      if (box.width < 4) return [];
+      const items = GLOBE_PLACES.map((place) => {
+        const pt = projectGlobePoint(place.lat, place.lon, yawRef.current, tiltRef.current);
+        if (!pt) return { place, x: 0, y: 0, visible: false };
+        return {
+          place,
+          x: box.left + ((pt.nx + 1) / 2) * box.width,
+          y: box.top + ((pt.ny + 1) / 2) * box.height,
+          visible: true,
+        };
+      });
+      const minSep = 52;
+      for (let n = 0; n < 5; n++) {
+        for (let i = 0; i < items.length; i++) {
+          for (let j = i + 1; j < items.length; j++) {
+            const a = items[i];
+            const b = items[j];
+            if (!a.visible || !b.visible) continue;
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            let d = Math.hypot(dx, dy);
+            if (d < 0.5) {
+              dx = 1;
+              dy = 0;
+              d = 0.5;
+            }
+            if (d >= minSep) continue;
+            const push = (minSep - d) / 2;
+            dx /= d;
+            dy /= d;
+            a.x -= dx * push;
+            a.y -= dy * push;
+            b.x += dx * push;
+            b.y += dy * push;
+          }
+        }
+      }
+      for (const key of Object.keys(pinXY)) delete pinXY[key];
+      for (const item of items) {
+        if (item.visible) pinXY[item.place.id] = { x: item.x, y: item.y };
+      }
+      return items;
+    };
+
+    const placePins = () => {
+      if (!typed || typing) return;
+      const box = disk.getBoundingClientRect();
+      const openId = openRef.current?.id;
+      for (const item of layoutPins()) {
+        const el = pinRefs.current[item.place.id];
+        if (!el) continue;
+        if (!item.visible) {
+          el.style.visibility = 'hidden';
+          el.style.pointerEvents = 'none';
+          continue;
+        }
+        el.style.visibility = 'visible';
+        el.style.pointerEvents = 'auto';
+        el.style.left = `${((item.x - box.left) / box.width) * 100}%`;
+        el.style.top = `${((item.y - box.top) / box.height) * 100}%`;
+        el.style.zIndex = openId && openId !== item.place.id ? '5' : '3';
+      }
+    };
+    placePinsRef.current = placePins;
+
+    const hitPlace = (clientX: number, clientY: number) => {
+      layoutPins();
+      const hits: { place: GlobePlace; d: number }[] = [];
+      for (const place of GLOBE_PLACES) {
+        const xy = pinXY[place.id];
+        if (!xy) continue;
+        hits.push({ place, d: Math.hypot(clientX - xy.x, clientY - xy.y) });
+      }
+      hits.sort((a, b) => a.d - b.d);
+      const reach = 48;
+      const inRange = hits.filter((h) => h.d < reach);
+      if (!inRange.length) return null;
+      const openId = openRef.current?.id;
+      if (openId && inRange.length > 1 && inRange[0].place.id === openId) return inRange[1].place;
+      return inRange[0].place;
+    };
+
     const sizePre = () => {
       const box = Math.min(root.clientWidth, root.clientHeight) * 0.72;
-      pre.style.width = `${box}px`;
-      pre.style.height = `${box}px`;
-      pre.style.fontSize = `${box / ASCII_ROWS}px`;
-      pre.style.letterSpacing = `${box / ASCII_COLS - (box / ASCII_ROWS) * 0.55}px`;
+      const grid = globeGrid(box);
+      cols = grid.cols;
+      rows = grid.rows;
+      disk.style.width = `${box}px`;
+      disk.style.height = `${box}px`;
+      pre.style.fontSize = `${box / rows}px`;
+      pre.style.letterSpacing = `calc((${box}px - ${cols}ch) / ${Math.max(1, cols - 1)})`;
+      if (typed && !typing) {
+        pre.textContent = frame();
+        placePins();
+      }
     };
 
     const painted = () => {
@@ -67,6 +180,13 @@ export default function AsciiGlobe() {
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(tick);
     };
+    kickRef.current = kick;
+
+    const paint = (now?: number) => {
+      pre.textContent = frame();
+      placePins();
+      if (now != null) lastSpin = now;
+    };
 
     const tick = (now: number) => {
       raf = 0;
@@ -74,7 +194,8 @@ export default function AsciiGlobe() {
 
       if (typing) {
         if (now - lastType > 6) {
-          let step = 22;
+          const total = cols * rows;
+          let step = Math.max(24, (total / 90) | 0);
           while (step > 0 && lineIdx < lines.length) {
             const line = lines[lineIdx];
             const take = Math.min(step, line.length - colIdx);
@@ -90,18 +211,16 @@ export default function AsciiGlobe() {
           if (lineIdx >= lines.length) {
             typing = false;
             typed = true;
-            pre.textContent = renderAsciiGlobePlain(yawRef.current, TILT);
+            paint(now);
             spinning = true;
-            lastSpin = now;
           }
         }
         kick();
-      } else if (spinning && !reduce && visible) {
-        if (now - lastSpin > 140) {
+      } else if (spinning && !reduce && visible && !dragging && !openRef.current) {
+        if (now - lastSpin > 32) {
           const dt = (now - lastSpin) / 1000;
           yawRef.current += dt * SPIN;
-          pre.textContent = renderAsciiGlobePlain(yawRef.current, TILT);
-          lastSpin = now;
+          paint(now);
         }
         kick();
       }
@@ -111,20 +230,77 @@ export default function AsciiGlobe() {
       if (typed || typing) return;
       root.dataset.lit = '1';
       sizePre();
-      const fullPlain = renderAsciiGlobePlain(yawRef.current, TILT);
       if (reduce) {
-        pre.textContent = fullPlain;
         typed = true;
         spinning = true;
+        paint();
         return;
       }
-      lines = fullPlain.split('\n');
+      lines = frame().split('\n');
       lineIdx = 0;
       colIdx = 0;
       typing = true;
       pre.textContent = '';
       lastType = performance.now();
       kick();
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (!typed && !typing) return;
+      if ((e.target as HTMLElement).closest('[data-globe-pin],[data-globe-pop]')) return;
+      typing = false;
+      typed = true;
+      const hit = hitPlace(e.clientX, e.clientY);
+      if (hit) {
+        setOpenRef.current(openRef.current?.id === hit.id ? null : hit);
+        paint();
+        return;
+      }
+      dragging = true;
+      dragDist = 0;
+      lastPtrX = e.clientX;
+      lastPtrY = e.clientY;
+      root.style.cursor = 'grabbing';
+      root.setPointerCapture(e.pointerId);
+      paint();
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastPtrX;
+      const dy = e.clientY - lastPtrY;
+      dragDist += Math.hypot(dx, dy);
+      yawRef.current += dx * 0.01;
+      tiltRef.current = Math.max(-0.95, Math.min(0.95, tiltRef.current + dy * 0.008));
+      lastPtrX = e.clientX;
+      lastPtrY = e.clientY;
+      if (dragDist > 16 && openRef.current) setOpenRef.current(null);
+      paint();
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      root.style.cursor = '';
+      try {
+        root.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+      if (dragDist < 16) {
+        const hit = hitPlace(e.clientX, e.clientY);
+        if (hit) setOpenRef.current(openRef.current?.id === hit.id ? null : hit);
+        else if (openRef.current) setOpenRef.current(null);
+      }
+      if (typed && !reduce && visible && !openRef.current) {
+        spinning = true;
+        lastSpin = performance.now();
+        kick();
+      }
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenRef.current(null);
     };
 
     const mo = new MutationObserver(onReady);
@@ -154,6 +330,11 @@ export default function AsciiGlobe() {
       if (visible && (typing || spinning)) kick();
     };
     document.addEventListener('visibilitychange', onVis);
+    document.addEventListener('keydown', onKey);
+    root.addEventListener('pointerdown', onPointerDown);
+    root.addEventListener('pointermove', onPointerMove);
+    root.addEventListener('pointerup', onPointerUp);
+    root.addEventListener('pointercancel', onPointerUp);
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
@@ -161,15 +342,24 @@ export default function AsciiGlobe() {
       ro.disconnect();
       io.disconnect();
       document.removeEventListener('visibilitychange', onVis);
+      document.removeEventListener('keydown', onKey);
+      root.removeEventListener('pointerdown', onPointerDown);
+      root.removeEventListener('pointermove', onPointerMove);
+      root.removeEventListener('pointerup', onPointerUp);
+      root.removeEventListener('pointercancel', onPointerUp);
     };
   }, []);
+
+  useEffect(() => {
+    placePinsRef.current();
+    if (!open) kickRef.current();
+  }, [open]);
 
   return (
     <div
       ref={rootRef}
-      className="group/globe relative z-[3] flex h-full w-full items-center justify-center"
+      className="group/globe relative z-[3] flex h-full w-full cursor-grab items-center justify-center touch-none"
     >
-      {/* Halo */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-700 group-data-[lit]/globe:opacity-100"
@@ -179,7 +369,6 @@ export default function AsciiGlobe() {
           filter: 'blur(2px)',
         }}
       />
-      {/* Soft ring */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-700 group-data-[lit]/globe:opacity-100"
@@ -188,7 +377,6 @@ export default function AsciiGlobe() {
             '0 0 40px rgba(12,183,139,0.22), inset 0 0 28px rgba(12,183,139,0.12)',
         }}
       />
-      {/* Twinkles */}
       {TWINKLES.map((tw, i) => (
         <span
           key={i}
@@ -204,11 +392,79 @@ export default function AsciiGlobe() {
           }}
         />
       ))}
-      <pre
-        ref={preRef}
-        data-ascii-globe
-        className="relative z-[2] m-0 select-none overflow-hidden whitespace-pre text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
-      />
+      <div ref={diskRef} className="relative z-[2]">
+        <pre
+          ref={preRef}
+          data-ascii-globe
+          className="m-0 h-full w-full select-none overflow-hidden whitespace-pre text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
+        />
+        {GLOBE_PLACES.map((place) => (
+          <button
+            key={place.id}
+            ref={(el) => {
+              pinRefs.current[place.id] = el;
+            }}
+            type="button"
+            data-globe-pin
+            aria-label={`${place.name}: work we’ve done`}
+            className="vaw-globe-pin absolute z-[3] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center border-0 bg-transparent p-0 opacity-0 group-data-[lit]/globe:opacity-100"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setOpen((cur) => (cur?.id === place.id ? null : place))}
+          >
+            <span className="vaw-globe-pin-dot" />
+          </button>
+        ))}
+      </div>
+      {open && (
+        <aside
+          data-globe-pop
+          role="dialog"
+          aria-label={open.name}
+          className="pointer-events-auto absolute top-[78%] left-1/2 z-10 w-[min(16rem,calc(100%-1.5rem))] -translate-x-1/2 lg:top-[20%] lg:left-[88%] lg:translate-x-0"
+        >
+          <div className="vaw-glass">
+          <div className="vaw-glass-core rounded-[1.15rem] px-4 py-3.5">
+            <div className="flex items-start justify-between gap-3">
+              <p className="m-0 text-[13px] font-medium uppercase tracking-[0.12em] text-[#8a8882]">
+                {open.name}
+              </p>
+              <button
+                type="button"
+                className="mt-0.5 text-[#8a8882] hover:text-[#161615]"
+                aria-label="Close"
+                onClick={() => setOpen(null)}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <p className="mt-2 mb-0 text-[13.5px] leading-snug text-[#161615]">{open.blurb}</p>
+            <ul className="mt-3 mb-0 list-none space-y-1.5 p-0">
+              {projectsForPlace(open).map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/gallery#${p.id}`}
+                    className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                  >
+                    {p.title}
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <p className="m-0 text-[12.5px] leading-snug text-[#5c5a56]">{p.summary}</p>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/gallery"
+                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                >
+                  {projectsForPlace(open).length ? 'All public work' : 'See the gallery'}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              </li>
+            </ul>
+          </div>
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

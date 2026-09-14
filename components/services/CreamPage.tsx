@@ -7,6 +7,9 @@ import CtaFooter from '@/components/home/CtaFooter';
 import '@/components/home/home.css';
 
 const NAV_WIDE_KEY = 'vaw-nav-wide';
+/** Viewport band the fixed pill sits in — anything dark here flips link color. */
+const NAV_BAND_TOP = 8;
+const NAV_BAND_BOTTOM = 96;
 
 type Props = {
   children: React.ReactNode;
@@ -14,9 +17,19 @@ type Props = {
   footer?: boolean;
 };
 
+function navOverDark() {
+  const nodes = document.querySelectorAll('[data-nav-contrast="dark"]');
+  for (const node of nodes) {
+    const r = node.getBoundingClientRect();
+    if (r.bottom > NAV_BAND_TOP && r.top < NAV_BAND_BOTTOM) return true;
+  }
+  return false;
+}
+
 export default function CreamPage({ children, nav = 'services', footer = true }: Props) {
   const reduce = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
+  const [onDark, setOnDark] = useState(false);
 
   useLayoutEffect(() => {
     const wide =
@@ -33,6 +46,28 @@ export default function CreamPage({ children, nav = 'services', footer = true }:
     return () => window.clearTimeout(id);
   }, [expanded]);
 
+  useEffect(() => {
+    let raf = 0;
+    const sync = () => {
+      raf = 0;
+      setOnDark((prev) => {
+        const next = navOverDark();
+        return prev === next ? prev : next;
+      });
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(sync);
+    };
+    sync();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
   return (
     <div className="vaw-home bg-[#f5f3ee]">
       <motion.div
@@ -42,7 +77,7 @@ export default function CreamPage({ children, nav = 'services', footer = true }:
         transition={{ duration: reduce ? 0 : 0.52, ease: [0.3, 0.9, 0.25, 1] }}
       >
         <div className="pointer-events-auto flex w-full justify-center">
-          <PillNav active={nav} expanded={expanded} embedded />
+          <PillNav active={nav} expanded={expanded} embedded onDark={onDark} />
         </div>
       </motion.div>
       {children}

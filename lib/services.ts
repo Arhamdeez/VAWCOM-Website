@@ -165,7 +165,7 @@ export const SERVICES = [
     first: 'A catalog, checkout, and one real test order that completes cleanly.',
     bring: 'How you fulfill today, a product list even if it is a spreadsheet, and how you get paid.',
     span: 'A focused catalog can launch in a few weeks once fulfillment is clear.',
-    stack: ['Next.js', 'Stripe', 'Postgres', 'AWS'],
+    stack: ['WordPress', 'WooCommerce', 'Shopify', 'Next.js', 'Stripe', 'Postgres'],
     extras: ['Catalog and cart', 'Inventory sync', 'Order email', 'Ops dashboard'],
   },
   {
@@ -202,10 +202,94 @@ export const SERVICES = [
     stack: ['Docker', 'AWS', 'Postgres', 'TypeScript'],
     extras: ['Uptime and backups', 'Bug hunts', 'Refactors', 'Handover notes'],
   },
+  {
+    id: 'erp',
+    nav: 'ERP',
+    title: 'ERP Systems',
+    lede: 'Inventory, orders, finance, and ops in one system your team actually uses.',
+    hook: 'Stop running the company from five spreadsheets that disagree.',
+    for: 'For operators who need stock, orders, and money to share one source of truth.',
+    help: 'We map how work moves today, then build or connect an ERP that matches that flow.',
+    promise:
+      'We put inventory, orders, and core ops on one system with roles, reports, and a path your team can run without us.',
+    outcomes: [
+      {
+        title: 'Process mapped before software',
+        body: 'We document how stock, orders, and approvals move before we pick modules or custom screens.',
+      },
+      {
+        title: 'Core modules that fit',
+        body: 'Inventory, purchasing, sales, and basic finance wired to how you work — not a generic demo dataset.',
+      },
+      {
+        title: 'Integrations where it hurts',
+        body: 'Storefront, warehouse, or accounting tools connect so teams are not retyping the same order.',
+      },
+      {
+        title: 'Training and handoff',
+        body: 'Roles, permissions, and short guides so the first week live is usable.',
+      },
+    ],
+    first: 'A working core flow — stock in, order out — with your real sample data.',
+    bring: 'How you fulfill today, which sheets or tools you trust, and who owns each step.',
+    span: 'A focused first module set is usually weeks once the process map is clear.',
+    stack: ['Postgres', 'Python', 'Node.js', 'Docker', 'AWS'],
+    extras: ['Inventory and orders', 'Roles and approvals', 'Reports', 'Tool integrations'],
+  },
+  {
+    id: 'crm',
+    nav: 'CRM',
+    title: 'CRM Systems',
+    lede: 'Leads, pipeline, and follow-ups in one place so nothing falls through.',
+    hook: 'If the pipeline lives in inboxes, deals are already slipping.',
+    for: 'For sales and ops teams who need a clear view of every lead and next step.',
+    help: 'We set up the pipeline, automations, and handoffs so CRM matches how you sell.',
+    promise:
+      'We build a CRM your team will open daily — stages, owners, reminders, and clean handoffs to delivery.',
+    outcomes: [
+      {
+        title: 'Pipeline that matches reality',
+        body: 'Stages and fields shaped around how you actually close, not a template you ignore.',
+      },
+      {
+        title: 'Capture from every channel',
+        body: 'Forms, email, chat, or voice write into the same lead record.',
+      },
+      {
+        title: 'Reminders and automations',
+        body: 'Follow-ups, assignments, and status changes that do not depend on memory.',
+      },
+      {
+        title: 'Handoff to delivery',
+        body: 'Won deals land with the context the build or support team needs.',
+      },
+    ],
+    first: 'A live pipeline with your stages, owners, and one inbound source writing leads in.',
+    bring: 'How leads arrive, what “won” means, and who owns each stage.',
+    span: 'A focused CRM setup is usually a few weeks once stages and sources are clear.',
+    stack: ['Postgres', 'n8n', 'Node.js', 'OpenAI', 'Twilio'],
+    extras: ['Pipeline and stages', 'Lead capture', 'Automations', 'Team handoffs'],
+  },
 ] as const;
 
 export type ServiceId = (typeof SERVICES)[number]['id'];
 export type Service = (typeof SERVICES)[number];
+
+/** Navbar services menu order (Voice kept last — not in the preferred marketing sequence). */
+export const SERVICE_NAV_ORDER: ServiceId[] = [
+  'web',
+  'apps',
+  'ai',
+  'commerce',
+  'erp',
+  'crm',
+  'care',
+  'voice',
+];
+
+export function servicesInNavOrder(): Service[] {
+  return SERVICE_NAV_ORDER.map((id) => SERVICES.find((s) => s.id === id)!).filter(Boolean);
+}
 
 const TRACK_COLOR: Record<ServiceId, string> = {
   web: '#429f7f',
@@ -214,6 +298,8 @@ const TRACK_COLOR: Record<ServiceId, string> = {
   ai: '#0cb78b',
   commerce: '#cf6a2c',
   care: '#d9a961',
+  erp: '#3d7a6a',
+  crm: '#e07a4a',
 };
 
 export const SERVICE_TRACK = SERVICES.map((s) => ({

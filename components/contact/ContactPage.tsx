@@ -197,7 +197,7 @@ export default function ContactPage() {
           </form>
 
           <aside className="flex flex-col gap-4">
-            <div className="rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
+            <div data-nav-contrast="dark" className="rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
               <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
                 Email us
               </p>

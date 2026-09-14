@@ -10,8 +10,14 @@ import './work-room.css';
 
 const SLIDES = workSlides();
 const N = SLIDES.length;
-const ORBIT_MS = 1100;
-const SETTLE_MS = 280;
+const ORBIT_MS = 480;
+const SETTLE_MS = 720;
+/** One short intro turn — not a full lap. */
+const ORBIT_DEG = 120;
+
+function easeOutCubic(t: number) {
+  return 1 - (1 - t) ** 3;
+}
 
 function wrap(i: number) {
   if (N < 1) return 0;
@@ -29,7 +35,11 @@ function domainLabel(id: WorkSlide['service']) {
   return getService(id)?.nav ?? id;
 }
 
-function walkTransform(d: number) {
+function walkTransform(d: number, compact = false) {
+  if (compact) {
+    // Flatter cover-flow so phones aren’t crammed into deep perspective.
+    return `translateX(calc(-50% + ${d * 12}vw)) rotateY(${-d * 18}deg) translateZ(${60 - Math.abs(d) * 40}px) scale(${1 - Math.abs(d) * 0.05})`;
+  }
   // Keep Z positive so preserve-3d hit proxies can still map rects; depth is relative.
   return `translateX(calc(-50% + ${d * 22}vw)) rotateY(${-d * 38}deg) translateZ(${140 - Math.abs(d) * 110}px) scale(${1 - Math.abs(d) * 0.06})`;
 }
@@ -59,9 +69,11 @@ function MockChrome({ kind }: { kind: WorkSlide['kind'] }) {
 function Panel({
   slide,
   onClose,
+  full = false,
 }: {
   slide: WorkSlide;
   onClose: () => void;
+  full?: boolean;
 }) {
   const service = getService(slide.service);
   const hasVideo = slide.review?.type === 'video';
@@ -69,19 +81,21 @@ function Panel({
 
   return (
     <div
-      className={`vaw-pop${hasVideo ? ' is-video' : ' is-wide'}`}
+      className={`vaw-pop${hasVideo ? ' is-video' : ' is-wide'}${full ? ' is-full' : ''}`}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="vaw-pop-core">
-        <button type="button" className="vaw-pop-x" onClick={onClose} aria-label="Close">
-          <X className="h-4 w-4" strokeWidth={2} />
-        </button>
+        {full ? (
+          <button type="button" className="vaw-pop-x" onClick={onClose} aria-label="Close">
+            <X className="h-4 w-4" strokeWidth={2} />
+          </button>
+        ) : null}
         <div className="vaw-pop-main">
           <div className="vaw-pop-copy">
             <p className="vaw-pop-kicker">
               <Link href={`/services/${slide.service}`}>{service?.nav ?? slide.service}</Link>
             </p>
-            <h2 id="vaw-monitor-title" className="vaw-display">
+            <h2 id={full ? 'vaw-monitor-title' : undefined} className="vaw-display">
               {slide.title}
             </h2>
             {body.map((para) => (
@@ -109,12 +123,6 @@ function Panel({
                 </ul>
               </div>
             ) : null}
-            {slide.review && !hasVideo ? (
-              <div className="vaw-pop-review">
-                <p className="vaw-pop-review-label">Client</p>
-                <ReviewBlock review={slide.review} />
-              </div>
-            ) : null}
             {slide.url ? (
               <Link href={slide.url} className="vaw-pop-open">
                 Open
@@ -123,17 +131,17 @@ function Panel({
             ) : null}
           </div>
           <div className="vaw-pop-stage">
-            <section className="vaw-pop-demo">
-              <p className="vaw-pop-review-label">Demo</p>
-              {slide.demo ? <p className="vaw-pop-demo-note">{slide.demo}</p> : null}
-              <MockChrome kind={slide.kind} />
-            </section>
-            {hasVideo && slide.review ? (
-              <section className="vaw-pop-demo">
+            {slide.review ? (
+              <section className={`vaw-pop-demo${hasVideo ? ' is-side' : ' is-quote'}`}>
                 <p className="vaw-pop-review-label">Client review</p>
                 <ReviewBlock review={slide.review} />
               </section>
             ) : null}
+            <section className="vaw-pop-demo is-hero">
+              <p className="vaw-pop-review-label">Demo</p>
+              {slide.demo ? <p className="vaw-pop-demo-note">{slide.demo}</p> : null}
+              <MockChrome kind={slide.kind} />
+            </section>
           </div>
         </div>
       </div>
@@ -143,49 +151,119 @@ function Panel({
 
 export default function WorkRoom() {
   const [i, setI] = useState(0);
+  const [hover, setHover] = useState<number | null>(null);
   const [panel, setPanel] = useState<number | null>(null);
   const [mode, setMode] = useState<'orbit' | 'walk'>('orbit');
-  const [fading, setFading] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const scene = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
   const dlg = useRef<HTMLDialogElement>(null);
   const reduce = useRef(false);
+  const compact = useRef(false);
   const lock = useRef(0);
   const acc = useRef(0);
   const touchX = useRef<number | null>(null);
   const openRef = useRef(false);
+  const iRef = useRef(0);
+  const settlingRef = useRef(false);
+  const flipFrom = useRef<
+    ({ x: number; y: number; w: number; h: number } | null)[] | null
+  >(null);
   const modeRef = useRef<'orbit' | 'settle' | 'walk'>('orbit');
   openRef.current = panel != null;
+  iRef.current = i;
 
   const go = useCallback((dir: number) => {
     if (N < 2 || openRef.current) return false;
     const now = performance.now();
     if (now < lock.current) return false;
     lock.current = now + 280;
+    setHover(null);
     setI((n) => wrap(n + dir));
     return true;
   }, []);
 
   const settle = useCallback((to?: number) => {
     if (modeRef.current !== 'orbit') return;
+    if (to != null) {
+      iRef.current = to;
+      setI(to);
+    }
+
     if (reduce.current) {
       modeRef.current = 'walk';
-      if (to != null) setI(to);
+      settlingRef.current = false;
       setMode('walk');
       return;
     }
+
     modeRef.current = 'settle';
-    setFading(true);
-    window.setTimeout(() => {
-      if (to != null) setI(to);
-      modeRef.current = 'walk';
-      setMode('walk');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setFading(false));
-      });
-    }, SETTLE_MS);
+    settlingRef.current = true;
+    flipFrom.current = cards.current.map((el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height };
+    });
+    cards.current.forEach((el) => {
+      if (!el) return;
+      el.style.transition = 'none';
+    });
+    setMode('walk');
   }, []);
+
+  useLayoutEffect(() => {
+    const first = flipFrom.current;
+    if (!first || mode !== 'walk' || !settlingRef.current) return;
+    flipFrom.current = null;
+    const active = iRef.current;
+
+    cards.current.forEach((el, n) => {
+      if (!el || !first[n]) return;
+      const d = offset(n, active);
+      const r = el.getBoundingClientRect();
+      const dx = first[n].x - (r.left + r.width / 2);
+      const dy = first[n].y - (r.top + r.height / 2);
+      const sx = first[n].w / (r.width || 1);
+      const sy = first[n].h / (r.height || 1);
+      el.style.transition = 'none';
+      el.style.transform = `${walkTransform(d, compact.current)} translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+      el.style.opacity = '1';
+      el.style.zIndex = String(8 - Math.abs(d));
+    });
+
+    let doneTimer = 0;
+    const play = requestAnimationFrame(() => {
+      cards.current.forEach((el, n) => {
+        if (!el) return;
+        const d = offset(n, active);
+        el.style.transition = `transform ${SETTLE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease`;
+        el.style.transform = walkTransform(d, compact.current);
+        el.style.opacity = Math.abs(d) > 2 ? '0' : '1';
+        el.style.zIndex = String(8 - Math.abs(d));
+      });
+      doneTimer = window.setTimeout(() => {
+        // Keep final walk poses — clearing transform drops to CSS translateX(-50%)
+        // and stacks every card on the center before React can re-apply styles.
+        cards.current.forEach((el, n) => {
+          if (!el) return;
+          const d = offset(n, active);
+          el.style.transition = '';
+          el.style.transform = walkTransform(d, compact.current);
+          el.style.opacity = Math.abs(d) > 2 ? '0' : '1';
+          el.style.zIndex = String(8 - Math.abs(d));
+        });
+        settlingRef.current = false;
+        modeRef.current = 'walk';
+        setI((n) => n);
+      }, SETTLE_MS + 40);
+    });
+
+    return () => {
+      cancelAnimationFrame(play);
+      if (doneTimer) window.clearTimeout(doneTimer);
+    };
+  }, [mode]);
 
   const closePanel = useCallback(() => {
     dlg.current?.close();
@@ -193,7 +271,8 @@ export default function WorkRoom() {
   }, []);
 
   const openPanel = useCallback((n: number) => {
-    if (modeRef.current === 'orbit') settle(n);
+    if (!compact.current && modeRef.current === 'orbit') settle(n);
+    setHover(null);
     setPanel(n);
   }, [settle]);
 
@@ -213,6 +292,17 @@ export default function WorkRoom() {
     return best;
   }, []);
 
+  const peekCard = useCallback(
+    (clientX: number, clientY: number) => {
+      if (openRef.current || modeRef.current !== 'walk' || reduce.current) {
+        setHover(null);
+        return;
+      }
+      setHover(pickCardAt(clientX, clientY));
+    },
+    [pickCardAt],
+  );
+
   useLayoutEffect(() => {
     if (panel == null) return;
     if (dlg.current && !dlg.current.open) dlg.current.showModal();
@@ -220,25 +310,35 @@ export default function WorkRoom() {
 
   useEffect(() => {
     reduce.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mq = window.matchMedia('(max-width: 800px)');
+    const syncCompact = () => {
+      const on = mq.matches;
+      compact.current = on;
+      setIsMobile(on);
+    };
+    syncCompact();
+    mq.addEventListener('change', syncCompact);
     const hash = window.location.hash.slice(1);
     const hit = SLIDES.findIndex((s) => s.id === hash || s.service === hash);
     if (hit >= 0) {
       setI(hit);
-      settle();
-      return;
+      if (mq.matches) setPanel(hit);
+      else settle();
+      return () => mq.removeEventListener('change', syncCompact);
     }
-    if (reduce.current) settle();
+    if (!mq.matches && reduce.current) settle();
+    return () => mq.removeEventListener('change', syncCompact);
   }, [settle]);
 
   useEffect(() => {
-    if (mode !== 'orbit' || reduce.current) return;
+    if (isMobile || mode !== 'orbit' || reduce.current) return;
     let raf = 0;
     let live = true;
     const start = performance.now();
     const tick = (now: number) => {
       if (!live || modeRef.current !== 'orbit') return;
       const t = Math.min(1, (now - start) / ORBIT_MS);
-      const spin = t * 360;
+      const spin = easeOutCubic(t) * ORBIT_DEG;
       cards.current.forEach((el, n) => {
         if (!el) return;
         const a = ((360 / Math.max(N, 1)) * n + spin) * (Math.PI / 180);
@@ -256,9 +356,10 @@ export default function WorkRoom() {
       live = false;
       cancelAnimationFrame(raf);
     };
-  }, [mode, settle]);
+  }, [mode, settle, isMobile]);
 
   useEffect(() => {
+    if (isMobile) return;
     const el = scene.current;
     if (!el) return;
 
@@ -337,14 +438,69 @@ export default function WorkRoom() {
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchend', onTouchEnd);
     };
-  }, [go, settle]);
+  }, [go, settle, isMobile]);
 
   const shown = panel != null ? SLIDES[panel] : null;
+  const peek = hover != null && panel == null && mode === 'walk' ? SLIDES[hover] : null;
+
+  const detailDialog = (
+    <dialog
+      ref={dlg}
+      className="vaw-pop-dlg"
+      onClose={() => setPanel(null)}
+      onClick={closePanel}
+      aria-labelledby="vaw-monitor-title"
+    >
+      {shown ? <Panel slide={shown} onClose={closePanel} full /> : null}
+    </dialog>
+  );
+
+  if (isMobile === null) return null;
+
+  if (isMobile) {
+    return (
+      <div className="min-h-svh bg-[#f5f3ee] text-[#161615]">
+        <div className="mx-auto max-w-lg px-5 pb-16 pt-28">
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+            Gallery
+          </p>
+          <h1 className="vaw-display m-0 text-[clamp(2rem,8vw,2.75rem)] tracking-[-0.03em] text-[#161615]">
+            Selected work
+          </h1>
+          <p className="mt-3 mb-0 max-w-[36ch] text-[15px] leading-relaxed text-[#5c5a56]">
+            Tap a project for the full write-up.
+          </p>
+          <ul className="mt-8 m-0 list-none space-y-3 p-0">
+            {SLIDES.map((slide, n) => (
+              <li key={slide.id}>
+                <button
+                  type="button"
+                  onClick={() => openPanel(n)}
+                  className="flex w-full flex-col rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 text-left shadow-[0_10px_28px_rgba(22,22,21,0.05)] transition-colors hover:border-[#0cb78b]/35"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
+                    {domainLabel(slide.service)}
+                  </span>
+                  <span className="vaw-display mt-1.5 text-[1.35rem] tracking-[-0.02em] text-[#161615]">
+                    {slide.title}
+                  </span>
+                  <span className="mt-2 text-[14px] leading-snug text-[#5c5a56]">
+                    {slide.summary}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {detailDialog}
+      </div>
+    );
+  }
 
   return (
     <div
       ref={scene}
-      className={`vaw-cover${mode === 'orbit' ? ' is-orbit' : ' is-walk'}${fading ? ' is-fading' : ''}${panel != null ? ' is-open' : ''}`}
+      className={`vaw-cover${mode === 'orbit' ? ' is-orbit' : ' is-walk'}${panel != null ? ' is-open' : ''}${peek ? ' is-peek' : ''}`}
     >
       <p className="vaw-cover-ghost vaw-display" aria-hidden>
         Gallery
@@ -368,13 +524,13 @@ export default function WorkRoom() {
                 aria-current={d === 0 && mode === 'walk' ? 'true' : undefined}
                 aria-label={`Open ${slide.title}`}
                 style={
-                  mode === 'walk'
-                    ? {
-                        transform: walkTransform(d),
+                  mode === 'orbit'
+                    ? { transform: orbitTransform(n, 0) }
+                    : {
+                        transform: walkTransform(d, compact.current),
                         zIndex: 8 - Math.abs(d),
                         opacity: far ? 0 : 1,
                       }
-                    : { transform: orbitTransform(n, 0) }
                 }
                 onClick={() => openPanel(n)}
                 onKeyDown={(e) => {
@@ -395,6 +551,11 @@ export default function WorkRoom() {
         <div
           className="vaw-cover-hits"
           aria-hidden
+          onPointerMove={(e) => {
+            if (e.pointerType === 'touch') return;
+            peekCard(e.clientX, e.clientY);
+          }}
+          onPointerLeave={() => setHover(null)}
           onPointerDown={(e) => {
             if (e.button !== 0 || openRef.current) return;
             const n = pickCardAt(e.clientX, e.clientY);
@@ -424,15 +585,13 @@ export default function WorkRoom() {
         </>
       ) : null}
 
-      <dialog
-        ref={dlg}
-        className="vaw-pop-dlg"
-        onClose={() => setPanel(null)}
-        onClick={closePanel}
-        aria-labelledby="vaw-monitor-title"
-      >
-        {shown ? <Panel slide={shown} onClose={closePanel} /> : null}
-      </dialog>
+      {peek ? (
+        <div className="vaw-pop-peek" aria-hidden>
+          <Panel slide={peek} onClose={() => setHover(null)} />
+        </div>
+      ) : null}
+
+      {detailDialog}
     </div>
   );
 }

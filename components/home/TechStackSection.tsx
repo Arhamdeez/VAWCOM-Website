@@ -1,57 +1,55 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { STACK_ICONS, stackIconUrl } from '@/lib/stackIcons';
 
-type Tech = {
-  name: string;
-  slug: string;
-  color: string;
-};
+type Tech = { name: string };
 
 /** Client-facing stack — split across two opposing marquees */
 const ROW_A: Tech[] = [
-  { name: 'React', slug: 'react', color: '#61DAFB' },
-  { name: 'Next.js', slug: 'nextdotjs', color: '#161615' },
-  { name: 'TypeScript', slug: 'typescript', color: '#3178C6' },
-  { name: 'Node.js', slug: 'nodedotjs', color: '#339933' },
-  { name: 'Python', slug: 'python', color: '#3776AB' },
-  { name: 'Flutter', slug: 'flutter', color: '#02569B' },
-  { name: 'React Native', slug: 'react', color: '#61DAFB' },
-  { name: 'Kotlin', slug: 'kotlin', color: '#7F52FF' },
-  { name: 'Swift', slug: 'swift', color: '#F05138' },
-  { name: 'Tailwind', slug: 'tailwindcss', color: '#06B6D4' },
+  { name: 'React' },
+  { name: 'Next.js' },
+  { name: 'TypeScript' },
+  { name: 'Node.js' },
+  { name: 'Python' },
+  { name: 'Flutter' },
+  { name: 'React Native' },
+  { name: 'Kotlin' },
+  { name: 'Swift' },
+  { name: 'Tailwind' },
 ];
 
 const ROW_B: Tech[] = [
-  { name: 'OpenAI', slug: 'openai', color: '#412991' },
-  { name: 'Claude', slug: 'anthropic', color: '#D4A27F' },
-  { name: 'n8n', slug: 'n8n', color: '#EA4B71' },
-  { name: 'Twilio', slug: 'twilio', color: '#F22F46' },
-  { name: 'AWS', slug: 'amazonaws', color: '#FF9900' },
-  { name: 'Docker', slug: 'docker', color: '#2496ED' },
-  { name: 'Firebase', slug: 'firebase', color: '#FFCA28' },
-  { name: 'PostgreSQL', slug: 'postgresql', color: '#4169E1' },
-  { name: 'Django', slug: 'django', color: '#092E20' },
-  { name: 'Google Cloud', slug: 'googlecloud', color: '#4285F4' },
+  { name: 'OpenAI' },
+  { name: 'Claude' },
+  { name: 'n8n' },
+  { name: 'Twilio' },
+  { name: 'AWS' },
+  { name: 'Docker' },
+  { name: 'Firebase' },
+  { name: 'PostgreSQL' },
+  { name: 'Django' },
+  { name: 'Google Cloud' },
 ];
 
-const ICON_BASE = 'https://cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons';
-
 function TechPill({ tech }: { tech: Tech }) {
-  const mask = `url(${ICON_BASE}/${tech.slug}.svg)`;
+  const meta = STACK_ICONS[tech.name];
+  const mask = meta ? `url(${stackIconUrl(meta.slug)})` : undefined;
 
   return (
     <div className="vaw-glass flex-none rounded-[1.75rem]">
       <div className="vaw-glass-core relative z-[1] flex items-center gap-2.5 rounded-[1.15rem] px-4 py-3 sm:gap-3 sm:px-5 sm:py-3.5">
-        <span
-          aria-hidden
-          className="vaw-tech-icon h-6 w-6 flex-none sm:h-7 sm:w-7"
-          style={{
-            backgroundColor: tech.color,
-            WebkitMaskImage: mask,
-            maskImage: mask,
-          }}
-        />
+        {meta ? (
+          <span
+            aria-hidden
+            className="vaw-tech-icon h-6 w-6 flex-none sm:h-7 sm:w-7"
+            style={{
+              backgroundColor: meta.color,
+              WebkitMaskImage: mask,
+              maskImage: mask,
+            }}
+          />
+        ) : null}
         <span className="text-[13px] font-medium tracking-[-0.01em] text-[#161615] sm:text-[14px]">
           {tech.name}
         </span>

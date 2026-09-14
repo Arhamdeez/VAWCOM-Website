@@ -37,10 +37,11 @@ function fade(reduce: boolean | null) {
 
 export default function ServicesHub() {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(SERVICES[0]?.id ?? '');
+  const [active, setActive] = useState<string>(SERVICES[0]?.id ?? '');
   const [jumpOpen, setJumpOpen] = useState(false);
   const [pastDeck, setPastDeck] = useState(false);
   const pastDeckRef = useRef(false);
+  const deckWrapRef = useRef<HTMLDivElement>(null);
   const deckEndRef = useRef<HTMLDivElement>(null);
   const anim = fade(reduce);
 
@@ -52,21 +53,37 @@ export default function ServicesHub() {
   }, []);
 
   useEffect(() => {
-    const el = deckEndRef.current;
-    if (!el) return;
+    const marker = deckEndRef.current;
+    const wrap = deckWrapRef.current;
+    if (!marker) return;
+
     const sync = () => {
-      const past = el.getBoundingClientRect().top < window.innerHeight * 0.42;
+      // Deck mounts null then expands — ignore until it has real height.
+      const deckH = wrap?.getBoundingClientRect().height ?? 0;
+      if (deckH < 160) {
+        if (pastDeckRef.current) {
+          pastDeckRef.current = false;
+          setPastDeck(false);
+          setJumpOpen(false);
+        }
+        return;
+      }
+      const past = marker.getBoundingClientRect().top < window.innerHeight * 0.42;
       if (past === pastDeckRef.current) return;
       pastDeckRef.current = past;
       setPastDeck(past);
       if (!past) setJumpOpen(false);
     };
+
     sync();
     window.addEventListener('scroll', sync, { passive: true });
     window.addEventListener('resize', sync);
+    const ro = wrap ? new ResizeObserver(sync) : null;
+    if (wrap && ro) ro.observe(wrap);
     return () => {
       window.removeEventListener('scroll', sync);
       window.removeEventListener('resize', sync);
+      ro?.disconnect();
     };
   }, []);
 
@@ -109,6 +126,7 @@ export default function ServicesHub() {
           open={jumpOpen}
           setOpen={setJumpOpen}
           visible={pastDeck}
+          mobileWhenVisible
           onPick={go}
         />
 
@@ -129,7 +147,7 @@ export default function ServicesHub() {
           </p>
         </motion.header>
 
-        <div className="relative z-0 mt-4 w-full bg-transparent">
+        <div ref={deckWrapRef} className="relative z-0 mt-4 w-full bg-transparent">
           <ServiceDeck />
         </div>
         <div ref={deckEndRef} className="h-0 w-full" aria-hidden />
@@ -188,11 +206,18 @@ export default function ServicesHub() {
           </motion.section>
 
           <motion.section className="mt-20" {...anim}>
-            <div className="rounded-[1.5rem] bg-white p-7 shadow-[0_12px_32px_rgba(22,22,21,0.06)] sm:p-9">
-              <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
+            <div
+              data-nav-contrast="dark"
+              className="flex flex-col items-center rounded-[1.5rem] px-7 py-14 text-center shadow-[0_18px_44px_rgba(6,20,18,0.35)] sm:px-9 sm:py-16"
+              style={{
+                background:
+                  'radial-gradient(120% 90% at 28% 18%, #2a4f47 0%, #152e2a 42%, #0a1916 78%, #061210 100%)',
+              }}
+            >
+              <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#f5f3ee]">
                 Still stuck?
               </h2>
-              <p className="mt-4 mb-0 max-w-[46ch] text-[15px] leading-relaxed text-[#5c5a56]">
+              <p className="mx-auto mt-4 mb-0 max-w-[42ch] text-[15px] leading-relaxed text-white">
                 Tell us what you are trying to get done. We will point you to the right service, or say
                 if it is not a fit.
               </p>

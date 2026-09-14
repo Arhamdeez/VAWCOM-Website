@@ -17,7 +17,7 @@ const HOOKS = ['idea', 'business', 'problem', 'next big thing'] as const;
 export function HeroBanner({ hidden }: { hidden: boolean }) {
   const reduce = useReducedMotion();
   const item =
-    'inline-flex items-center justify-center rounded-full p-1.5 text-[#161615]/70 transition-colors hover:text-[#0cb78b]';
+    'inline-flex items-center justify-center rounded-full p-1.5 text-white/75 transition-colors hover:text-[#2dd4a8]';
 
   return (
     <motion.div
@@ -28,7 +28,7 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
           : { opacity: 1, y: 0, pointerEvents: 'auto' as const }
       }
       transition={reduce ? { duration: 0 } : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-x-3 top-3 z-[61] flex h-10 items-center justify-between gap-3 rounded-[1.25rem] border border-black/[0.06] bg-[#f5f3ee]/55 px-4 backdrop-blur-[8px] sm:inset-x-4 sm:px-5"
+      className="fixed inset-x-3 top-3 z-[61] flex h-10 items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
     >
       <div className="flex items-center gap-1">
         <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className={item} aria-label="Instagram">
@@ -45,7 +45,7 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
         href={getGmailComposeUrl()}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[12.5px] text-[#161615]/70 hover:text-[#0cb78b]"
+        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[12.5px] text-white/75 hover:text-[#2dd4a8]"
       >
         <IconMail size={15} />
         <span className="hidden sm:inline">{CONTACT_EMAIL}</span>
@@ -61,15 +61,14 @@ export default function HeroSection() {
 
   return (
     <section id="top" className="vaw-hero relative z-[2] overflow-visible">
-      <div className="relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pl-10 pb-20 pt-40 sm:px-8 sm:pl-14 sm:pb-24 sm:pt-52 lg:pl-20 lg:pt-56 xl:pl-24">
-        {/* Copy stacks vertically with chat; bot sits beside on large screens */}
-        <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
-          <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left">
+      <div className="relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 sm:pt-52 lg:pl-20 lg:pt-56 xl:pl-24">
+        <div className="relative grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
+          <div className="relative z-[2] flex w-full flex-col items-start text-left pr-[6.5rem] sm:pr-[8rem] lg:pr-0">
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
-              className="vaw-display m-0 max-w-[11ch] text-[clamp(2.4rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
+              className="vaw-display m-0 max-w-[11ch] text-[clamp(2.2rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
             >
               <span className="block">What if we</span>
               <span className="block">
@@ -126,10 +125,10 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.26, ease: [0.16, 1.1, 0.3, 1] }}
-              className="mt-7 flex w-full max-w-[28rem] flex-col items-center gap-2.5 lg:items-start"
+              className="mt-7 flex w-full max-w-[28rem] flex-col items-stretch gap-2.5 lg:items-start"
             >
               <HeroChatSlot />
-              <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
+              <div className="flex flex-wrap gap-2">
                 {CHAT_PROMPTS.map((label) => (
                   <button
                     key={label}
@@ -143,9 +142,19 @@ export default function HeroSection() {
                 ))}
               </div>
             </motion.div>
+
+            {/* Mobile: bot slides in beside the headline instead of stacking below */}
+            <motion.div
+              className="pointer-events-none absolute -right-1 top-0 z-[1] h-[10.5rem] w-[10.5rem] sm:-right-2 sm:h-[12.5rem] sm:w-[12.5rem] lg:hidden"
+              initial={reduce ? false : { x: 64, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <VawcomBot compact />
+            </motion.div>
           </div>
 
-          <div className="flex h-[20rem] w-full max-w-[24rem] items-center justify-center sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:justify-end">
+          <div className="hidden h-[min(64vh,36rem)] w-full max-w-[36rem] items-center justify-end lg:flex">
             <VawcomBot />
           </div>
         </div>

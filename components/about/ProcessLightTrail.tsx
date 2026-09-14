@@ -1,90 +1,131 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useId, useRef, useLayoutEffect, useState } from 'react';
+import {
+  Code2,
+  Layers,
+  LayoutTemplate,
+  Lightbulb,
+  ListChecks,
+  Rocket,
+  type LucideIcon,
+} from 'lucide-react';
+import { useReducedMotion } from 'framer-motion';
 import { PROCESS_STEPS } from '@/lib/process';
 
-const PANELS = [
-  { bg: '#0cb78b', ink: '#0b0d0c', muted: '#0b0d0c' },
-  { bg: '#161615', ink: '#ece9e3', muted: '#c8c5bf' },
-  { bg: '#ffffff', ink: '#161615', muted: '#5c5a56' },
-  { bg: '#0a9d77', ink: '#0b0d0c', muted: '#0b0d0c' },
-  { bg: '#0b0d0c', ink: '#ece9e3', muted: '#c8c5bf' },
-  { bg: '#e6faf3', ink: '#161615', muted: '#5c5a56' },
-] as const;
+const ICONS: LucideIcon[] = [Lightbulb, ListChecks, LayoutTemplate, Layers, Code2, Rocket];
 
-/** Horizontal accordion — LTR order; active expands, others collapse. */
 export default function ProcessLightTrail() {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(0);
+  const uid = useId().replace(/:/g, '');
+  const listRef = useRef<HTMLOlElement>(null);
+  const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [pathD, setPathD] = useState('');
+  const [railH, setRailH] = useState(0);
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const root = list.getBoundingClientRect();
+      const centers = nodeRefs.current
+        .map((el) => {
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          return r.top - root.top + r.height / 2;
+        })
+        .filter((y): y is number => y != null);
+      if (centers.length < 2) {
+        setPathD('');
+        setRailH(root.height);
+        return;
+      }
+      const [first, ...rest] = centers;
+      setPathD(`M12 ${first} ${rest.map((y) => `V${y}`).join(' ')}`);
+      setRailH(root.height);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(list);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  const pathId = `${uid}-rail`;
 
   return (
-    <div
-      className="mx-auto flex h-[18rem] w-full max-w-[56rem] gap-2.5 sm:h-[20rem] sm:gap-3"
-      role="list"
-      aria-label="How we work, in order"
-    >
-      {PROCESS_STEPS.map((step, i) => {
-        const on = i === active;
-        const tone = PANELS[i]!;
-        return (
-          <motion.button
-            key={step.title}
-            type="button"
-            role="listitem"
-            aria-current={on ? 'step' : undefined}
-            aria-expanded={on}
-            onClick={() => setActive(i)}
-            initial={false}
-            animate={{
-              flexGrow: on ? 5.5 : 0.85,
-              flexBasis: on ? '48%' : '0%',
-            }}
-            transition={
-              reduce
-                ? { duration: 0 }
-                : { type: 'spring', stiffness: 300, damping: 34, mass: 0.8 }
-            }
-            className="relative flex h-full min-w-[3.75rem] flex-col overflow-hidden rounded-[1.25rem] text-left outline-none focus-visible:ring-2 focus-visible:ring-[#0cb78b] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f3ee] sm:min-w-[4.25rem] sm:rounded-[1.35rem]"
-            style={{ background: tone.bg, color: tone.ink, flexShrink: 1 }}
-          >
-            {/* Collapsed: vertical title */}
-            <span
-              aria-hidden={on}
-              className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-150 ${
-                on ? 'opacity-0' : 'opacity-100 delay-100'
-              }`}
-            >
-              <span
-                className="text-[15px] font-semibold tracking-[-0.01em] sm:text-[16px]"
-                style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'rotate(180deg)',
-                }}
-              >
-                {step.title}
-              </span>
-            </span>
+    <div className="relative mx-auto w-full max-w-[36rem]">
+      <ol ref={listRef} className="relative m-0 list-none space-y-5 p-0 sm:space-y-6">
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute left-[1.35rem] top-0 z-0 w-6 -translate-x-1/2 overflow-visible sm:left-[1.5rem]"
+          width={24}
+          height={Math.max(railH, 1)}
+          viewBox={`0 0 24 ${Math.max(railH, 1)}`}
+        >
+          <defs>
+            {pathD ? <path id={pathId} d={pathD} /> : null}
+            <filter id={`${uid}-glow`} x="-120%" y="-120%" width="340%" height="340%">
+              <feGaussianBlur stdDeviation="2.4" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {pathD ? (
+            <path
+              d={pathD}
+              fill="none"
+              stroke="rgba(12,183,139,0.35)"
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+          ) : null}
+          {!reduce && pathD ? (
+            <circle r={3.8} fill="#0cb78b" filter={`url(#${uid}-glow)`}>
+              <animateMotion dur="4.5s" repeatCount="indefinite">
+                <mpath xlinkHref={`#${pathId}`} href={`#${pathId}`} />
+              </animateMotion>
+            </circle>
+          ) : null}
+        </svg>
 
-            {/* Expanded: title + line */}
-            <span
-              className={`relative z-[1] flex h-full flex-col justify-center px-6 py-6 transition-opacity duration-150 sm:px-8 sm:py-8 ${
-                on ? 'opacity-100 delay-100' : 'pointer-events-none opacity-0'
-              }`}
-            >
-              <span className="vaw-display block text-[clamp(1.65rem,3vw,2.25rem)] leading-[1.05] tracking-[-0.03em]">
-                {step.title}
-              </span>
-              <span
-                className="mt-4 block max-w-[26ch] text-[15px] font-medium leading-relaxed sm:text-[16px]"
-                style={{ color: tone.muted }}
-              >
-                {step.line}
-              </span>
-            </span>
-          </motion.button>
-        );
-      })}
+        {PROCESS_STEPS.map((step, i) => {
+          const Icon = ICONS[i] ?? Lightbulb;
+          return (
+            <li key={step.title} className="relative z-[1] flex gap-4 sm:gap-5">
+              <div className="flex w-[2.7rem] flex-none flex-col items-center sm:w-[3rem]">
+                <span
+                  ref={(el) => {
+                    nodeRefs.current[i] = el;
+                  }}
+                  className="relative z-[1] flex h-11 w-11 items-center justify-center rounded-full border border-[#0cb78b]/35 bg-[#f5f3ee] text-[#0cb78b] shadow-[0_0_0_4px_rgba(245,243,238,1),0_0_18px_rgba(12,183,139,0.28)] sm:h-12 sm:w-12"
+                >
+                  <Icon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.85} />
+                </span>
+                <span className="mt-2 font-mono text-[11px] font-semibold tracking-[0.12em] text-[#0cb78b]">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+
+              <div className="min-w-0 flex-1 rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 shadow-[0_10px_28px_rgba(22,22,21,0.05)] sm:px-6 sm:py-5">
+                <h3 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#161615] sm:text-[1.5rem]">
+                  {step.title}
+                </h3>
+                <p className="mt-1.5 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">
+                  {step.line}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

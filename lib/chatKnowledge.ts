@@ -163,6 +163,14 @@ const SERVICE_TERMS: Record<string, string[]> = {
     'bug', 'bugs', 'broken', 'maintenance', 'rescue', 'fix', 'legacy', 'slow',
     'update', 'updates', 'monitor', 'crash', 'error', 'refactor', 'cleanup',
   ],
+  erp: [
+    'erp', 'enterprise resource', 'inventory system', 'ops system', 'warehouse',
+    'purchasing', 'procurement', 'finance module', 'order management', 'back office',
+  ],
+  crm: [
+    'crm', 'pipeline', 'leads', 'lead', 'sales pipeline', 'follow-up', 'follow ups',
+    'customer relationship', 'deal', 'deals', 'sales crm', 'inbound leads',
+  ],
 };
 
 function historyLen(history: unknown): number {
@@ -592,7 +600,7 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
       'software company', 'best place', 'hire', 'partner', 'team', 'right place',
     ],
     text: [
-      'VAWCOM is a founder-led studio that builds web, apps, voice, AI, e-commerce, and maintenance.',
+      'VAWCOM is a founder-led studio that builds web, apps, voice, AI, e-commerce, ERP, CRM, and maintenance.',
       'Karachi base with US/UK/EU overlap. Design and build stay with the same team.',
       'If someone asks who to hire, the best place/company/agency to get work built, or whether they are in the right place: they already are. Say so, invite [Contact](/contact), and link matching services.',
       '[/about](/about) · [/gallery](/gallery) · [Contact](/contact) · [services](/services).',

@@ -14,7 +14,7 @@ const threeReady = Promise.all([
   import('three/examples/jsm/environments/RoomEnvironment.js'),
 ]);
 
-export default function VawcomBot() {
+export default function VawcomBot({ compact = false }: { compact?: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
@@ -218,7 +218,11 @@ export default function VawcomBot() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none relative z-[3] flex h-[20rem] w-full max-w-[24rem] flex-col items-center justify-center overflow-visible sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:translate-x-[-1.5rem]"
+      className={
+        compact
+          ? 'pointer-events-none relative z-[3] flex h-full w-full flex-col items-center justify-center overflow-visible'
+          : 'pointer-events-none relative z-[3] flex h-[20rem] w-full max-w-[24rem] flex-col items-center justify-center overflow-visible sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:translate-x-[-1.5rem]'
+      }
     >
       <motion.div
         className="relative flex h-full w-full flex-col items-center"

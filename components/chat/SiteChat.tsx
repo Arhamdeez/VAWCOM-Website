@@ -231,6 +231,7 @@ export function useSiteChat() {
 function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
   const { messages, draft, setDraft, typing, ask, close, dockOpen, setDockOpen, openHref } =
     useSiteChat();
+  const panelRef = useRef<HTMLDivElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const prevTyping = useRef(typing);
@@ -238,9 +239,25 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
   const hasThread = messages.length > 1;
 
   useEffect(() => {
-    const el = logRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, typing, active]);
+    const log = logRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+    if (placement !== 'hero' || !active || (!hasThread && !typing)) return;
+    // Chat grows downward in the hero; keep the reply + input on screen.
+    let inner = 0;
+    const outer = window.requestAnimationFrame(() => {
+      inner = window.requestAnimationFrame(() => {
+        inputRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outer);
+      window.cancelAnimationFrame(inner);
+    };
+  }, [messages, typing, active, placement, hasThread]);
 
   useEffect(() => {
     const was = prevTyping.current;
@@ -280,6 +297,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
 
   return (
     <div
+      ref={panelRef}
       className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] shadow-[0_12px_40px_rgba(22,22,21,0.1)] ${
         placement === 'hero'
           ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[28px]'

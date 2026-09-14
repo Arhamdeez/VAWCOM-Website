@@ -61,7 +61,10 @@ export default function About() {
 
         <div className="relative z-10 mx-auto max-w-[1100px] px-6 pb-20 pt-16 sm:px-8 lg:px-10">
           <motion.section {...anim} aria-label="Company film">
-            <div className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_12px_32px_rgba(22,22,21,0.08)]">
+            <div
+              data-nav-contrast="dark"
+              className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_12px_32px_rgba(22,22,21,0.08)]"
+            >
               <div className="relative flex aspect-video items-center justify-center">
                 <div
                   aria-hidden

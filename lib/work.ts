@@ -72,6 +72,8 @@ const KIND: Record<ServiceId, SlideKind> = {
   ai: 'chat',
   commerce: 'store',
   care: 'care',
+  erp: 'browser',
+  crm: 'chat',
 };
 
 export function workSlides(): WorkSlide[] {

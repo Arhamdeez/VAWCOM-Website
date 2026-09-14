@@ -32,7 +32,6 @@ export default function WhyChooseUs({
         <div
           ref={slotRef}
           data-globe-slot
-          aria-hidden
           className="relative z-[3] mx-auto aspect-square w-[min(100%,22rem)] sm:w-[min(100%,28rem)] lg:w-full lg:max-w-[38rem]"
         >
           <AsciiGlobe />

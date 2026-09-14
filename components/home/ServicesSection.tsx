@@ -7,23 +7,8 @@ import { ArrowUpRight } from 'lucide-react';
 import { SERVICE_TRACK } from '@/lib/services';
 import LiquidLens from './LiquidLens';
 
-const AUDIENCES = [
-  {
-    id: 'individuals',
-    label: 'Individuals',
-    blurb: 'Solo founders and creators who need a sharp product without a big team.',
-  },
-  {
-    id: 'businesses',
-    label: 'Businesses',
-    blurb: 'Teams that need reliable sites, apps, and AI baked into how they work.',
-  },
-] as const;
-
 export default function ServicesSection() {
-  const [audience, setAudience] = useState<(typeof AUDIENCES)[number]['id']>('individuals');
   const [active, setActive] = useState<number | null>(null);
-  const current = AUDIENCES.find((a) => a.id === audience)!;
 
   return (
     <section
@@ -39,37 +24,11 @@ export default function ServicesSection() {
             What do you want to build?
           </h2>
           <p className="mx-auto mt-5 max-w-[34ch] text-[16px] leading-relaxed text-[#5c5a56]">
-            {current.blurb}
+            Sites, apps, and AI for founders and teams — same people start to finish.
           </p>
-
-          <div
-            className="mx-auto mt-7 inline-flex rounded-full border border-black/[0.08] bg-white/50 p-1"
-            role="tablist"
-            aria-label="Who we build for"
-          >
-            {AUDIENCES.map((a) => {
-              const on = audience === a.id;
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  onClick={() => setAudience(a.id)}
-                  className={`rounded-full px-4 py-2 text-[13.5px] font-medium transition-colors ${
-                    on
-                      ? 'bg-[#0cb78b] text-[#f5f3ee]'
-                      : 'text-[#5c5a56] hover:text-[#161615]'
-                  }`}
-                >
-                  {a.label}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
-        <div className="relative mt-12 sm:mt-16">
+        <div className="relative mt-8 sm:mt-10">
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-x-8 -inset-y-10 -z-0 blur-3xl"
@@ -78,7 +37,7 @@ export default function ServicesSection() {
                 'radial-gradient(ellipse 55% 80% at 12% 40%, rgba(12,183,139,0.28), transparent 72%), radial-gradient(ellipse 50% 70% at 88% 50%, rgba(184,217,60,0.24), transparent 72%), radial-gradient(ellipse 50% 60% at 50% 100%, rgba(232,103,74,0.16), transparent 78%)',
             }}
           />
-          <div className="relative flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:pb-2 md:pt-2 [&::-webkit-scrollbar]:hidden">
+          <div className="relative flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:pb-2 lg:pt-2 [&::-webkit-scrollbar]:hidden">
             {SERVICE_TRACK.map((svc, i) => {
               const open = active === i;
               return (
@@ -89,7 +48,7 @@ export default function ServicesSection() {
                   onFocus={() => setActive(i)}
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  className={`vaw-glass w-[min(78vw,20rem)] shrink-0 snap-center rounded-[1.75rem] md:w-auto ${
+                  className={`vaw-glass w-[min(78vw,20rem)] shrink-0 snap-center rounded-[1.75rem] lg:w-auto ${
                     open ? 'is-liquid-hot' : ''
                   }`}
                 >
@@ -131,7 +90,7 @@ export default function ServicesSection() {
               );
             })}
           </div>
-          <p className="mt-3 text-center text-[12.5px] text-[#8a8882] md:hidden">
+          <p className="mt-3 text-center text-[12.5px] text-[#8a8882] lg:hidden">
             Swipe to see all services
           </p>
         </div>

@@ -99,6 +99,9 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
     w: SKIPER_W,
     h: SKIPER_H,
     stroke: 18,
+    gx: 0,
+    gy: 0,
+    gr: 0,
   });
 
   useLayoutEffect(() => {
@@ -121,27 +124,35 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       const ox = (w - SKIPER_W * scale) / 2;
       const stroke = Math.max(13, Math.min(18, 18 * scale));
 
-      // Join at the top of the ASCII pre (actual glyph disk), not the halo ring.
+      // Join at the north pole of the ASCII disk. A hole mask keeps the stroke off the globe.
       const ascii = slot.querySelector('[data-ascii-globe]');
-      let cx: number;
-      let joinY: number;
+      let gx: number;
+      let gy: number;
+      let gr: number;
       if (ascii instanceof HTMLElement && ascii.offsetWidth > 4) {
         const ar = ascii.getBoundingClientRect();
-        cx = ar.left - cr.left + ar.width / 2;
-        // Round caps extend ~half stroke past the tip — light pullback so it kisses the rim.
-        joinY = ar.top - cr.top - stroke * 0.12;
+        gx = ar.left - cr.left + ar.width / 2;
+        gy = ar.top - cr.top + ar.height / 2;
+        gr = ar.width / 2;
       } else {
-        // Fallback: AsciiGlobe sizes the pre to 72% of the slot, centered.
         const box = Math.min(sr.width, sr.height) * 0.72;
-        cx = sr.left - cr.left + sr.width / 2;
-        joinY = sr.top - cr.top + (sr.height - box) / 2 - stroke * 0.12;
+        gx = sr.left - cr.left + sr.width / 2;
+        gy = sr.top - cr.top + sr.height / 2;
+        gr = box / 2;
       }
-      const join: Pt = [cx, joinY];
+      const join: Pt = [gx, gy - gr];
 
       let skiper = trimLastCommands(scaleSkiper(scale, scale, ox, 0), 2);
       skiper += connect(endPt(skiper), endTan(skiper), join);
       setFrame((prev) =>
-        prev.skiper === skiper && prev.w === w && prev.h === h ? prev : { skiper, w, h, stroke },
+        prev.skiper === skiper &&
+        prev.w === w &&
+        prev.h === h &&
+        prev.gx === gx &&
+        prev.gy === gy &&
+        prev.gr === gr
+          ? prev
+          : { skiper, w, h, stroke, gx, gy, gr },
       );
     };
 
@@ -213,7 +224,7 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
     <div
       ref={overlayRef}
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-0 overflow-visible"
+      className="pointer-events-none absolute inset-0 z-0 hidden overflow-visible lg:block"
     >
       <svg
         width={frame.w}
@@ -224,6 +235,14 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
         className="absolute inset-0 h-full w-full"
         preserveAspectRatio="none"
       >
+        {frame.gr > 0 && (
+          <defs>
+            <mask id="vaw-globe-line-mask">
+              <rect width={frame.w} height={frame.h} fill="white" />
+              <circle cx={frame.gx} cy={frame.gy} r={frame.gr} fill="black" />
+            </mask>
+          </defs>
+        )}
         <motion.path
           ref={skiperPathRef}
           d={frame.skiper}
@@ -232,6 +251,7 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
+          mask={frame.gr > 0 ? 'url(#vaw-globe-line-mask)' : undefined}
           style={{ pathLength: skiperLen, pathSpacing: 1 }}
         />
       </svg>

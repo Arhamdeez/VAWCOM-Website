@@ -59,13 +59,28 @@ const TONE: Record<string, Tone> = {
     chip: 'bg-[#429f7f]/14 text-[#2f6b55]',
     ink: '#429f7f',
   },
+  erp: {
+    wash: 'linear-gradient(155deg, #e8f4ef 0%, #f5f3ee 52%, #ffffff 100%)',
+    chip: 'bg-[#3d7a6a]/14 text-[#2a564a]',
+    ink: '#3d7a6a',
+  },
+  crm: {
+    wash: 'linear-gradient(155deg, #fbf0e8 0%, #f5f3ee 48%, #ffffff 100%)',
+    chip: 'bg-[#e07a4a]/16 text-[#9a4a28]',
+    ink: '#c45f2f',
+  },
 };
 
-/** Mix tall/short in each outer lane so the scale jump reads clearly */
+function svc(id: Service['id']) {
+  return SERVICES.find((s) => s.id === id)!;
+}
+
+/** Mix tall/short in each outer lane so the scale jump reads clearly.
+ *  ERP left column, CRM right column. */
 const LANES: Service[][] = [
-  [SERVICES[0], SERVICES[5]], // web tall + care short
-  [SERVICES[2], SERVICES[4]], // voice short + commerce tall
-  [SERVICES[1], SERVICES[3]], // apps mid + ai mid
+  [svc('web'), svc('erp')],
+  [svc('voice'), svc('commerce'), svc('care')],
+  [svc('apps'), svc('crm'), svc('ai')],
 ];
 
 type CardSize = 'tall' | 'mid' | 'short';
@@ -77,6 +92,8 @@ const SIZE: Record<string, CardSize> = {
   ai: 'mid',
   commerce: 'tall',
   care: 'short',
+  erp: 'mid',
+  crm: 'mid',
 };
 
 const SIZE_CLASS: Record<CardSize, string> = {
@@ -106,27 +123,12 @@ function TeaserCard({ service }: { service: Service }) {
     <Link
       id={service.id}
       href={`/services/${service.id}`}
+      data-nav-contrast={darkCard ? 'dark' : undefined}
       className={`vaw-svc-card isolate scroll-mt-28 flex flex-col rounded-[1.4rem] border border-black/[0.05] shadow-[0_10px_28px_rgba(22,22,21,0.07)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(22,22,21,0.12)] ${
         isApps ? 'min-h-0 p-5' : SIZE_CLASS[size]
-      } ${darkCard ? 'border-white/[0.06]' : ''} ${isCommerce ? 'relative overflow-hidden' : ''}`}
+      } ${darkCard ? 'border-white/[0.06]' : ''}`}
       style={{ background: tone.wash }}
     >
-      {isCommerce ? (
-        <>
-          <Image
-            src="/services/commerce-phone.png"
-            alt=""
-            fill
-            sizes="(min-width: 768px) 33vw, 100vw"
-            className="pointer-events-none object-cover object-center"
-            aria-hidden
-          />
-          <span
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/85"
-            aria-hidden
-          />
-        </>
-      ) : null}
       <p
         className={`relative m-0 font-semibold uppercase tracking-[0.16em] ${size === 'short' ? 'text-[10px]' : 'text-[11px]'}`}
         style={{ color: tone.ink }}
@@ -163,6 +165,19 @@ function TeaserCard({ service }: { service: Service }) {
             width={1280}
             height={720}
             className="pointer-events-none h-full max-h-[14rem] w-auto max-w-[100%] select-none object-contain object-center"
+          />
+        </span>
+      ) : isCommerce ? (
+        <span
+          className="relative my-auto flex min-h-[9rem] flex-1 items-center justify-center overflow-hidden py-3"
+          aria-hidden
+        >
+          <Image
+            src="/services/commerce-cart.jpg"
+            alt=""
+            width={1024}
+            height={877}
+            className="pointer-events-none h-full max-h-[11.5rem] w-auto max-w-[90%] select-none object-contain object-center"
           />
         </span>
       ) : isApps ? null : (
@@ -230,7 +245,7 @@ function FlattenDeck({ progress }: { progress: MotionValue<number> }) {
 
 function Stack({ services }: { services: Service[] }) {
   return (
-    <div className="grid gap-4 px-6 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:pl-20 lg:pr-8">
+    <div className="grid gap-4 px-5 sm:grid-cols-2 sm:gap-5 sm:px-8 lg:grid-cols-3 lg:pl-20 lg:pr-8">
       {services.map((s) => (
         <TeaserCard key={s.id} service={s} />
       ))}
@@ -247,7 +262,7 @@ function FlattenTrack() {
   });
 
   return (
-    <div ref={track} className="relative h-[118vh]">
+    <div ref={track} className="relative hidden h-[118vh] lg:block">
       <div
         className="sticky top-24 overflow-hidden py-4 pl-[4.75rem] pr-8"
         style={{ perspective: '1600px', perspectiveOrigin: '50% 12%' }}
@@ -260,17 +275,19 @@ function FlattenTrack() {
 
 export default function ServiceDeck() {
   const reduce = useReducedMotion();
-  const [wide, setWide] = useState<boolean | null>(null);
+  const [desktop, setDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const sync = () => setWide(mq.matches);
+    // Flatten scroll only when the jump rail exists (lg+) — md kept the 3-col
+    // perspective with rail padding and looked shoved to one side.
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setDesktop(mq.matches);
     sync();
     mq.addEventListener('change', sync);
     return () => mq.removeEventListener('change', sync);
   }, []);
 
-  if (wide === null) return null;
-  if (reduce || !wide) return <Stack services={[...SERVICES]} />;
+  if (desktop === null) return null;
+  if (reduce || !desktop) return <Stack services={[...SERVICES]} />;
   return <FlattenTrack />;
 }
