@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import CreamPage from './CreamPage';
 import ServiceJump from './ServiceJump';
@@ -45,6 +45,35 @@ export default function ServiceDetail({ service }: { service: Service }) {
   const projects = projectsFor(service.id);
   const contactHref = `/contact?service=${encodeURIComponent(service.title)}`;
   const [jumpOpen, setJumpOpen] = useState(false);
+
+  // Open the jump rail at the very bottom of the page, collapse it again back up in the hero.
+  // Edge-triggered, so a manual open/close in between sticks.
+  useEffect(() => {
+    let zone: 'top' | 'mid' | 'bottom' | null = null;
+    let raf = 0;
+    const sync = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const atBottom =
+        y + window.innerHeight >= document.documentElement.scrollHeight - 48;
+      const next = atBottom ? 'bottom' : y < window.innerHeight * 0.4 ? 'top' : 'mid';
+      if (next === zone) return;
+      zone = next;
+      if (next === 'bottom') setJumpOpen(true);
+      else if (next === 'top') setJumpOpen(false);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(sync);
+    };
+    sync();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   return (
     <CreamPage nav="services">

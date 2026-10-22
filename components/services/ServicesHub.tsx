@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -45,13 +45,6 @@ export default function ServicesHub() {
   const deckEndRef = useRef<HTMLDivElement>(null);
   const anim = fade(reduce);
 
-  const go = useCallback((id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    history.replaceState(null, '', `#${id}`);
-  }, []);
-
   useEffect(() => {
     const marker = deckEndRef.current;
     const wrap = deckWrapRef.current;
@@ -75,14 +68,24 @@ export default function ServicesHub() {
       if (!past) setJumpOpen(false);
     };
 
+    let raf = 0;
+    const onScroll = () => {
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          sync();
+        });
+      }
+    };
     sync();
-    window.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', sync);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
     const ro = wrap ? new ResizeObserver(sync) : null;
     if (wrap && ro) ro.observe(wrap);
     return () => {
-      window.removeEventListener('scroll', sync);
-      window.removeEventListener('resize', sync);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
       ro?.disconnect();
     };
   }, []);
@@ -127,7 +130,7 @@ export default function ServicesHub() {
           setOpen={setJumpOpen}
           visible={pastDeck}
           mobileWhenVisible
-          onPick={go}
+          link
         />
 
         <motion.header
