@@ -40,7 +40,7 @@ export const GLOBE_PLACES: GlobePlace[] = [
     name: 'Pakistan',
     lat: 30.4,
     lon: 69.3,
-    blurb: 'Based in Karachi, with client work across Pakistan.',
+    blurb: 'Based in Lahore, with client work across Pakistan.',
     projectIds: ['hisaab'],
   },
 ];

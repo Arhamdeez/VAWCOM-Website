@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, Play } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import ProcessLightTrail from '@/components/about/ProcessLightTrail';
 import CreamPage from '@/components/services/CreamPage';
@@ -65,25 +65,15 @@ export default function About() {
               data-nav-contrast="dark"
               className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_12px_32px_rgba(22,22,21,0.08)]"
             >
-              <div className="relative flex aspect-video items-center justify-center">
-                <div
-                  aria-hidden
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'radial-gradient(ellipse at center, rgba(12,183,139,0.18), transparent 62%)',
-                  }}
-                />
-                <div className="relative flex flex-col items-center gap-3 px-6 text-center">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0cb78b]/20 text-[#0cb78b]">
-                    <Play className="h-6 w-6 fill-current" />
-                  </span>
-                  <p className="m-0 text-[15px] font-medium text-[#ece9e3]">Company film</p>
-                  <p className="m-0 max-w-[28ch] text-[13.5px] leading-relaxed text-[rgba(236,233,227,0.55)]">
-                    A short look at how we work. Video coming soon.
-                  </p>
-                </div>
-              </div>
+              <video
+                className="block aspect-video w-full bg-[#161615] object-contain"
+                src="/vawcom_video.mp4"
+                poster="/vawcom_video_poster.jpg"
+                controls
+                playsInline
+                preload="metadata"
+                aria-label="VAWCOM company film"
+              />
             </div>
           </motion.section>
 

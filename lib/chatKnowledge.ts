@@ -132,7 +132,7 @@ const CATALOG_ASK =
   /what do you (offer|do)|what (services|can you offer)|your (services|work|capabilities)|show me (your )?services|list (your )?services/i;
 
 const SITE_RELEVANT_RE =
-  /\b(vawcom|service|services|website|web\s*app|landing|mobile\s*app|ios|android|ecommerce|e-commerce|store|shop|inventory|checkout|voice\s*agent|phone\s*call|chatbot|automat|n8n|maintenance|rescue|bug|project|build|hire|quote|pricing|price|cost|contact|about|gallery|portfolio|founders?|karachi|client|startup|saas|cms|seo|how (do|long|much)|where are you|take over|existing code|help|idea|agency|studio|software company|developer|freelancer|outsource|partner)\b/i;
+  /\b(vawcom|service|services|website|web\s*app|landing|mobile\s*app|ios|android|ecommerce|e-commerce|store|shop|inventory|checkout|voice\s*agent|phone\s*call|chatbot|automat|n8n|maintenance|rescue|bug|project|build|hire|quote|pricing|price|cost|contact|about|gallery|portfolio|founders?|lahore|karachi|client|startup|saas|cms|seo|how (do|long|much)|where are you|take over|existing code|help|idea|agency|studio|software company|developer|freelancer|outsource|partner)\b/i;
 
 const PROJECT_SIGNAL_RE =
   /\b(need|want|build|sell|store|website|web\s*app|app|ios|android|inventory|broken|looking for|help with|shop|candles|phone|calls|chatbot|automat|maintenance|bug|portfolio|landing)\b/i;
@@ -523,7 +523,7 @@ export function resolvePageContext(pathname?: string | null): PageContext {
         'About covers the studio story, founders, and how we work.',
         `Founders: ${FOUNDERS.map((f) => `${f.name} (${f.role})`).join('; ')}.`,
         `Process: ${PROCESS_STEPS.map((s) => s.title).join(' → ')}.`,
-        'Karachi base with US/UK/EU overlap. Founder-led; design and build stay together.',
+        'Lahore base with US/UK/EU overlap. Founder-led; design and build stay together.',
       ].join(' '),
       chunkIds: ['company', 'founders', 'process'],
     };
@@ -596,12 +596,12 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
   chunks.push({
     id: 'company',
     terms: [
-      'vawcom', 'company', 'studio', 'agency', 'who are you', 'based', 'karachi', 'about',
+      'vawcom', 'company', 'studio', 'agency', 'who are you', 'based', 'lahore', 'karachi', 'about',
       'software company', 'best place', 'hire', 'partner', 'team', 'right place',
     ],
     text: [
       'VAWCOM is a founder-led studio that builds web, apps, voice, AI, e-commerce, ERP, CRM, and maintenance.',
-      'Karachi base with US/UK/EU overlap. Design and build stay with the same team.',
+      'Lahore base with US/UK/EU overlap. Design and build stay with the same team.',
       'If someone asks who to hire, the best place/company/agency to get work built, or whether they are in the right place: they already are. Say so, invite [Contact](/contact), and link matching services.',
       SHOW_GALLERY
         ? '[/about](/about) · [/gallery](/gallery) · [Contact](/contact) · [services](/services).'

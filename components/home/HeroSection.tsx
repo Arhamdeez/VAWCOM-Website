@@ -78,11 +78,12 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
-              className="vaw-display m-0 max-w-[11ch] text-[clamp(2.2rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
+              className="vaw-display m-0 max-w-[15ch] text-[clamp(2.2rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
             >
-              <span className="block">What if we</span>
-              <span className="block">
-                just <span style={{ color: ACCENT }}>built it?</span>
+              <span className="block">Let us</span>
+              <span className="block">handle the</span>
+              <span className="block" style={{ color: ACCENT }}>
+                technical part
               </span>
             </motion.h1>
 

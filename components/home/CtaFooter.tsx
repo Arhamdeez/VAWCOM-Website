@@ -102,7 +102,7 @@ export default function CtaFooter() {
           >
             {CONTACT_EMAIL}
           </a>
-          <p className="mt-1 mb-0 text-[13px] text-[#3d4a45]">Karachi, Pakistan</p>
+          <p className="mt-1 mb-0 text-[13px] text-[#3d4a45]">Lahore, Pakistan</p>
         </div>
 
         <nav aria-label="Footer" className="flex shrink-0 flex-col gap-1.5 text-right">

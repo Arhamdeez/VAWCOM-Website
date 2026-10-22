@@ -328,6 +328,6 @@ export const SERVICE_FAQS = [
   },
   {
     q: 'Where are you based?',
-    a: 'Karachi, with real overlap across US, UK, and EU days.',
+    a: 'Lahore, with real overlap across US, UK, and EU days.',
   },
 ] as const;
