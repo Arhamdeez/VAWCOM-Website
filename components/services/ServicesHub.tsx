@@ -8,6 +8,7 @@ import CreamPage from './CreamPage';
 import ServiceDeck from './ServiceDeck';
 import ServiceJump from './ServiceJump';
 import { SERVICES, SERVICE_FAQS } from '@/lib/services';
+import { SHOW_GALLERY } from '@/lib/site';
 
 const START = [
   {
@@ -234,13 +235,15 @@ export default function ServicesHub() {
             </div>
           </motion.section>
 
-          <Link
-            href="/gallery"
-            className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/12 px-5 py-2.5 text-[14px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
-          >
-            See gallery
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
+          {SHOW_GALLERY ? (
+            <Link
+              href="/gallery"
+              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/12 px-5 py-2.5 text-[14px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
+            >
+              See gallery
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          ) : null}
         </div>
       </div>
     </CreamPage>

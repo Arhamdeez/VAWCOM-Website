@@ -1,6 +1,6 @@
 import { FOUNDERS } from '@/components/home/data';
 import { SERVICES, SERVICE_FAQS, getService, type Service } from '@/lib/services';
-import { CHAT_SITE_LINKS, CONTACT_EMAIL } from '@/lib/site';
+import { CHAT_SITE_LINKS, CONTACT_EMAIL, SHOW_GALLERY } from '@/lib/site';
 import { PROJECTS } from '@/lib/work';
 import { PROCESS_STEPS } from '@/lib/process';
 
@@ -603,7 +603,9 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
       'VAWCOM is a founder-led studio that builds web, apps, voice, AI, e-commerce, ERP, CRM, and maintenance.',
       'Karachi base with US/UK/EU overlap. Design and build stay with the same team.',
       'If someone asks who to hire, the best place/company/agency to get work built, or whether they are in the right place: they already are. Say so, invite [Contact](/contact), and link matching services.',
-      '[/about](/about) · [/gallery](/gallery) · [Contact](/contact) · [services](/services).',
+      SHOW_GALLERY
+        ? '[/about](/about) · [/gallery](/gallery) · [Contact](/contact) · [services](/services).'
+        : '[/about](/about) · [Contact](/contact) · [services](/services).',
     ].join(' '),
   });
 
@@ -623,7 +625,7 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
     id: 'work',
     terms: ['gallery', 'portfolio', 'projects', 'work', 'hisaab', 'vawbot', 'case study'],
     text: [
-      'Work ([/gallery](/gallery)):',
+      SHOW_GALLERY ? 'Work ([/gallery](/gallery)):' : 'Work:',
       ...PROJECTS.map((p) => `- ${p.title}: ${p.summary}`),
     ].join('\n'),
   });

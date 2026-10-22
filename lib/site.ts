@@ -2,10 +2,13 @@
 
 export const CONTACT_EMAIL = 'vawcomtechnologies@gmail.com';
 
+/** Gallery is built but hidden for now: flip to true to bring back its route, nav, footer and CTAs. */
+export const SHOW_GALLERY = false;
+
 /** Pages the site assistant may link to. Keep hrefs exact — the model copies them. */
 export const CHAT_SITE_LINKS = [
   { label: 'Services', href: '/services' },
-  { label: 'Gallery', href: '/gallery' },
+  ...(SHOW_GALLERY ? [{ label: 'Gallery', href: '/gallery' }] : []),
   { label: 'Why us', href: '/#why' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },

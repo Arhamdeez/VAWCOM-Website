@@ -10,6 +10,7 @@ import type { Service } from '@/lib/services';
 import { PROCESS_STEPS } from '@/lib/process';
 import { projectsFor } from '@/lib/work';
 import { STACK_ICONS, stackIconUrl } from '@/lib/stackIcons';
+import { SHOW_GALLERY } from '@/lib/site';
 
 const shell = 'mx-auto w-full max-w-[1100px] px-6 sm:px-8 lg:px-10 lg:pl-24';
 
@@ -197,13 +198,15 @@ export default function ServiceDetail({ service }: { service: Service }) {
               <h2 className="vaw-display m-0 text-[clamp(1.4rem,2.5vw,1.85rem)] tracking-[-0.03em] text-[#161615]">
                 Related work
               </h2>
-              <Link
-                href={`/gallery#${service.id}`}
-                className="inline-flex items-center gap-1 text-[13.5px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
-              >
-                Open gallery
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
+              {SHOW_GALLERY ? (
+                <Link
+                  href={`/gallery#${service.id}`}
+                  className="inline-flex items-center gap-1 text-[13.5px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                >
+                  Open gallery
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : null}
             </div>
             {projects.length ? (
               <div className="mt-5 grid gap-4 sm:grid-cols-2">

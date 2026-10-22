@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { CONTACT_EMAIL, getGmailComposeUrl, SOCIAL } from '@/lib/site';
+import { CONTACT_EMAIL, getGmailComposeUrl, SHOW_GALLERY, SOCIAL } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
 
 const NAV = [
   { label: 'Services', href: '/services' },
-  { label: 'Gallery', href: '/gallery' },
+  ...(SHOW_GALLERY ? [{ label: 'Gallery', href: '/gallery' }] : []),
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ] as const;

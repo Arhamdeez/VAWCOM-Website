@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import CreamPage from '@/components/services/CreamPage';
 import CtaFooter from '@/components/home/CtaFooter';
-import { CONTACT_EMAIL, getGmailComposeUrl } from '@/lib/site';
+import { CONTACT_EMAIL, getGmailComposeUrl, SHOW_GALLERY } from '@/lib/site';
 import { SERVICES } from '@/lib/services';
 
 const SERVICE_OPTIONS = [
@@ -211,6 +211,7 @@ export default function ContactPage() {
               </a>
             </div>
 
+            {SHOW_GALLERY ? (
             <div className="flex min-h-[9rem] flex-col justify-between rounded-[1.5rem] bg-[#0cb78b] p-6 sm:p-7">
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
@@ -228,6 +229,7 @@ export default function ContactPage() {
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
+            ) : null}
 
             <Link
               href="/services"

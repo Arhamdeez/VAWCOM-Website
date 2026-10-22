@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { servicesInNavOrder } from '@/lib/services';
+import { SHOW_GALLERY } from '@/lib/site';
 
 export type NavOpen = 'full' | 'half' | 'compact';
 
@@ -151,7 +152,9 @@ function MobileNav({
 
                     {(
                       [
-                        { href: '/gallery', label: 'Gallery', key: 'gallery' as const },
+                        ...(SHOW_GALLERY
+                          ? [{ href: '/gallery', label: 'Gallery', key: 'gallery' as const }]
+                          : []),
                         { href: '/about', label: 'About', key: 'about' as const },
                         { href: '/contact', label: 'Contact', key: 'contact' as const },
                       ] as const
@@ -395,9 +398,11 @@ function DesktopNav({
               </div>
             </div>
           </div>
-          <Link href="/gallery" prefetch className={active === 'gallery' ? on : link}>
-            Gallery
-          </Link>
+          {SHOW_GALLERY ? (
+            <Link href="/gallery" prefetch className={active === 'gallery' ? on : link}>
+              Gallery
+            </Link>
+          ) : null}
           <Link href="/about" prefetch className={active === 'about' ? on : link}>
             About
           </Link>

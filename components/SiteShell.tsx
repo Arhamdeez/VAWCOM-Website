@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 import { ChatProvider } from '@/components/chat/SiteChat';
 import CursorGlow from '@/components/CursorGlow';
+import { SHOW_GALLERY } from '@/lib/site';
 
 function isStandalonePath(pathname: string) {
   return pathname.startsWith('/hisaab/');
@@ -41,7 +42,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       '/',
       '/services',
       '/services/web',
-      '/gallery',
+      ...(SHOW_GALLERY ? ['/gallery'] : []),
       '/about',
       '/contact',
     ];

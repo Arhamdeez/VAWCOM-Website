@@ -7,7 +7,7 @@ import ProcessLightTrail from '@/components/about/ProcessLightTrail';
 import CreamPage from '@/components/services/CreamPage';
 import { FOUNDERS } from '@/components/home/data';
 import { IconGitHub, IconLinkedIn } from '@/components/home/SocialIcons';
-import { SOCIAL } from '@/lib/site';
+import { SHOW_GALLERY, SOCIAL } from '@/lib/site';
 
 function fade(reduce: boolean | null) {
   return reduce
@@ -162,6 +162,7 @@ export default function About() {
           </motion.section>
 
           <div className="mt-14 grid gap-4 sm:grid-cols-2">
+            {SHOW_GALLERY ? (
             <div className="flex min-h-[10.5rem] flex-col justify-between rounded-[1.35rem] bg-white p-6 shadow-[0_1px_0_rgba(22,22,21,0.06)] sm:p-7">
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#161615]">
@@ -179,6 +180,7 @@ export default function About() {
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
+            ) : null}
             <div className="flex min-h-[10.5rem] flex-col justify-between rounded-[1.35rem] bg-[#0cb78b] p-6 sm:p-7">
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
