@@ -275,13 +275,11 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
 
   if (placement === 'dock' && !dockOpen) {
     return (
-      <motion.button
+      <button
         type="button"
         onClick={() => setDockOpen(true)}
         aria-label="Open chat"
-        className="relative block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
-        animate={{ y: [0, -7, 0] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+        className="vaw-chat-bob relative block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
       >
         <Image
           src="/bothead.png"
@@ -291,7 +289,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           className="pointer-events-none h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(22,22,21,0.18)]"
           priority
         />
-      </motion.button>
+      </button>
     );
   }
 
@@ -414,16 +412,15 @@ function DockedChat() {
           key="launcher"
           type="button"
           initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.92 }}
           transition={{
             opacity: { duration: 0.25 },
             scale: { duration: 0.25 },
-            y: { duration: 2.4, repeat: Infinity, ease: 'easeInOut' },
           }}
           onClick={reopen}
           aria-label="Open chat"
-          className="fixed bottom-5 right-5 z-[70] block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
+          className="vaw-chat-bob fixed bottom-5 right-5 z-[70] block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
         >
           <Image
             src="/bothead.png"

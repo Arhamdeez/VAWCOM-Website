@@ -124,7 +124,7 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       const ox = (w - SKIPER_W * scale) / 2;
       const stroke = Math.max(13, Math.min(18, 18 * scale));
 
-      // Join at the north pole of the ASCII disk. A hole mask keeps the stroke off the globe.
+      // Join at the north pole of the ASCII disk. A cream disc in AsciiGlobe keeps the stroke off the globe.
       const ascii = slot.querySelector('[data-ascii-globe]');
       let gx: number;
       let gy: number;
@@ -235,14 +235,6 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
         className="absolute inset-0 h-full w-full"
         preserveAspectRatio="none"
       >
-        {frame.gr > 0 && (
-          <defs>
-            <mask id="vaw-globe-line-mask">
-              <rect width={frame.w} height={frame.h} fill="white" />
-              <circle cx={frame.gx} cy={frame.gy} r={frame.gr} fill="black" />
-            </mask>
-          </defs>
-        )}
         <motion.path
           ref={skiperPathRef}
           d={frame.skiper}
@@ -251,7 +243,6 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
-          mask={frame.gr > 0 ? 'url(#vaw-globe-line-mask)' : undefined}
           style={{ pathLength: skiperLen, pathSpacing: 1 }}
         />
       </svg>

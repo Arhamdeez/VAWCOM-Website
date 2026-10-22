@@ -118,11 +118,23 @@ body:has(.vaw-home) {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(22, 22, 21, 0.35);
   }
   50% {
     transform: scale(1.18);
-    box-shadow: 0 0 0 5px rgba(22, 22, 21, 0);
+  }
+}
+
+/* Pulse ring: scale + opacity (compositor) instead of animating box-shadow (repaint every frame).
+   Radius 4.5px → 9.5px matches the old 0 → 5px spread. */
+@keyframes vaw-globe-pin-ring {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(2.1111);
+    opacity: 0;
   }
 }
 
@@ -132,12 +144,29 @@ body:has(.vaw-home) {
 
 .vaw-globe-pin-dot {
   display: block;
+  position: relative;
   width: 9px;
   height: 9px;
   border-radius: 999px;
   background: #161615;
-  box-shadow: 0 0 0 2px #f5f3ee;
   animation: vaw-globe-pin 2.2s ease-in-out infinite;
+}
+
+.vaw-globe-pin-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: #161615;
+  animation: vaw-globe-pin-ring 2.2s ease-in-out infinite;
+}
+
+/* Nothing to animate while the globe is offscreen. */
+[data-globe-root].is-offscreen .vaw-globe-pin-dot,
+[data-globe-root].is-offscreen .vaw-globe-pin-dot::before,
+[data-globe-root].is-offscreen .vaw-globe-twinkle {
+  animation-play-state: paused;
 }
 
 /* Transparent nav pill — clear center, glass only on the rim */

@@ -10,6 +10,8 @@ function sdRoundRect(px: number, py: number, hw: number, hh: number, r: number) 
   return Math.min(Math.max(dx, dy), 0) + Math.hypot(ax, ay) - r;
 }
 
+const bezelCache = new Map<string, string>();
+
 /** Convex bezel map: warp lives on the rim (Apple-style), center stays clear. */
 function makeBezelMap(width: number, height: number, radius: number, bezel: number) {
   const max = 280;
@@ -100,7 +102,13 @@ export default function LiquidLens({ active = true }: { active?: boolean }) {
 
   const map = useMemo(() => {
     if (!on || box.w < 2 || box.h < 2) return '';
-    return makeBezelMap(box.w, box.h, box.r, 26);
+    const key = `${box.w}x${box.h}x${box.r}`;
+    let url = bezelCache.get(key);
+    if (!url) {
+      url = makeBezelMap(box.w, box.h, box.r, 26);
+      bezelCache.set(key, url);
+    }
+    return url;
   }, [box, on]);
 
   if (!on) return null;

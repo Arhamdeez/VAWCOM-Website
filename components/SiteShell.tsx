@@ -45,9 +45,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       '/about',
       '/contact',
     ];
-    const id = window.setTimeout(() => {
+    // Idle, not +200ms: prefetching six routes mid-first-scroll competes with the main thread.
+    const run = () => {
       for (const href of routes) router.prefetch(href);
-    }, 200);
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(run, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 1500);
     return () => window.clearTimeout(id);
   }, [router]);
 

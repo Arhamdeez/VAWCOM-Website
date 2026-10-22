@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
 
 /** Brand green from the site outline PDF */
 const BRAND = 0x0cb78b;
@@ -16,7 +15,19 @@ const threeReady = Promise.all([
 
 export default function VawcomBot({ compact = false }: { compact?: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // CSS float loops run on the compositor; pause them while the bot is offscreen.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      ([entry]) => root.classList.toggle('is-offscreen', !entry.isIntersecting),
+      { rootMargin: '60px' },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -217,41 +228,15 @@ export default function VawcomBot({ compact = false }: { compact?: boolean }) {
 
   return (
     <div
+      ref={rootRef}
       aria-hidden
       className={
         compact
-          ? 'pointer-events-none relative z-[3] flex h-full w-full flex-col items-center justify-center overflow-visible'
-          : 'pointer-events-none relative z-[3] flex h-[20rem] w-full max-w-[24rem] flex-col items-center justify-center overflow-visible sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:translate-x-[-1.5rem]'
+          ? 'vaw-bot pointer-events-none relative z-[3] flex h-full w-full flex-col items-center justify-center overflow-visible'
+          : 'vaw-bot pointer-events-none relative z-[3] flex h-[20rem] w-full max-w-[24rem] flex-col items-center justify-center overflow-visible sm:h-[24rem] sm:max-w-[28rem] lg:h-[min(64vh,36rem)] lg:max-w-[36rem] lg:translate-x-[-1.5rem]'
       }
     >
-      <motion.div
-        className="relative flex h-full w-full flex-col items-center"
-        initial={false}
-        animate={
-          reduce
-            ? { y: 0, rotate: 0 }
-            : {
-                y: [0, -14, 0],
-                rotate: [0, -2.5, 2.5, 0],
-              }
-        }
-        transition={
-          reduce
-            ? { duration: 0 }
-            : {
-                y: {
-                  duration: 2.4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                },
-                rotate: {
-                  duration: 3.6,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                },
-              }
-        }
-      >
+      <div className="vaw-bot-float relative flex h-full w-full flex-col items-center">
         <div ref={hostRef} className="relative z-[1] h-[86%] w-full shrink-0">
           <Image
             src="/bothead.png"
@@ -264,26 +249,13 @@ export default function VawcomBot({ compact = false }: { compact?: boolean }) {
           />
         </div>
 
-        <motion.div
-          className="relative z-[2] -mt-[9%] h-[12%] w-[54%] shrink-0 rounded-[100%] bg-[#0cb78b]/35"
-          animate={
-            reduce
-              ? { scale: 1, opacity: 0.35 }
-              : {
-                  scale: [1, 0.88, 1],
-                  opacity: [0.38, 0.22, 0.38],
-                }
-          }
-          transition={
-            reduce
-              ? { duration: 0 }
-              : { duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
-          }
+        <div
+          className="vaw-bot-shadow relative z-[2] -mt-[9%] h-[12%] w-[54%] shrink-0 rounded-[100%] bg-[#0cb78b]/35"
           style={{
             boxShadow: '0 0 28px 8px rgba(12, 183, 139, 0.28)',
           }}
         />
-      </motion.div>
+      </div>
     </div>
   );
 }

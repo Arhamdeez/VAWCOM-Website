@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
@@ -58,6 +59,15 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
 export default function HeroSection() {
   const { ask, typing } = useSiteChat();
   const reduce = useReducedMotion();
+  // Mount one bot only — the hidden one still cost a WebGL context and a GLB parse.
+  const [desktop, setDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setDesktop(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
   return (
     <section id="top" className="vaw-hero relative z-[2] overflow-visible">
@@ -150,12 +160,12 @@ export default function HeroSection() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             >
-              <VawcomBot compact />
+              {desktop === false ? <VawcomBot compact /> : null}
             </motion.div>
           </div>
 
           <div className="hidden h-[min(64vh,36rem)] w-full max-w-[36rem] items-center justify-end lg:flex">
-            <VawcomBot />
+            {desktop ? <VawcomBot /> : null}
           </div>
         </div>
       </div>

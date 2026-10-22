@@ -164,6 +164,7 @@ function TeaserCard({ service }: { service: Service }) {
             alt=""
             width={1280}
             height={720}
+            sizes="400px"
             className="pointer-events-none h-full max-h-[14rem] w-auto max-w-[100%] select-none object-contain object-center"
           />
         </span>
@@ -177,6 +178,7 @@ function TeaserCard({ service }: { service: Service }) {
             alt=""
             width={1024}
             height={877}
+            sizes="220px"
             className="pointer-events-none h-full max-h-[11.5rem] w-auto max-w-[90%] select-none object-contain object-center"
           />
         </span>

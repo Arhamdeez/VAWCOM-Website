@@ -169,6 +169,60 @@ html.splash-exiting .splash-boot {
   }
 }
 
+/* Hero bot float — same keys, timing and easing the Framer loops had. */
+@keyframes vaw-bot-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
+}
+
+@keyframes vaw-bot-tilt {
+  0%, 100% { rotate: 0deg; }
+  33.333% { rotate: -2.5deg; }
+  66.667% { rotate: 2.5deg; }
+}
+
+@keyframes vaw-bot-breathe {
+  0%, 100% { scale: 1; opacity: 0.38; }
+  50% { scale: 0.88; opacity: 0.22; }
+}
+
+.vaw-bot-float {
+  animation:
+    vaw-bot-bob 2.4s ease-in-out infinite,
+    vaw-bot-tilt 3.6s ease-in-out infinite;
+}
+
+.vaw-bot-shadow {
+  opacity: 0.38;
+  animation: vaw-bot-breathe 2.4s ease-in-out 0.4s infinite;
+}
+
+.vaw-bot.is-offscreen .vaw-bot-float,
+.vaw-bot.is-offscreen .vaw-bot-shadow {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-bot-float,
+  .vaw-bot-shadow {
+    animation: none;
+  }
+
+  .vaw-bot-shadow {
+    opacity: 0.35;
+  }
+}
+
+/* Chat launcher bob — was a Framer y loop on a fixed element, present on every page. */
+@keyframes vaw-chat-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -7px; }
+}
+
+.vaw-chat-bob {
+  animation: vaw-chat-bob 2.4s ease-in-out infinite;
+}
+
 @keyframes vawcom-marquee-left {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-50%, 0, 0); }

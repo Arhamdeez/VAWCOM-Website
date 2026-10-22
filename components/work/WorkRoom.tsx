@@ -157,6 +157,8 @@ export default function WorkRoom() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const scene = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
+  const peekRaf = useRef(0);
+  const peekPt = useRef<{ x: number; y: number } | null>(null);
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
   const dlg = useRef<HTMLDialogElement>(null);
   const reduce = useRef(false);
@@ -400,11 +402,19 @@ export default function WorkRoom() {
       }
     };
 
+    let moveRaf = 0;
+    let moveX = 0;
     const onMove = (e: MouseEvent) => {
       if (openRef.current || reduce.current || !ring.current) return;
-      const r = el.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width - 0.5) * 6;
-      ring.current.style.transform = `rotateY(${x}deg)`;
+      moveX = e.clientX;
+      if (moveRaf) return;
+      moveRaf = requestAnimationFrame(() => {
+        moveRaf = 0;
+        if (openRef.current || reduce.current || !ring.current) return;
+        const r = el.getBoundingClientRect();
+        const x = ((moveX - r.left) / r.width - 0.5) * 6;
+        ring.current.style.transform = `rotateY(${x}deg)`;
+      });
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -434,6 +444,7 @@ export default function WorkRoom() {
     return () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('keydown', onKey);
+      if (moveRaf) cancelAnimationFrame(moveRaf);
       el.removeEventListener('mousemove', onMove);
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchend', onTouchEnd);
@@ -553,9 +564,19 @@ export default function WorkRoom() {
           aria-hidden
           onPointerMove={(e) => {
             if (e.pointerType === 'touch') return;
-            peekCard(e.clientX, e.clientY);
+            peekPt.current = { x: e.clientX, y: e.clientY };
+            if (peekRaf.current) return;
+            peekRaf.current = requestAnimationFrame(() => {
+              peekRaf.current = 0;
+              if (peekPt.current) peekCard(peekPt.current.x, peekPt.current.y);
+            });
           }}
-          onPointerLeave={() => setHover(null)}
+          onPointerLeave={() => {
+            peekPt.current = null;
+            if (peekRaf.current) cancelAnimationFrame(peekRaf.current);
+            peekRaf.current = 0;
+            setHover(null);
+          }}
           onPointerDown={(e) => {
             if (e.button !== 0 || openRef.current) return;
             const n = pickCardAt(e.clientX, e.clientY);

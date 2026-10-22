@@ -24,6 +24,7 @@ const TWINKLES = [
 export default function AsciiGlobe() {
   const rootRef = useRef<HTMLDivElement>(null);
   const diskRef = useRef<HTMLDivElement>(null);
+  const coverRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
   const pinRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const yawRef = useRef(0.4);
@@ -59,13 +60,14 @@ export default function AsciiGlobe() {
     let lines: string[] = [];
     let lastSpin = 0;
     let lastType = 0;
+    let diskPx = 0;
 
     const frame = () => renderAsciiGlobePlain(yawRef.current, tiltRef.current, cols, rows);
 
     const pinXY: Record<string, { x: number; y: number }> = {};
 
-    const layoutPins = () => {
-      const box = disk.getBoundingClientRect();
+    // Pin math is relative to the disk, so placePins needs no rect read (a forced layout per frame).
+    const layoutPins = (box: { left: number; top: number; width: number; height: number }) => {
       if (box.width < 4) return [];
       const items = GLOBE_PLACES.map((place) => {
         const pt = projectGlobePoint(place.lat, place.lon, yawRef.current, tiltRef.current);
@@ -112,9 +114,9 @@ export default function AsciiGlobe() {
 
     const placePins = () => {
       if (!typed || typing) return;
-      const box = disk.getBoundingClientRect();
+      const box = { left: 0, top: 0, width: diskPx, height: diskPx };
       const openId = openRef.current?.id;
-      for (const item of layoutPins()) {
+      for (const item of layoutPins(box)) {
         const el = pinRefs.current[item.place.id];
         if (!el) continue;
         if (!item.visible) {
@@ -132,7 +134,7 @@ export default function AsciiGlobe() {
     placePinsRef.current = placePins;
 
     const hitPlace = (clientX: number, clientY: number) => {
-      layoutPins();
+      layoutPins(disk.getBoundingClientRect());
       const hits: { place: GlobePlace; d: number }[] = [];
       for (const place of GLOBE_PLACES) {
         const xy = pinXY[place.id];
@@ -153,6 +155,11 @@ export default function AsciiGlobe() {
       const grid = globeGrid(box);
       cols = grid.cols;
       rows = grid.rows;
+      diskPx = box;
+      if (coverRef.current) {
+        coverRef.current.style.width = `${box}px`;
+        coverRef.current.style.height = `${box}px`;
+      }
       disk.style.width = `${box}px`;
       disk.style.height = `${box}px`;
       pre.style.fontSize = `${box / rows}px`;
@@ -315,6 +322,7 @@ export default function AsciiGlobe() {
     const io = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
+        root.classList.toggle('is-offscreen', !visible);
         if (visible && (typing || spinning)) kick();
       },
       { rootMargin: '80px' },
@@ -358,8 +366,15 @@ export default function AsciiGlobe() {
   return (
     <div
       ref={rootRef}
+      data-globe-root
       className="group/globe relative z-[3] flex h-full w-full cursor-grab items-center justify-center touch-none"
     >
+      {/* Hides the scroll line behind the globe (replaces the SVG hole mask). Same colour as the page. */}
+      <div
+        ref={coverRef}
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#f5f3ee]"
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-700 group-data-[lit]/globe:opacity-100"
@@ -396,7 +411,7 @@ export default function AsciiGlobe() {
         <pre
           ref={preRef}
           data-ascii-globe
-          className="m-0 h-full w-full select-none overflow-hidden whitespace-pre text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
+          className="m-0 h-full w-full select-none overflow-hidden whitespace-pre [contain:layout_paint] text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
         />
         {GLOBE_PLACES.map((place) => (
           <button

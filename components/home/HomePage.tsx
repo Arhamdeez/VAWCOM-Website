@@ -62,9 +62,10 @@ function HomeChrome() {
     <>
       <HeroBanner hidden={!atTop} />
       <motion.div
-        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
+        className="pointer-events-none fixed inset-x-0 top-[54px] z-[60] flex justify-center px-3 sm:px-4"
         initial={false}
-        animate={{ top: atTop ? 54 : 16 }}
+        // transform instead of `top`: same 54 → 16 travel without a layout pass per frame
+        animate={{ y: atTop ? 0 : -38 }}
         transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="pointer-events-auto flex w-full justify-center">
