@@ -41,6 +41,7 @@ export default function ServiceFold({
   items: readonly Item[];
 }) {
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false); // briefly true after closing: hides the text while the card narrows
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const armed = useRef(true); // whether plain hovering may open it (off right after it auto-closes)
@@ -76,6 +77,7 @@ export default function ServiceFold({
       if (open) {
         if (up && r.top > window.innerHeight * 0.6 && performance.now() - openedAt.current > 1000) {
           armed.current = false;
+          setClosing(true);
           setOpen(false);
         }
       } else if (!armed.current && (r.top > window.innerHeight || r.bottom < 0)) {
@@ -86,8 +88,15 @@ export default function ServiceFold({
     return () => window.removeEventListener('scroll', onScroll);
   }, [open]);
 
+  useEffect(() => {
+    if (open || !closing) return;
+    const t = setTimeout(() => setClosing(false), 1100);
+    return () => clearTimeout(t);
+  }, [open, closing]);
+
   const show = () => {
     if (open) return;
+    setClosing(false);
     openedAt.current = performance.now();
     setOpen(true);
   };
@@ -95,7 +104,7 @@ export default function ServiceFold({
   const style = { '--fold-shift': `${shift}px` } as CSSProperties;
 
   return (
-    <div ref={rootRef} className="vaw-fold" data-open={open} style={style}>
+    <div ref={rootRef} className="vaw-fold" data-open={open} data-closing={closing} style={style}>
       <div className="vaw-fold__head">
         <div
           className="vaw-fold__card"
@@ -119,7 +128,7 @@ export default function ServiceFold({
             </span>
           </div>
 
-          <div>
+          <div className="vaw-fold__mid">
             <p className="vaw-fold__eyebrow">{eyebrow}</p>
             <h2 className="vaw-fold__title vaw-display">{title}</h2>
             <p className="vaw-fold__text">

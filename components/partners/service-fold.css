@@ -203,6 +203,25 @@
   transition-delay: 0s;
 }
 
+/* While closing, the text would visibly re-wrap as the card narrows, so it is hidden for that stretch
+   and fades back in once the card has settled. */
+.vaw-fold[data-closing='true'] .vaw-fold__mid {
+  animation: vaw-fold-mid calc(1700ms * var(--k)) linear both;
+}
+
+@keyframes vaw-fold-mid {
+  0% {
+    opacity: 1;
+  }
+  12%,
+  88% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* footer: segmented dashes + two glass pills */
 .vaw-fold__dashes {
   display: flex;
