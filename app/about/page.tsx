@@ -9,6 +9,7 @@ import CreamPage from '@/components/services/CreamPage';
 import { FOUNDERS } from '@/components/home/data';
 import { IconGitHub, IconLinkedIn } from '@/components/home/SocialIcons';
 import { SHOW_GALLERY, SOCIAL } from '@/lib/site';
+import { EASE, DUR } from '@/lib/motion';
 
 function fade(reduce: boolean | null) {
   return reduce
@@ -17,7 +18,7 @@ function fade(reduce: boolean | null) {
         initial: { opacity: 0, y: 22 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: '-8% 0px' },
-        transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+        transition: { duration: DUR.enter, ease: EASE },
       };
 }
 

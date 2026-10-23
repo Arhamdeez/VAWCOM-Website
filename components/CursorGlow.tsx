@@ -83,7 +83,7 @@ export default function CursorGlow() {
     <svg
       ref={wrapRef}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[9990] h-full w-full opacity-0 transition-opacity duration-200"
+      className="pointer-events-none fixed inset-0 z-[9990] h-full w-full opacity-0 transition-opacity duration-std"
     >
       <path
         ref={pathRef}

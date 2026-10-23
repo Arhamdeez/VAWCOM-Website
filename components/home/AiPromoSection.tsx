@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { EASE, DUR } from '@/lib/motion';
 
 const CHIPS = [
   { title: 'Automate', body: 'Replace manual busywork. Keep approval steps where a mistake would hurt.' },
@@ -33,7 +34,7 @@ export default function AiPromoSection() {
           initial={reduce ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: DUR.enter, ease: EASE }}
         >
           <h2 className="vaw-display m-0 max-w-[12ch] text-[clamp(2.2rem,5vw,3.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]">
             Accelerate your business with{' '}
@@ -64,7 +65,7 @@ export default function AiPromoSection() {
           initial={reduce ? false : { opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: DUR.enter, ease: EASE }}
           className="relative mx-auto w-full max-w-[32rem] lg:max-w-none"
         >
           <div className="relative grid gap-3 sm:grid-cols-2 sm:gap-4">
@@ -75,9 +76,9 @@ export default function AiPromoSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{
-                  duration: 0.4,
+                  duration: DUR.enter,
                   delay: reduce ? 0 : 0.06 * i,
-                  ease: [0.22, 1, 0.36, 1],
+                  ease: EASE,
                 }}
                 className={`vaw-glass rounded-[1.75rem] ${i === 0 ? 'sm:translate-y-4' : ''} ${
                   i === 3 ? 'sm:-translate-y-4' : ''

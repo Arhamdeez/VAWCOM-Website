@@ -88,7 +88,7 @@ export default function CompanyFilm() {
           <span
             ref={bubbleRef}
             aria-hidden
-            className={`pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-white/95 text-[#161615] shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[width,height,padding] duration-150 ease-out ${
+            className={`pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-white/95 text-[#161615] shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[width,height,padding] duration-micro ${
               hovering ? 'h-9 px-4 text-[13px] font-medium' : 'h-11 w-11'
             }`}
           >

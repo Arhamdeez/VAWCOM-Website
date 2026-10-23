@@ -49,7 +49,7 @@ export default function WhyChooseUs({
               Clients in France, Germany, Nigeria, and Pakistan, and we can take on every
               kind of global requirement. If you need it built for your market, we can do it.
             </p>
-            <ul className="mt-8 w-[80%] space-y-3">
+            <ul className="mt-8 w-full space-y-3 sm:w-[80%]">
               {POINTS.map((p) => (
                 <li key={p.title} className="vaw-glass rounded-[1.35rem]">
                   <div className="vaw-glass-core rounded-[1.15rem] px-5 py-4">

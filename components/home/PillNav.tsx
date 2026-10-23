@@ -9,6 +9,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { servicesInNavOrder } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
+import { EASE, DUR } from '@/lib/motion';
 
 export type NavOpen = 'full' | 'half' | 'compact';
 
@@ -26,8 +27,8 @@ type Props = {
   onDark?: boolean;
 };
 
-const ease = [0.22, 1, 0.36, 1] as const;
-const morph = { duration: 0.78, ease };
+const ease = EASE;
+const morph = { duration: DUR.morph, ease };
 
 function MobileNav({
   active,
@@ -78,7 +79,7 @@ function MobileNav({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: DUR.std }}
                 className="fixed inset-0 z-[100] bg-[#f5f3ee]"
               >
                 <div className="flex h-full flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
@@ -120,7 +121,7 @@ function MobileNav({
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.22, ease }}
+                            transition={{ duration: DUR.std, ease }}
                             className="overflow-hidden"
                           >
                             <div className="flex flex-col gap-0.5 px-1 pb-2">
@@ -194,7 +195,7 @@ function MobileNav({
   return (
     <>
       <div
-        className={`vaw-nav-glass w-full max-w-none overflow-visible transition-[background,border-color,box-shadow] duration-300 ${
+        className={`vaw-nav-glass w-full max-w-none overflow-visible rounded-[1.25rem] transition-[background,border-color,box-shadow] duration-std ${
           onDark ? 'vaw-nav-glass-on-dark' : ''
         } ${embedded ? 'relative' : 'fixed left-0 right-0 top-4 z-[60]'} mx-auto px-3 py-2`}
       >
@@ -303,7 +304,7 @@ function DesktopNav({
         layout: morph,
         borderRadius: morph,
       }}
-      className={`vaw-nav-glass overflow-visible transition-[background,border-color,box-shadow] duration-300 ${
+      className={`vaw-nav-glass overflow-visible transition-[background,border-color,box-shadow] duration-std ${
         onDark ? 'vaw-nav-glass-on-dark' : ''
       } ${embedded ? 'relative' : 'fixed left-0 right-0 top-5 z-[60]'} mx-auto px-4 py-2.5 pl-4 ${
         full ? 'w-full max-w-none sm:px-5' : 'w-max max-w-[calc(100vw-32px)]'
@@ -336,7 +337,7 @@ function DesktopNav({
           }
           transition={{
             maxWidth: morph,
-            opacity: { duration: 0.45, ease: 'linear' },
+            opacity: { duration: DUR.enter, ease: 'linear' },
           }}
           className={`flex items-center gap-8 whitespace-nowrap text-[14.5px] ${
             collapsible && !showLinks ? 'overflow-hidden' : 'overflow-visible'

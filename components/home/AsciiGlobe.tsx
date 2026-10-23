@@ -378,7 +378,7 @@ export default function AsciiGlobe() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-700 group-data-[lit]/globe:opacity-100"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-morph group-data-[lit]/globe:opacity-100"
         style={{
           background:
             'radial-gradient(circle, rgba(12,183,139,0.42) 0%, rgba(12,183,139,0.16) 42%, rgba(12,183,139,0.04) 62%, transparent 74%)',
@@ -387,7 +387,7 @@ export default function AsciiGlobe() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-700 group-data-[lit]/globe:opacity-100"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-morph group-data-[lit]/globe:opacity-100"
         style={{
           boxShadow:
             '0 0 40px rgba(12,183,139,0.22), inset 0 0 28px rgba(12,183,139,0.12)',
@@ -412,7 +412,7 @@ export default function AsciiGlobe() {
         <pre
           ref={preRef}
           data-ascii-globe
-          className="m-0 h-full w-full select-none overflow-hidden whitespace-pre [contain:layout_paint] text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-500 group-data-[lit]/globe:opacity-90"
+          className="m-0 h-full w-full select-none overflow-hidden whitespace-pre [contain:layout_paint] text-left font-mono leading-none text-[#0cb78b] opacity-0 transition-opacity duration-enter group-data-[lit]/globe:opacity-90"
         />
         {GLOBE_PLACES.map((place) => (
           <button

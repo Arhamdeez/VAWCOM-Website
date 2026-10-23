@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Send, X } from 'lucide-react';
+import { DUR } from '@/lib/motion';
 
 type ChatMsg = { role: 'user' | 'ai'; text: string };
 
@@ -415,8 +416,8 @@ function DockedChat() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.92 }}
           transition={{
-            opacity: { duration: 0.25 },
-            scale: { duration: 0.25 },
+            opacity: { duration: DUR.std },
+            scale: { duration: DUR.std },
           }}
           onClick={reopen}
           aria-label="Open chat"

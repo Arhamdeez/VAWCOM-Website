@@ -9,6 +9,7 @@ import ServiceDeck from './ServiceDeck';
 import ServiceJump from './ServiceJump';
 import { SERVICES, SERVICE_FAQS } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
+import { EASE, DUR } from '@/lib/motion';
 
 const START = [
   {
@@ -32,7 +33,7 @@ function fade(reduce: boolean | null) {
         initial: { opacity: 0, y: 22 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: '-8% 0px' },
-        transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+        transition: { duration: DUR.enter, ease: EASE },
       };
 }
 

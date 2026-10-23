@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { CONTACT_EMAIL, HERO_CENTERED_TRYOUT as CENTERED, SOCIAL, getGmailComposeUrl } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
 import { CHAT_PROMPTS, HeroChatSlot, useSiteChat } from '@/components/chat/SiteChat';
+import { EASE, DUR } from '@/lib/motion';
 
 const VawcomBot = dynamic(() => import('./VawcomBot'), { ssr: false });
 
@@ -32,7 +33,7 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
           ? { opacity: 0, y: -12, pointerEvents: 'none' as const }
           : { opacity: 1, y: 0, pointerEvents: 'auto' as const }
       }
-      transition={reduce ? { duration: 0 } : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      transition={reduce ? { duration: 0 } : { duration: DUR.std, ease: EASE }}
       className="fixed inset-x-3 top-3 z-[61] flex h-10 items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
     >
       <div className="flex items-center gap-1">
@@ -93,7 +94,7 @@ export default function HeroSection() {
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
+              transition={{ duration: DUR.enter, ease: EASE }}
               className={`vaw-display m-0 leading-[0.94] tracking-[-0.03em] text-[#161615] ${
                 CENTERED
                   ? 'max-w-[20ch] text-[clamp(2.2rem,5.6vw,4.5rem)]'
@@ -110,7 +111,7 @@ export default function HeroSection() {
             <motion.ul
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.1, ease: [0.16, 1.1, 0.3, 1] }}
+              transition={{ duration: DUR.enter, delay: 0.1, ease: EASE }}
               aria-label="What we build"
               className={`m-0 flex list-none flex-col gap-y-1 p-0 font-semibold leading-[1.45] tracking-[-0.01em] text-[#161615] sm:flex-row sm:flex-wrap sm:gap-x-3 ${
                 CENTERED
@@ -142,7 +143,7 @@ export default function HeroSection() {
             <motion.p
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.16, ease: [0.16, 1.1, 0.3, 1] }}
+              transition={{ duration: DUR.enter, delay: 0.16, ease: EASE }}
               className={`leading-relaxed text-[#5c5a56] ${
                 CENTERED
                   ? 'mt-5 max-w-[46ch] text-[clamp(0.95rem,1.6vw,1.1rem)]'
@@ -159,7 +160,7 @@ export default function HeroSection() {
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.2, ease: [0.16, 1.1, 0.3, 1] }}
+              transition={{ duration: DUR.enter, delay: 0.2, ease: EASE }}
               className={CENTERED ? 'mt-6' : 'mt-6'}
             >
               <Link
@@ -176,7 +177,7 @@ export default function HeroSection() {
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.26, ease: [0.16, 1.1, 0.3, 1] }}
+              transition={{ duration: DUR.enter, delay: 0.26, ease: EASE }}
               className={`mt-7 flex w-full flex-col items-stretch gap-2.5 ${
                 CENTERED ? 'max-w-[38rem] [&>div]:w-full [&>div]:max-w-full' : 'max-w-[28rem] lg:items-start'
               }`}
@@ -203,7 +204,7 @@ export default function HeroSection() {
               className="pointer-events-none absolute -right-1 top-0 z-[1] h-[10.5rem] w-[10.5rem] sm:-right-2 sm:h-[12.5rem] sm:w-[12.5rem] lg:hidden"
               initial={reduce ? false : { x: 64, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: DUR.enter, delay: 0.12, ease: EASE }}
             >
               {desktop === false ? <VawcomBot compact /> : null}
             </motion.div>

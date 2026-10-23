@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { MotionConfig } from 'framer-motion';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 import { ChatProvider } from '@/components/chat/SiteChat';
 import CursorGlow from '@/components/CursorGlow';
@@ -59,12 +60,19 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   if (isStandalonePath(pathname)) {
-    return <StandaloneShell>{children}</StandaloneShell>;
+    return (
+      <MotionConfig reducedMotion="user">
+        <StandaloneShell>{children}</StandaloneShell>
+      </MotionConfig>
+    );
   }
 
   const cream = isCreamPath(pathname);
 
+  // reducedMotion="user": people who ask their OS for less motion get no transform/layout animation
+  // from Framer anywhere on the site (opacity and colour still fade).
   return (
+    <MotionConfig reducedMotion="user">
     <ChatProvider>
       <CursorGlow />
       <SplashScreenWrapper cream={cream}>
@@ -77,5 +85,6 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         </main>
       </SplashScreenWrapper>
     </ChatProvider>
+    </MotionConfig>
   );
 }

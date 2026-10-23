@@ -121,9 +121,12 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
 
       rootDocTopRef.current = cr.top + window.scrollY;
       const globeTop = sr.top - cr.top;
-      const scale = Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
+      // Always scale the drawing uniformly (never stretch it). Wide screens fit it to the space above
+      // the globe; narrow screens fit it to the width and a thread carries on down to the globe.
+      const narrow = w < 1024;
+      const scale = narrow ? w / SKIPER_W : Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
       const ox = (w - SKIPER_W * scale) / 2;
-      const stroke = Math.max(13, Math.min(18, 18 * scale));
+      const stroke = Math.max(narrow ? 6 : 13, Math.min(18, 18 * scale));
 
       // Join at the north pole of the ASCII disk. A cream disc in AsciiGlobe keeps the stroke off the globe.
       const ascii = slot.querySelector('[data-ascii-globe]');
@@ -143,7 +146,10 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       }
       const join: Pt = [gx, gy - gr];
 
-      let skiper = trimLastCommands(scaleSkiper(scale, scale, ox, 0), 2);
+      // Narrow screens: start the drawing below the fixed social bar + navbar so its first loops
+      // are not tucked behind them.
+      const top = narrow ? 120 : 0;
+      let skiper = trimLastCommands(scaleSkiper(scale, scale, ox, top), 2);
       skiper += connect(endPt(skiper), endTan(skiper), join);
       setFrame((prev) =>
         prev.skiper === skiper &&
@@ -225,7 +231,7 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
     <div
       ref={overlayRef}
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-0 hidden overflow-visible lg:block"
+      className="pointer-events-none absolute inset-0 z-0 overflow-visible"
       style={HERO_CENTERED_TRYOUT ? { opacity: 0.3 } : undefined}
     >
       <svg

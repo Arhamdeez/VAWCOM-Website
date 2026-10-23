@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronRight, List } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SERVICES } from '@/lib/services';
+import { EASE, DUR } from '@/lib/motion';
 
 type Props = {
   active: string;
@@ -103,8 +104,8 @@ export default function ServiceJump({
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              transition={{ duration: DUR.std, ease: EASE }}
+              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-[width] duration-std ${
                 open ? 'w-[11.5rem]' : 'w-11'
               }`}
             >
@@ -129,7 +130,7 @@ export default function ServiceJump({
               </button>
               <nav
                 aria-label="Jump to service"
-                className={`min-w-0 flex-1 overflow-y-auto py-3 pr-2 transition-opacity duration-200 ${
+                className={`min-w-0 flex-1 overflow-y-auto py-3 pr-2 transition-opacity duration-std ${
                   open ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
               >

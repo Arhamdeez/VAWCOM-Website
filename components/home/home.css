@@ -1,7 +1,8 @@
 /* Sticky / follow stroke need a visible overflow chain up to the viewport scroller */
 html:has(.vaw-home),
 body:has(.vaw-home) {
-  overflow-x: visible !important;
+  /* clip, not hidden: no scroll container (sticky still works) but nothing can widen the page sideways */
+  overflow-x: clip !important;
 }
 
 .vaw-home {
@@ -219,10 +220,10 @@ body:has(.vaw-home) {
   backdrop-filter: blur(8px) saturate(1.15);
   -webkit-backdrop-filter: blur(8px) saturate(1.15);
   transition:
-    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease;
+    transform var(--vaw-dur-std) var(--vaw-ease),
+    background var(--vaw-dur-std) var(--vaw-ease),
+    border-color var(--vaw-dur-std) var(--vaw-ease),
+    box-shadow var(--vaw-dur-std) var(--vaw-ease);
 }
 
 .vaw-liquid-lens {
@@ -264,7 +265,7 @@ body:has(.vaw-home) {
     -webkit-backdrop-filter: none;
     /* No colour fade on hover-in: the lens appears at once, so the border and fill must too.
        (Fading back out on leave still uses the base .vaw-glass-core transitions.) */
-    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--vaw-dur-std) var(--vaw-ease);
   }
 
   .vawcom-marquee.is-svg-lens .vaw-glass:hover .vaw-glass-core,
@@ -300,8 +301,8 @@ body:has(.vaw-home) {
   pointer-events: none;
   border-radius: 2rem;
   transform: translate(-50%, -50%);
-  transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    height 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width var(--vaw-dur-std) var(--vaw-ease),
+    height var(--vaw-dur-std) var(--vaw-ease);
 }
 
 .vaw-marquee-lens .vaw-liquid-lens {

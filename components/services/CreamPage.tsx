@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import PillNav from '@/components/home/PillNav';
 import CtaFooter from '@/components/home/CtaFooter';
 import '@/components/home/home.css';
+import { EASE, DUR } from '@/lib/motion';
 
 const NAV_WIDE_KEY = 'vaw-nav-wide';
 /** Viewport band the fixed pill sits in — anything dark here flips link color. */
@@ -74,7 +75,7 @@ export default function CreamPage({ children, nav = 'services', footer = true }:
         className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 sm:px-4"
         initial={false}
         animate={{ top: expanded ? 64 : 20 }}
-        transition={{ duration: reduce ? 0 : 0.52, ease: [0.3, 0.9, 0.25, 1] }}
+        transition={{ duration: reduce ? 0 : DUR.enter, ease: EASE }}
       >
         <div className="pointer-events-auto flex w-full justify-center">
           <PillNav active={nav} expanded={expanded} embedded onDark={onDark} />

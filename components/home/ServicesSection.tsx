@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { SERVICE_TRACK } from '@/lib/services';
 import LiquidLens from './LiquidLens';
+import { EASE, DUR } from '@/lib/motion';
 
 /**
  * Desktop grid is 6 columns, each card spans 2. A short last row is centred under the full rows:
@@ -59,14 +60,14 @@ export default function ServicesSection() {
                   onMouseLeave={() => setActive(null)}
                   onFocus={() => setActive(i)}
                   whileHover={{ y: -3 }}
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: DUR.std, ease: EASE }}
                   className={`vaw-glass w-[min(78vw,20rem)] shrink-0 snap-center rounded-[1.75rem] lg:col-span-2 lg:w-auto ${
                     lastRowStart(i, SERVICE_TRACK.length)
                   } ${open ? 'is-liquid-hot' : ''}`}
                 >
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute -inset-10 -z-[1] blur-3xl"
+                    className="pointer-events-none absolute -inset-10 -z-[1] blur-3xl max-lg:hidden"
                     style={{
                       background: `radial-gradient(ellipse 80% 70% at 30% 25%, ${svc.color}55, transparent 70%)`,
                     }}
