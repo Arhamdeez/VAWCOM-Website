@@ -1,0 +1,450 @@
+/*
+ * "From first idea to launch": one centred card that, on hover/tap, fades into four cards in place (row
+ * one, which then never moves). A copy of that row appears stacked on top of it and turns over, hinged
+ * at row one's bottom edge, to land below as row two with the next four services on its other side.
+ * Closing plays the same sequence backwards (row two folds back up, row one fades out, the card re-forms).
+ * Each element has two transition sets: the base rule is the CLOSING timing, the [data-open='true'] rule
+ * is the OPENING timing, because a transition uses the timing of the state it is heading to.
+ * Phones/tablets: the card expands into a simple staggered list instead (no 3D).
+ */
+
+.vaw-fold {
+  --fold-gap: 1.25rem;
+  --k: 0.55; /* speed knob: every duration/delay below is multiplied by this (1 = original, smaller = faster) */
+  --ease-close: cubic-bezier(0.6, 0, 0.2, 1); /* in-out, so closing steps hand over to each other instead of stalling */
+  --close-d: calc(350ms * var(--k)); /* when closing, the card starts re-forming while the cards are still leaving */
+  /* brand-green gradients (top-left dark -> bottom-right bright), echoing the reference card */
+  --g0: linear-gradient(165deg, #0a1b17 0%, #0f3a30 55%, #12896a 100%);
+  --g1: linear-gradient(165deg, #0b1f1b 0%, #0d4237 60%, #0a9a74 100%);
+  --g2: linear-gradient(165deg, #0e1d19 0%, #1a4a3e 55%, #429f7f 100%);
+  --g3: linear-gradient(165deg, #091a1a 0%, #0c3f44 55%, #159a8a 100%);
+}
+
+/* ───── the single card / heading ───── */
+.vaw-fold__head {
+  position: relative;
+  z-index: 3;
+}
+
+.vaw-fold__card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: min(100%, 21.5rem);
+  min-height: 30rem;
+  margin-inline: auto;
+  padding: 1.1rem;
+  border-radius: 2rem;
+  color: #fff;
+  text-align: left;
+  box-shadow:
+    0 40px 90px rgba(10, 60, 48, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition:
+    width calc(900ms * var(--k)) var(--ease-close) var(--close-d),
+    min-height calc(900ms * var(--k)) var(--ease-close) var(--close-d),
+    padding calc(800ms * var(--k)) var(--ease-close) var(--close-d),
+    gap calc(800ms * var(--k)) var(--ease-close) var(--close-d),
+    box-shadow calc(600ms * var(--k)) var(--ease-close) var(--close-d),
+    transform var(--vaw-dur-std) var(--vaw-ease) 0s;
+}
+
+.vaw-fold__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 75% 38% at 100% 100%, rgba(45, 212, 168, 0.5), transparent 72%),
+    radial-gradient(ellipse 70% 50% at 0% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    var(--g1);
+  transition: opacity calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold:not([data-open='true']) .vaw-fold__card:hover {
+  transform: translateY(-4px);
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__card {
+  width: min(100%, 44rem);
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+  color: #161615;
+  text-align: center;
+  box-shadow: none;
+  transition-delay: 0s;
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__bg {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* glass chips (top row) and the footer collapse away once open */
+.vaw-fold__chips,
+.vaw-fold__foot {
+  max-height: 8rem;
+  transition:
+    opacity calc(500ms * var(--k)) var(--ease-close) var(--close-d),
+    max-height calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__chips,
+.vaw-fold[data-open='true'] .vaw-fold__foot {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition-delay: 0s;
+}
+
+.vaw-fold__chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vaw-fold__glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.vaw-fold__glass--icon {
+  width: 2.5rem;
+  flex: none;
+}
+
+.vaw-fold__glass--pill {
+  gap: 0.4rem;
+  padding-inline: 1rem;
+  white-space: nowrap;
+}
+
+/* the middle: big title + two-tone text */
+.vaw-fold__eyebrow {
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #0cb78b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition:
+    opacity calc(400ms * var(--k)) var(--ease-close) var(--close-d),
+    max-height calc(700ms * var(--k)) var(--ease-close) var(--close-d),
+    margin calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__eyebrow {
+  max-height: 3rem;
+  margin-bottom: 0.75rem;
+  opacity: 1;
+  transition-delay: calc(300ms * var(--k)), 0s, 0s;
+}
+
+.vaw-fold__title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.5rem, 4.4vw, 3.1rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  transition:
+    color calc(700ms * var(--k)) var(--ease-close) var(--close-d),
+    font-size calc(900ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__title {
+  color: #161615;
+  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+  transition-delay: 0s;
+}
+
+.vaw-fold__text {
+  margin: 1rem auto 0;
+  max-width: 44ch;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.74);
+  transition: color calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold__text strong {
+  font-weight: 600;
+  color: #fff;
+  transition: color calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__text {
+  color: #5c5a56;
+  transition-delay: 0s;
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__text strong {
+  color: #161615;
+  font-weight: 500;
+  transition-delay: 0s;
+}
+
+/* footer: segmented dashes + two glass pills */
+.vaw-fold__dashes {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 0.9rem;
+}
+
+.vaw-fold__dashes span {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.vaw-fold__dashes span:first-child {
+  background: #fff;
+}
+
+.vaw-fold__hint {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.vaw-fold__hint-arrow {
+  animation: vaw-fold-nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes vaw-fold-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 3px;
+  }
+}
+
+.vaw-fold__hint-tap {
+  display: inline;
+}
+.vaw-fold__hint-hover {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vaw-fold__hint-tap {
+    display: none;
+  }
+  .vaw-fold__hint-hover {
+    display: inline;
+  }
+}
+
+/* ───── the cards ───── */
+.vaw-fold__wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows calc(600ms * var(--k)) var(--vaw-ease) calc(300ms * var(--k));
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__wrap {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows calc(700ms * var(--k)) var(--vaw-ease) 0s;
+}
+
+.vaw-fold__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.vaw-fold__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .vaw-fold__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.vaw-fold__item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity calc(300ms * var(--k)) var(--vaw-ease) 0s,
+    transform calc(300ms * var(--k)) var(--vaw-ease) 0s;
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__item {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity calc(500ms * var(--k)) var(--vaw-ease) calc((calc(250ms * var(--k)) + var(--n, 0) * calc(60ms * var(--k))) * var(--k)),
+    transform calc(600ms * var(--k)) var(--vaw-ease) calc((calc(250ms * var(--k)) + var(--n, 0) * calc(60ms * var(--k))) * var(--k));
+}
+
+.vaw-fold__flip,
+.vaw-fold__face {
+  height: 100%;
+}
+
+.vaw-fold__face {
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.5rem;
+  background: var(--ga);
+  color: #fff;
+  box-shadow:
+    0 18px 40px rgba(10, 60, 48, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform var(--vaw-dur-std) var(--vaw-ease);
+}
+
+.vaw-fold__face--front.vaw-fold__face--b {
+  background: var(--gb);
+}
+
+.vaw-fold__face:hover {
+  filter: brightness(1.08);
+}
+
+.vaw-fold__face--back {
+  display: none;
+}
+
+/* ───── desktop: fade in place, then fold down ───── */
+@media (min-width: 1024px) {
+  .vaw-fold {
+    --close-d: calc(650ms * var(--k));
+  }
+
+  .vaw-fold__head {
+    transform: translateY(var(--fold-shift, 0px));
+    transition: transform calc(900ms * var(--k)) var(--ease-close) var(--close-d);
+  }
+
+  .vaw-fold[data-open='true'] .vaw-fold__head {
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .vaw-fold__wrap {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+
+  .vaw-fold__inner {
+    overflow: visible;
+  }
+
+  .vaw-fold__list {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 1fr;
+    gap: var(--fold-gap);
+    margin-top: 2.5rem;
+    visibility: hidden;
+    transition: visibility 0s linear calc(1500ms * var(--k));
+  }
+
+  .vaw-fold[data-open='true'] .vaw-fold__list {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .vaw-fold__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* row 1: fades in right where it sits (no sliding); fades out last when closing */
+  .vaw-fold__item--a {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity calc(700ms * var(--k)) var(--ease-close) calc(600ms * var(--k) + var(--c) * 30ms * var(--k));
+  }
+
+  .vaw-fold[data-open='true'] .vaw-fold__item--a {
+    opacity: 1;
+    transition: opacity calc(650ms * var(--k)) linear calc((calc(250ms * var(--k)) + var(--c) * calc(100ms * var(--k))) * var(--k));
+  }
+
+  /* row 2: a copy of row 1 lies on top of it (offset a few px so it reads as a second layer), then
+     turns over about the hinge at row 1's bottom edge and lands in its own slot, flipping from the
+     copy's face to the new service on its back. Closing folds it back up first. */
+  .vaw-fold__item--b {
+    position: relative;
+    z-index: 3;
+    perspective: 1800px;
+    perspective-origin: 50% 0;
+  }
+
+  .vaw-fold__flip {
+    position: relative;
+  }
+
+  .vaw-fold__item--b .vaw-fold__flip {
+    transform-style: preserve-3d;
+    transform-origin: 50% calc(var(--fold-gap) / -2);
+    transform: rotateX(180deg);
+    translate: 0 -9px;
+    transition:
+      transform calc(1000ms * var(--k)) var(--ease-close) calc((3 - var(--c)) * 50ms * var(--k)),
+      translate calc(1000ms * var(--k)) var(--ease-close) calc((3 - var(--c)) * 50ms * var(--k));
+  }
+
+  .vaw-fold[data-open='true'] .vaw-fold__item--b .vaw-fold__flip {
+    transform: rotateX(0deg);
+    translate: 0 0;
+    transition:
+      transform calc(1300ms * var(--k)) cubic-bezier(0.5, 0.05, 0.25, 1) calc((calc(1900ms * var(--k)) + var(--c) * calc(110ms * var(--k))) * var(--k)),
+      translate calc(1300ms * var(--k)) var(--vaw-ease) calc((calc(1900ms * var(--k)) + var(--c) * calc(110ms * var(--k))) * var(--k));
+  }
+
+  .vaw-fold__face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .vaw-fold__face--back {
+    display: block;
+    position: absolute;
+    inset: 0;
+    transform: rotateX(180deg);
+    opacity: 0;
+    box-shadow: 0 -16px 36px rgba(10, 60, 48, 0.32);
+    transition: opacity calc(400ms * var(--k)) linear calc(700ms * var(--k));
+  }
+
+  .vaw-fold[data-open='true'] .vaw-fold__face--back {
+    opacity: 1;
+    transition: opacity calc(450ms * var(--k)) linear calc(1250ms * var(--k));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-fold__hint-arrow {
+    animation: none;
+  }
+}

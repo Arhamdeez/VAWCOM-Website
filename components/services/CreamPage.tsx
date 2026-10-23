@@ -14,7 +14,7 @@ const NAV_BAND_BOTTOM = 96;
 
 type Props = {
   children: React.ReactNode;
-  nav?: 'services' | 'gallery' | 'about' | 'contact';
+  nav?: 'services' | 'gallery' | 'about' | 'contact' | 'partners';
   footer?: boolean;
 };
 

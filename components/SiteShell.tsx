@@ -18,6 +18,7 @@ function isCreamPath(pathname: string) {
     pathname === '/splash' ||
     pathname === '/contact' ||
     pathname === '/about' ||
+    pathname === '/partners' ||
     pathname.startsWith('/services') ||
     pathname.startsWith('/gallery')
   );

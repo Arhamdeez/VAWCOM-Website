@@ -13,6 +13,7 @@ const SERVICE_OPTIONS = [
   'Select a service',
   ...SERVICES.map((s) => s.title),
   'Consultation',
+  'White-label partnership',
   'Other',
 ] as const;
 

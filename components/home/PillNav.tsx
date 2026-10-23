@@ -20,7 +20,7 @@ type Props = {
   expanded?: boolean;
   /** full = edge-to-edge, half = pill with links, compact = logo + CTA. */
   open?: NavOpen;
-  active?: 'home' | 'contact' | 'services' | 'gallery' | 'about';
+  active?: 'home' | 'contact' | 'services' | 'gallery' | 'about' | 'partners';
   /** Parent owns fixed positioning (home chrome). */
   embedded?: boolean;
   /** Light link colors when the bar sits over a dark page band. */
@@ -162,6 +162,7 @@ function MobileNav({
                           ? [{ href: '/gallery', label: 'Gallery', key: 'gallery' as const }]
                           : []),
                         { href: '/about', label: 'About', key: 'about' as const },
+                        { href: '/partners', label: 'Partners', key: 'partners' as const },
                         { href: '/contact', label: 'Contact', key: 'contact' as const },
                       ] as const
                     ).map((item) => (
@@ -411,6 +412,9 @@ function DesktopNav({
           ) : null}
           <Link href="/about" prefetch className={active === 'about' ? on : link}>
             About
+          </Link>
+          <Link href="/partners" prefetch className={active === 'partners' ? on : link}>
+            Partners
           </Link>
           {active === 'home' ? (
             <motion.div

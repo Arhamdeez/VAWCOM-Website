@@ -8,6 +8,7 @@ const NAV = [
   { label: 'Services', href: '/services' },
   ...(SHOW_GALLERY ? [{ label: 'Gallery', href: '/gallery' }] : []),
   { label: 'About', href: '/about' },
+  { label: 'Partners', href: '/partners' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 
