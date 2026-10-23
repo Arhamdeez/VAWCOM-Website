@@ -18,7 +18,7 @@ const ICONS: LucideIcon[] = [Lightbulb, ListChecks, LayoutTemplate, Layers, Code
 export default function ProcessLightTrail() {
   const reduce = useReducedMotion();
   const uid = useId().replace(/:/g, '');
-  const listRef = useRef<HTMLOlElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
   const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [pathD, setPathD] = useState('');
   const [railH, setRailH] = useState(0);
