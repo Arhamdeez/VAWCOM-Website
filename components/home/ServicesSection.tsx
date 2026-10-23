@@ -7,6 +7,18 @@ import { ArrowUpRight } from 'lucide-react';
 import { SERVICE_TRACK } from '@/lib/services';
 import LiquidLens from './LiquidLens';
 
+/**
+ * Desktop grid is 6 columns, each card spans 2. A short last row is centred under the full rows:
+ * 2 leftover cards sit half a column in (between the cards above), 1 leftover sits in the middle.
+ */
+function lastRowStart(i: number, total: number) {
+  const left = total % 3;
+  if (left === 2 && i === total - 2) return 'lg:col-start-2';
+  if (left === 2 && i === total - 1) return 'lg:col-start-4';
+  if (left === 1 && i === total - 1) return 'lg:col-start-3';
+  return '';
+}
+
 export default function ServicesSection() {
   const [active, setActive] = useState<number | null>(null);
 
@@ -37,7 +49,7 @@ export default function ServicesSection() {
                 'radial-gradient(ellipse 55% 80% at 12% 40%, rgba(12,183,139,0.28), transparent 72%), radial-gradient(ellipse 50% 70% at 88% 50%, rgba(184,217,60,0.24), transparent 72%), radial-gradient(ellipse 50% 60% at 50% 100%, rgba(232,103,74,0.16), transparent 78%)',
             }}
           />
-          <div className="relative flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:pb-2 lg:pt-2 [&::-webkit-scrollbar]:hidden">
+          <div className="relative flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:gap-8 lg:overflow-visible lg:pb-2 lg:pt-2 [&::-webkit-scrollbar]:hidden">
             {SERVICE_TRACK.map((svc, i) => {
               const open = active === i;
               return (
@@ -48,9 +60,9 @@ export default function ServicesSection() {
                   onFocus={() => setActive(i)}
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  className={`vaw-glass w-[min(78vw,20rem)] shrink-0 snap-center rounded-[1.75rem] lg:w-auto ${
-                    open ? 'is-liquid-hot' : ''
-                  }`}
+                  className={`vaw-glass w-[min(78vw,20rem)] shrink-0 snap-center rounded-[1.75rem] lg:col-span-2 lg:w-auto ${
+                    lastRowStart(i, SERVICE_TRACK.length)
+                  } ${open ? 'is-liquid-hot' : ''}`}
                 >
                   <div
                     aria-hidden

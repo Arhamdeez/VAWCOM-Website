@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { motion, useMotionValue, useReducedMotion } from 'framer-motion';
+import { HERO_CENTERED_TRYOUT } from '@/lib/site';
 
 /** Exact path from https://skiper-ui.com/v1/skiper19 */
 const SKIPER_D =
@@ -225,6 +226,7 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       ref={overlayRef}
       aria-hidden
       className="pointer-events-none absolute inset-0 z-0 hidden overflow-visible lg:block"
+      style={HERO_CENTERED_TRYOUT ? { opacity: 0.3 } : undefined}
     >
       <svg
         width={frame.w}

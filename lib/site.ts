@@ -2,6 +2,12 @@
 
 export const CONTACT_EMAIL = 'vawcomtechnologies@gmail.com';
 
+/**
+ * TRY-OUT (reversible): centred hero, 3D bot hidden, softer scribble line. The bot, the chat box and
+ * the line code are all still there — set to false to get the original hero back.
+ */
+export const HERO_CENTERED_TRYOUT = true;
+
 /** Gallery is built but hidden for now: flip to true to bring back its route, nav, footer and CTAs. */
 export const SHOW_GALLERY = false;
 

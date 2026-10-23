@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { CONTACT_EMAIL, SOCIAL, getGmailComposeUrl } from '@/lib/site';
+import { CONTACT_EMAIL, HERO_CENTERED_TRYOUT as CENTERED, SOCIAL, getGmailComposeUrl } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
 import { CHAT_PROMPTS, HeroChatSlot, useSiteChat } from '@/components/chat/SiteChat';
 
@@ -13,7 +13,11 @@ const VawcomBot = dynamic(() => import('./VawcomBot'), { ssr: false });
 
 const ACCENT = '#0cb78b';
 
-const HOOKS = ['idea', 'business', 'problem', 'next big thing'] as const;
+/** What we build, as a compact row: Web | Apps | Voice … Two groups so phones wrap into two clean rows. */
+const SERVICE_ROWS = [
+  ['Web', 'Apps', 'Voice', 'AI'],
+  ['E-commerce', 'ERP', 'CRM', 'Maintenance'],
+] as const;
 
 export function HeroBanner({ hidden }: { hidden: boolean }) {
   const reduce = useReducedMotion();
@@ -71,17 +75,33 @@ export default function HeroSection() {
 
   return (
     <section id="top" className="vaw-hero relative z-[2] overflow-visible">
-      <div className="relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 sm:pt-52 lg:pl-20 lg:pt-56 xl:pl-24">
-        <div className="relative grid grid-cols-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
-          <div className="relative z-[2] flex w-full flex-col items-start text-left pr-[6.5rem] sm:pr-[8rem] lg:pr-0">
+      <div className={`relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 ${
+        CENTERED ? 'sm:pt-44 lg:px-8 lg:pt-48' : 'sm:pt-52 lg:pt-56 lg:pl-20 xl:pl-24'
+      }`}>
+        <div
+          className={`relative grid grid-cols-1 items-center gap-6 ${
+            CENTERED ? '' : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10'
+          }`}
+        >
+          <div
+            className={`relative z-[2] flex w-full flex-col ${
+              CENTERED
+                ? 'items-center text-center'
+                : 'items-start text-left pr-[6.5rem] sm:pr-[8rem] lg:pr-0'
+            }`}
+          >
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1.1, 0.3, 1] }}
-              className="vaw-display m-0 max-w-[15ch] text-[clamp(2.2rem,5.8vw,4.75rem)] leading-[0.94] tracking-[-0.03em] text-[#161615]"
+              className={`vaw-display m-0 leading-[0.94] tracking-[-0.03em] text-[#161615] ${
+                CENTERED
+                  ? 'max-w-[20ch] text-[clamp(2.2rem,5.6vw,4.5rem)]'
+                  : 'max-w-[15ch] text-[clamp(2.2rem,5.8vw,4.75rem)]'
+              }`}
             >
-              <span className="block">Let us</span>
-              <span className="block">handle the</span>
+              <span className="block">{CENTERED ? 'Let us handle the' : 'Let us'}</span>
+              {!CENTERED && <span className="block">handle the</span>}
               <span className="block" style={{ color: ACCENT }}>
                 technical part
               </span>
@@ -91,15 +111,30 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.1, ease: [0.16, 1.1, 0.3, 1] }}
-              className="mt-5 m-0 list-none space-y-0.5 p-0 text-[clamp(1.05rem,1.9vw,1.3rem)] leading-[1.45] tracking-[-0.01em] text-[#161615]"
+              aria-label="What we build"
+              className={`m-0 flex list-none flex-col gap-y-1 p-0 font-semibold leading-[1.45] tracking-[-0.01em] text-[#161615] sm:flex-row sm:flex-wrap sm:gap-x-3 ${
+                CENTERED
+                  ? 'mt-6 items-center text-[clamp(0.95rem,1.7vw,1.3rem)] sm:justify-center'
+                  : 'mt-5 items-start text-[clamp(0.95rem,1.9vw,1.3rem)]'
+              }`}
             >
-              {HOOKS.map((word) => (
-                <li key={word}>
-                  Your{' '}
-                  <span className="font-semibold" style={{ color: ACCENT }}>
-                    {word}
-                  </span>
-                  .
+              {SERVICE_ROWS.map((row, r) => (
+                <li key={row[0]} className="flex items-center gap-2 whitespace-nowrap sm:gap-3">
+                  {r > 0 && (
+                    <span aria-hidden className="hidden font-normal sm:inline" style={{ color: ACCENT }}>
+                      |
+                    </span>
+                  )}
+                  {row.map((name, i) => (
+                    <span key={name} className="flex items-center gap-2 sm:gap-3">
+                      {i > 0 && (
+                        <span aria-hidden className="font-normal" style={{ color: ACCENT }}>
+                          |
+                        </span>
+                      )}
+                      {name}
+                    </span>
+                  ))}
                 </li>
               ))}
             </motion.ul>
@@ -108,9 +143,13 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.16, ease: [0.16, 1.1, 0.3, 1] }}
-              className="mt-5 max-w-[34ch] text-[clamp(0.95rem,1.6vw,1.05rem)] leading-relaxed text-[#5c5a56]"
+              className={`leading-relaxed text-[#5c5a56] ${
+                CENTERED
+                  ? 'mt-5 max-w-[46ch] text-[clamp(0.95rem,1.6vw,1.1rem)]'
+                  : 'mt-5 max-w-[34ch] text-[clamp(0.95rem,1.6vw,1.05rem)]'
+              }`}
             >
-              You think it. We build it —{' '}
+              You think it. We build it,{' '}
               <span className="font-medium" style={{ color: ACCENT }}>
                 start to finish
               </span>
@@ -121,11 +160,13 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2, ease: [0.16, 1.1, 0.3, 1] }}
-              className="mt-6"
+              className={CENTERED ? 'mt-6' : 'mt-6'}
             >
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-5 py-3 text-[13.5px] font-semibold uppercase tracking-[0.06em] text-[#f5f3ee] transition-colors hover:bg-[#0a9d77]"
+                className={`inline-flex items-center gap-2 rounded-full bg-[#0cb78b] font-semibold uppercase tracking-[0.06em] text-[#f5f3ee] transition-colors hover:bg-[#0a9d77] ${
+                  CENTERED ? 'px-6 py-3.5 text-[14px]' : 'px-5 py-3 text-[13.5px]'
+                }`}
               >
                 Start building
                 <ArrowRight className="h-4 w-4" />
@@ -136,10 +177,12 @@ export default function HeroSection() {
               initial={reduce ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.26, ease: [0.16, 1.1, 0.3, 1] }}
-              className="mt-7 flex w-full max-w-[28rem] flex-col items-stretch gap-2.5 lg:items-start"
+              className={`mt-7 flex w-full flex-col items-stretch gap-2.5 ${
+                CENTERED ? 'max-w-[38rem] [&>div]:w-full [&>div]:max-w-full' : 'max-w-[28rem] lg:items-start'
+              }`}
             >
               <HeroChatSlot />
-              <div className="flex flex-wrap gap-2">
+              <div className={`flex flex-wrap gap-2 ${CENTERED ? 'justify-center' : ''}`}>
                 {CHAT_PROMPTS.map((label) => (
                   <button
                     key={label}
@@ -155,6 +198,7 @@ export default function HeroSection() {
             </motion.div>
 
             {/* Mobile: bot slides in beside the headline instead of stacking below */}
+            {!CENTERED && (
             <motion.div
               className="pointer-events-none absolute -right-1 top-0 z-[1] h-[10.5rem] w-[10.5rem] sm:-right-2 sm:h-[12.5rem] sm:w-[12.5rem] lg:hidden"
               initial={reduce ? false : { x: 64, opacity: 0 }}
@@ -163,11 +207,14 @@ export default function HeroSection() {
             >
               {desktop === false ? <VawcomBot compact /> : null}
             </motion.div>
+            )}
           </div>
 
+          {!CENTERED && (
           <div className="hidden h-[min(64vh,36rem)] w-full max-w-[36rem] items-center justify-end lg:flex">
             {desktop ? <VawcomBot /> : null}
           </div>
+          )}
         </div>
       </div>
     </section>

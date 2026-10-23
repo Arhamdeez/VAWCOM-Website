@@ -262,6 +262,9 @@ body:has(.vaw-home) {
     box-shadow: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    /* No colour fade on hover-in: the lens appears at once, so the border and fill must too.
+       (Fading back out on leave still uses the base .vaw-glass-core transitions.) */
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .vawcom-marquee.is-svg-lens .vaw-glass:hover .vaw-glass-core,
