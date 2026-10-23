@@ -439,6 +439,41 @@ html.splash-exiting .splash-boot {
   animation-delay: var(--vaw-enter-delay, 0s);
 }
 
+/* Panels and messages */
+@keyframes vaw-pop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.97);
+  }
+}
+
+.vaw-pop-in {
+  transform-origin: bottom right;
+  animation: vaw-pop var(--vaw-dur-std) var(--vaw-ease) backwards;
+}
+
+.vaw-msg {
+  animation: vaw-enter var(--vaw-dur-std) var(--vaw-ease) backwards;
+}
+
+/* FAQ accordions glide open and shut where the browser can animate to `height: auto`
+   (Chromium today); elsewhere they simply snap, as before. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.vaw-faq::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size var(--vaw-dur-std) var(--vaw-ease),
+    content-visibility var(--vaw-dur-std) allow-discrete;
+}
+
+.vaw-faq[open]::details-content {
+  block-size: auto;
+}
+
 /* Reduced motion: no eased transitions, no smooth scrolling, no ambient loops. Framer Motion is
    handled by <MotionConfig reducedMotion="user"> in SiteShell. */
 @media (prefers-reduced-motion: reduce) {
@@ -451,6 +486,8 @@ html.splash-exiting .splash-boot {
   }
 
   .vaw-enter,
+  .vaw-pop-in,
+  .vaw-msg,
   .vaw-chat-bob,
   .vaw-globe-pin-dot,
   .vaw-globe-pin-dot::before,

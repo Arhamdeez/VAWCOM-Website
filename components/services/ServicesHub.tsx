@@ -193,18 +193,18 @@ export default function ServicesHub() {
               {SERVICE_FAQS.map((item) => (
                 <details
                   key={item.q}
-                  className="group rounded-[1.5rem] bg-white p-5 shadow-[0_10px_28px_rgba(22,22,21,0.06)] open:bg-[#e6faf3] open:shadow-[0_14px_36px_rgba(12,183,139,0.12)]"
+                  className="vaw-faq group rounded-[1.5rem] bg-white p-5 shadow-[0_10px_28px_rgba(22,22,21,0.06)] transition-[background-color,box-shadow] duration-std open:bg-[#e6faf3] open:shadow-[0_14px_36px_rgba(12,183,139,0.12)]"
                 >
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-3 text-[15px] font-semibold text-[#161615] marker:content-none [&::-webkit-details-marker]:hidden">
                     <span>{item.q}</span>
                     <span
                       aria-hidden
-                      className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/12 text-[18px] font-normal leading-none text-[#0cb78b] transition-transform group-open:rotate-45"
+                      className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/12 text-[18px] font-normal leading-none text-[#0cb78b] transition-transform duration-std group-open:rotate-45"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mb-0 mt-3 text-[14.5px] leading-relaxed text-[#5c5a56]">{item.a}</p>
+                  <p className="m-0 pt-3 text-[14.5px] leading-relaxed text-[#5c5a56]">{item.a}</p>
                 </details>
               ))}
             </div>

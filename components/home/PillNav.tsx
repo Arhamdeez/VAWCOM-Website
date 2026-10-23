@@ -69,7 +69,7 @@ function MobileNav({
   const ink = onDark ? 'text-white' : 'text-[#161615]';
 
   const sheet =
-    open && mounted
+    mounted
       ? createPortal(
           <AnimatePresence>
             {open ? (
@@ -82,7 +82,12 @@ function MobileNav({
                 transition={{ duration: DUR.std }}
                 className="fixed inset-0 z-[100] bg-[#f5f3ee]"
               >
-                <div className="flex h-full flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: DUR.std, delay: 0.05, ease }}
+                  className="flex h-full flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+                >
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <p className="m-0 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8a8882]">
                       Menu
@@ -184,7 +189,7 @@ function MobileNav({
                   >
                     Get Started
                   </Link>
-                </div>
+                </motion.div>
               </motion.div>
             ) : null}
           </AnimatePresence>,
@@ -375,7 +380,7 @@ function DesktopNav({
             <div
               role="menu"
               aria-label="Services"
-              className="absolute left-0 top-full z-[70] hidden pt-2 group-hover/svc:block group-focus-within/svc:block"
+              className="invisible absolute left-0 top-full z-[70] -translate-y-1 pt-2 opacity-0 transition-[opacity,transform,visibility] delay-150 duration-std group-focus-within/svc:visible group-focus-within/svc:translate-y-0 group-focus-within/svc:opacity-100 group-focus-within/svc:delay-0 group-hover/svc:visible group-hover/svc:translate-y-0 group-hover/svc:opacity-100 group-hover/svc:delay-0"
             >
               <div className="w-[min(17.5rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/50 bg-white/90 p-2 shadow-[0_20px_50px_rgba(22,22,21,0.12)]">
                 <Link

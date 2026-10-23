@@ -187,7 +187,7 @@ export default function ContactPage() {
               {status ? (
                 <p
                   role="status"
-                  className={`m-0 text-[14.5px] ${
+                  className={`vaw-msg m-0 text-[14.5px] ${
                     statusError ? 'text-[#c45c3a]' : 'text-[#0a9d77]'
                   }`}
                 >

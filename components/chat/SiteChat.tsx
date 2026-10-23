@@ -280,7 +280,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
         type="button"
         onClick={() => setDockOpen(true)}
         aria-label="Open chat"
-        className="vaw-chat-bob relative block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
+        className="vaw-chat-bob vaw-pop-in relative block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
       >
         <Image
           src="/bothead.png"
@@ -298,6 +298,8 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
     <div
       ref={panelRef}
       className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] shadow-[0_12px_40px_rgba(22,22,21,0.1)] ${
+        placement === 'dock' ? 'vaw-pop-in ' : ''
+      }${
         placement === 'hero'
           ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[28px]'
           : 'w-[min(22.5rem,calc(100vw-2rem))] rounded-[24px]'
@@ -342,7 +344,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           {messages.map((m, i) => (
             <div
               key={`${i}-${m.text.slice(0, 16)}`}
-              className={`max-w-[90%] rounded-2xl px-3.5 py-2 text-[14.5px] leading-snug ${
+              className={`vaw-msg max-w-[90%] rounded-2xl px-3.5 py-2 text-[14.5px] leading-snug ${
                 m.role === 'user'
                   ? 'self-end bg-[#0cb78b] text-[#f5f3ee]'
                   : 'self-start bg-[#f0eee8] text-[#161615]'
@@ -353,7 +355,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           ))}
           {typing ? (
             <div
-              className="self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[14.5px] leading-snug"
+              className="vaw-msg self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[14.5px] leading-snug"
               aria-label="Vawbot is typing"
             >
               <span className="inline-flex h-[1.25em] items-center gap-[5px]" aria-hidden>
@@ -433,9 +435,15 @@ function DockedChat() {
           />
         </motion.button>
       ) : docked ? (
-        <div key="dock" className="fixed bottom-5 right-5 z-[70]">
+        <motion.div
+          key="dock"
+          exit={{ opacity: 0, y: 8, scale: 0.98 }}
+          transition={{ duration: DUR.micro }}
+          style={{ transformOrigin: 'bottom right' }}
+          className="fixed bottom-5 right-5 z-[70]"
+        >
           <ChatPanel placement="dock" />
-        </div>
+        </motion.div>
       ) : null}
     </AnimatePresence>
   );
