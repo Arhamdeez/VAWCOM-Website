@@ -213,6 +213,17 @@ html.splash-exiting .splash-boot {
   }
 }
 
+/* Company film: the Play bubble is the cursor, so hide the real one (touch keeps its normal tap). */
+.vaw-film-hit {
+  cursor: none !important;
+}
+
+@media (pointer: coarse) {
+  .vaw-film-hit {
+    cursor: pointer !important;
+  }
+}
+
 /* Chat launcher bob — was a Framer y loop on a fixed element, present on every page. */
 @keyframes vaw-chat-bob {
   0%, 100% { translate: 0 0; }

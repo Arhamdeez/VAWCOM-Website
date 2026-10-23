@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import CompanyFilm from '@/components/about/CompanyFilm';
 import ProcessLightTrail from '@/components/about/ProcessLightTrail';
 import CreamPage from '@/components/services/CreamPage';
 import { FOUNDERS } from '@/components/home/data';
@@ -65,15 +66,7 @@ export default function About() {
               data-nav-contrast="dark"
               className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_12px_32px_rgba(22,22,21,0.08)]"
             >
-              <video
-                className="block aspect-video w-full bg-[#161615] object-contain"
-                src="/vawcom_video.mp4"
-                poster="/vawcom_video_poster.jpg"
-                controls
-                playsInline
-                preload="metadata"
-                aria-label="VAWCOM company film"
-              />
+              <CompanyFilm />
             </div>
           </motion.section>
 
