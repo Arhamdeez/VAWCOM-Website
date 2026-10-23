@@ -38,7 +38,7 @@ export default function FaqItem({
         <span>{q}</span>
         <span
           aria-hidden
-          className={`flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/12 text-[18px] font-normal leading-none text-[#0cb78b] transition-transform duration-std ${
+          className={`flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/15 text-[18px] font-normal leading-none text-[#0cb78b] transition-transform duration-std ${
             open ? 'rotate-45' : ''
           }`}
         >

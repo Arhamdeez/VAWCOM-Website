@@ -49,7 +49,7 @@ const TONE: Record<string, Tone> = {
   },
   commerce: {
     wash: '#000000',
-    chip: 'border-transparent bg-[#0cb78b]/22 text-[#2dd4a8]',
+    chip: 'border-transparent bg-[#0cb78b]/25 text-[#2dd4a8]',
     ink: '#0cb78b',
     title: '#ece9e3',
     body: 'rgba(236,233,227,0.72)',

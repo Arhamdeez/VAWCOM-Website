@@ -53,7 +53,7 @@ export default function AiPromoSection() {
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#161615]/8 px-6 py-3 text-[14.5px] font-medium text-[#161615] hover:bg-[#161615]/12"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#161615]/10 px-6 py-3 text-[14.5px] font-medium text-[#161615] hover:bg-[#161615]/15"
             >
               Talk to us
               <ArrowUpRight className="h-4 w-4" />

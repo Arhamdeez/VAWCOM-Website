@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import CreamPage from './CreamPage';
 import ServiceDeck from './ServiceDeck';
 import ServiceJump from './ServiceJump';
-import FaqItem from './FaqItem';
+import FaqGrid from './FaqGrid';
 import { SERVICES, SERVICE_FAQS } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
 import { EASE, DUR } from '@/lib/motion';
@@ -190,11 +190,8 @@ export default function ServicesHub() {
             <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
               Questions we get first
             </h2>
-            {/* items-start: each card keeps its own height, so opening one never stretches its neighbour */}
-            <div className="mt-8 grid items-start gap-4 sm:grid-cols-2">
-              {SERVICE_FAQS.map((item) => (
-                <FaqItem key={item.q} q={item.q} a={item.a} link={'link' in item ? item.link : undefined} />
-              ))}
+            <div className="mt-8">
+              <FaqGrid items={SERVICE_FAQS} />
             </div>
           </motion.section>
 
@@ -227,7 +224,7 @@ export default function ServicesHub() {
           {SHOW_GALLERY ? (
             <Link
               href="/gallery"
-              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/12 px-5 py-2.5 text-[14px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
+              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/15 px-5 py-2.5 text-[14px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
             >
               See gallery
               <ArrowUpRight className="h-4 w-4" />

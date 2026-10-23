@@ -68,7 +68,7 @@ export default function ServiceJump({
   return (
     <>
       {showMobile ? (
-        <div className="sticky top-[4.75rem] z-40 bg-[#f5f3ee]/92 backdrop-blur-md lg:hidden">
+        <div className="sticky top-[4.75rem] z-40 bg-[#f5f3ee]/90 backdrop-blur-md lg:hidden">
           <div className="flex gap-2 overflow-x-auto px-6 py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SERVICES.map((s) => {
               const className = `flex-none rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
