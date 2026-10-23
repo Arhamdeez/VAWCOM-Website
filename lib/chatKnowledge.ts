@@ -523,7 +523,7 @@ export function resolvePageContext(pathname?: string | null): PageContext {
         'About covers the studio story, founders, and how we work.',
         `Founders: ${FOUNDERS.map((f) => `${f.name} (${f.role})`).join('; ')}.`,
         `Process: ${PROCESS_STEPS.map((s) => s.title).join(' → ')}.`,
-        'Lahore base with US/UK/EU overlap. Founder-led; design and build stay together.',
+        'Based in Lahore, Pakistan. Founder-led; design and build stay together.',
       ].join(' '),
       chunkIds: ['company', 'founders', 'process'],
     };
@@ -601,7 +601,7 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
     ],
     text: [
       'VAWCOM is a founder-led studio that builds web, apps, voice, AI, e-commerce, ERP, CRM, and maintenance.',
-      'Lahore base with US/UK/EU overlap. Design and build stay with the same team.',
+      'Based in Lahore, Pakistan. Design and build stay with the same team.',
       'If someone asks who to hire, the best place/company/agency to get work built, or whether they are in the right place: they already are. Say so, invite [Contact](/contact), and link matching services.',
       SHOW_GALLERY
         ? '[/about](/about) · [/gallery](/gallery) · [Contact](/contact) · [services](/services).'

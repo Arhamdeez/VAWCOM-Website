@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import CreamPage from './CreamPage';
 import ServiceDeck from './ServiceDeck';
 import ServiceJump from './ServiceJump';
+import FaqItem from './FaqItem';
 import { SERVICES, SERVICE_FAQS } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
 import { EASE, DUR } from '@/lib/motion';
@@ -189,23 +190,10 @@ export default function ServicesHub() {
             <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
               Questions we get first
             </h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {/* items-start: each card keeps its own height, so opening one never stretches its neighbour */}
+            <div className="mt-8 grid items-start gap-4 sm:grid-cols-2">
               {SERVICE_FAQS.map((item) => (
-                <details
-                  key={item.q}
-                  className="vaw-faq group rounded-[1.5rem] bg-white p-5 shadow-[0_10px_28px_rgba(22,22,21,0.06)] transition-[background-color,box-shadow] duration-std open:bg-[#e6faf3] open:shadow-[0_14px_36px_rgba(12,183,139,0.12)]"
-                >
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-3 text-[15px] font-semibold text-[#161615] marker:content-none [&::-webkit-details-marker]:hidden">
-                    <span>{item.q}</span>
-                    <span
-                      aria-hidden
-                      className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/12 text-[18px] font-normal leading-none text-[#0cb78b] transition-transform duration-std group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <p className="m-0 pt-3 text-[14.5px] leading-relaxed text-[#5c5a56]">{item.a}</p>
-                </details>
+                <FaqItem key={item.q} q={item.q} a={item.a} link={'link' in item ? item.link : undefined} />
               ))}
             </div>
           </motion.section>

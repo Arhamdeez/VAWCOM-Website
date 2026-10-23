@@ -320,7 +320,8 @@ export const SERVICE_FAQS = [
   },
   {
     q: 'How long does a project take?',
-    a: 'A marketing site is usually weeks. An app, voice line, or store depends on the first version. We put dates on paper before we write code.',
+    a: 'It depends on your requirements. Get in touch for a consultation and we will map out a clear timeline for your project.',
+    link: { label: 'Book a consultation', href: '/contact' },
   },
   {
     q: 'Do you take over existing code?',
@@ -328,6 +329,6 @@ export const SERVICE_FAQS = [
   },
   {
     q: 'Where are you based?',
-    a: 'Lahore, with real overlap across US, UK, and EU days.',
+    a: 'VAWCOM is based in Lahore, Pakistan.',
   },
 ] as const;

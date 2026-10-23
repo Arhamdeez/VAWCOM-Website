@@ -25,49 +25,49 @@ type Tone = {
 const TONE: Record<string, Tone> = {
   web: {
     wash: '#000000',
-    chip: 'bg-[#0cb78b]/20 text-[#2dd4a8]',
+    chip: 'border-transparent bg-[#0cb78b]/20 text-[#2dd4a8]',
     ink: '#0cb78b',
     title: '#ece9e3',
     body: 'rgba(236,233,227,0.72)',
   },
   apps: {
     wash: '#000000',
-    chip: 'bg-[#0cb78b]/20 text-[#2dd4a8]',
+    chip: 'border-transparent bg-[#0cb78b]/20 text-[#2dd4a8]',
     ink: '#0cb78b',
     title: '#ece9e3',
     body: 'rgba(236,233,227,0.72)',
   },
   voice: {
     wash: 'linear-gradient(155deg, #e4f7f0 0%, #f5f3ee 50%, #ffffff 100%)',
-    chip: 'bg-[#0a9d77]/14 text-[#067055]',
+    chip: 'border-[#0a9d77]/45 text-[#067055]',
     ink: '#0a9d77',
   },
   ai: {
     wash: 'linear-gradient(155deg, #ddf5eb 0%, #f0f7f3 48%, #fbf6ec 100%)',
-    chip: 'bg-[#0cb78b]/18 text-[#056b50]',
+    chip: 'border-[#0cb78b]/50 text-[#056b50]',
     ink: '#067a5a',
   },
   commerce: {
     wash: '#000000',
-    chip: 'bg-[#0cb78b]/22 text-[#2dd4a8]',
+    chip: 'border-transparent bg-[#0cb78b]/22 text-[#2dd4a8]',
     ink: '#0cb78b',
     title: '#ece9e3',
     body: 'rgba(236,233,227,0.72)',
   },
   care: {
     wash: 'linear-gradient(155deg, #f0f8f4 0%, #f5f3ee 50%, #fbf6ec 100%)',
-    chip: 'bg-[#429f7f]/14 text-[#2f6b55]',
+    chip: 'border-[#429f7f]/50 text-[#2f6b55]',
     ink: '#429f7f',
   },
   erp: {
     wash: 'linear-gradient(155deg, #e8f4ef 0%, #f5f3ee 52%, #ffffff 100%)',
-    chip: 'bg-[#3d7a6a]/14 text-[#2a564a]',
+    chip: 'border-[#3d7a6a]/50 text-[#2a564a]',
     ink: '#3d7a6a',
   },
   crm: {
-    wash: 'linear-gradient(155deg, #fbf0e8 0%, #f5f3ee 48%, #ffffff 100%)',
-    chip: 'bg-[#e07a4a]/16 text-[#9a4a28]',
-    ink: '#c45f2f',
+    wash: 'linear-gradient(155deg, #e8f4ef 0%, #f5f3ee 52%, #ffffff 100%)',
+    chip: 'border-[#0cb78b]/50 text-[#067055]',
+    ink: '#0a9d77',
   },
 };
 
@@ -98,14 +98,14 @@ const SIZE: Record<string, CardSize> = {
 
 const SIZE_CLASS: Record<CardSize, string> = {
   tall: 'min-h-[28rem] p-7',
-  mid: 'min-h-[17rem] p-5',
+  mid: 'p-5',
   short: 'min-h-[10rem] p-3.5',
 };
 
 const TITLE_CLASS: Record<CardSize, string> = {
   tall: 'text-[clamp(1.7rem,2.2vw,2.05rem)]',
-  mid: 'text-[1.3rem]',
-  short: 'text-[1.05rem]',
+  mid: 'text-[1.5rem]',
+  short: 'text-[1.25rem]',
 };
 
 function TeaserCard({ service }: { service: Service }) {
@@ -140,12 +140,15 @@ function TeaserCard({ service }: { service: Service }) {
       >
         {service.title}
       </h3>
+      {/* No picture: the free space sits between the title and the description, so the description
+          lands right above the pills instead of floating away from them. */}
+      {!isWeb && !isApps ? <span className="relative mt-auto" aria-hidden /> : null}
       {size === 'tall' ? (
         <p className="relative mt-3 mb-0 text-[14px] leading-relaxed" style={{ color: bodyColor }}>
           {service.lede}
         </p>
       ) : size === 'mid' ? (
-        <p className="relative mt-2.5 mb-0 line-clamp-3 text-[13px] leading-snug" style={{ color: bodyColor }}>
+        <p className="relative mt-3 mb-0 line-clamp-3 text-[13px] leading-snug" style={{ color: bodyColor }}>
           {service.lede}
         </p>
       ) : (
@@ -181,14 +184,12 @@ function TeaserCard({ service }: { service: Service }) {
             className="pointer-events-none h-full max-h-[11.5rem] w-auto max-w-[90%] select-none object-contain object-center"
           />
         </span>
-      ) : (
-        <span className="relative mt-auto" aria-hidden />
-      )}
+      ) : null}
       <ul className="relative mt-4 mb-0 flex list-none flex-wrap gap-1.5 p-0">
         {service.extras.slice(0, chips).map((x) => (
           <li
             key={x}
-            className={`rounded-full px-2.5 py-1 font-medium ${tone.chip} ${size === 'short' ? 'text-[10.5px]' : 'text-[11.5px]'}`}
+            className={`rounded-full border px-2.5 py-[3px] font-medium ${tone.chip} ${size === 'short' ? 'text-[10.5px]' : 'text-[11.5px]'}`}
           >
             {x}
           </li>
