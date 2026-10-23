@@ -11,6 +11,7 @@ import { PROCESS_STEPS } from '@/lib/process';
 import { projectsFor } from '@/lib/work';
 import { STACK_ICONS, stackIconUrl } from '@/lib/stackIcons';
 import { SHOW_GALLERY } from '@/lib/site';
+import Reveal from '@/components/Reveal';
 
 const shell = 'mx-auto w-full max-w-[1100px] px-6 sm:px-8 lg:px-10 lg:pl-24';
 
@@ -110,7 +111,7 @@ export default function ServiceDetail({ service }: { service: Service }) {
             </div>
           </div>
 
-          <section className="mt-12">
+          <Reveal as="section" className="mt-12">
             <h2 className="vaw-display m-0 text-[clamp(1.4rem,2.5vw,1.85rem)] tracking-[-0.03em] text-[#161615]">
               What this service <span className="text-[#0cb78b]">can</span> include
             </h2>
@@ -127,9 +128,9 @@ export default function ServiceDetail({ service }: { service: Service }) {
                 </div>
               ))}
             </div>
-          </section>
+          </Reveal>
 
-          <section
+          <Reveal as="section"
             data-nav-contrast="dark"
             className="mt-12 rounded-[1.35rem] bg-[#161615] p-6 sm:p-8"
           >
@@ -171,9 +172,9 @@ export default function ServiceDetail({ service }: { service: Service }) {
                 </div>
               ))}
             </div>
-          </section>
+          </Reveal>
 
-          <div className="mt-8 flex w-full flex-col gap-5 rounded-[1.35rem] bg-[#0cb78b] px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:px-8 sm:py-6">
+          <Reveal className="mt-8 flex w-full flex-col gap-5 rounded-[1.35rem] bg-[#0cb78b] px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:px-8 sm:py-6">
             <div className="min-w-0">
               <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#0b0d0c]/70">
                 Stack we often use
@@ -191,9 +192,9 @@ export default function ServiceDetail({ service }: { service: Service }) {
               See full stack
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
-          </div>
+          </Reveal>
 
-          <section className="mt-12">
+          <Reveal as="section" className="mt-12">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="vaw-display m-0 text-[clamp(1.4rem,2.5vw,1.85rem)] tracking-[-0.03em] text-[#161615]">
                 Related work
@@ -219,9 +220,9 @@ export default function ServiceDetail({ service }: { service: Service }) {
                 Nothing public yet. On a call we can walk through a similar build if you need examples.
               </p>
             )}
-          </section>
+          </Reveal>
 
-          <div className="mt-12 flex flex-wrap items-center gap-3">
+          <Reveal className="mt-12 flex flex-wrap items-center gap-3">
             <Link
               href={contactHref}
               className="inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-6 py-3 text-[14.5px] font-medium text-[#0b0d0c] hover:bg-[#0a9d77] hover:text-[#0b0d0c]"
@@ -236,7 +237,7 @@ export default function ServiceDetail({ service }: { service: Service }) {
               All services
               <ArrowUpRight className="h-4 w-4" />
             </Link>
-          </div>
+          </Reveal>
         </div>
       </div>
     </CreamPage>

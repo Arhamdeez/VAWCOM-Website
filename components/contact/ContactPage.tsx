@@ -7,6 +7,7 @@ import CreamPage from '@/components/services/CreamPage';
 import CtaFooter from '@/components/home/CtaFooter';
 import { CONTACT_EMAIL, getGmailComposeUrl, SHOW_GALLERY } from '@/lib/site';
 import { SERVICES } from '@/lib/services';
+import Reveal from '@/components/Reveal';
 
 const SERVICE_OPTIONS = [
   'Select a service',
@@ -196,7 +197,7 @@ export default function ContactPage() {
             </div>
           </form>
 
-          <aside className="flex flex-col gap-4">
+          <Reveal as="aside" className="flex flex-col gap-4">
             <div data-nav-contrast="dark" className="rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
               <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
                 Email us
@@ -238,7 +239,7 @@ export default function ContactPage() {
               Compare services
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
-          </aside>
+          </Reveal>
         </div>
       </div>
 

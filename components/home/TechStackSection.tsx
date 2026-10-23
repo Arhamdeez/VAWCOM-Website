@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { STACK_ICONS, stackIconUrl } from '@/lib/stackIcons';
+import Reveal from '@/components/Reveal';
 
 type Tech = { name: string };
 
@@ -116,10 +117,10 @@ export default function TechStackSection() {
       <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-16 bg-gradient-to-r from-[#f5f3ee] to-transparent sm:w-24" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-16 bg-gradient-to-l from-[#f5f3ee] to-transparent sm:w-24" />
 
-      <div className="relative flex flex-col gap-4 sm:gap-5">
+      <Reveal className="relative flex flex-col gap-4 sm:gap-5">
         <MarqueeRow items={ROW_A} direction="left" />
         <MarqueeRow items={ROW_B} direction="right" />
-      </div>
+      </Reveal>
     </section>
   );
 }

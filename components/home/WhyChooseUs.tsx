@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { RefObject } from 'react';
+import Reveal from '@/components/Reveal';
 
 const AsciiGlobe = dynamic(() => import('./AsciiGlobe'), { ssr: false });
 
@@ -37,7 +38,7 @@ export default function WhyChooseUs({
           <AsciiGlobe />
         </div>
 
-        <div className="relative z-[2]">
+        <Reveal delay={0.08} className="relative z-[2]">
           <p className="mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
             Why choose us
           </p>
@@ -72,7 +73,7 @@ export default function WhyChooseUs({
             Start a project
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -409,6 +409,36 @@ html.splash-exiting .splash-boot {
   }
 }
 
+/* Shared scroll reveal (components/Reveal.tsx) and the hero's CSS entrance. */
+[data-reveal] {
+  transition:
+    opacity var(--vaw-dur-enter) var(--vaw-ease) var(--vaw-reveal-delay, 0s),
+    transform var(--vaw-dur-enter) var(--vaw-ease) var(--vaw-reveal-delay, 0s);
+}
+
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+[data-reveal='in'] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes vaw-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+}
+
+/* Starts on first paint (CSS is render-blocking) instead of waiting for React to hydrate. */
+.vaw-enter {
+  animation: vaw-enter var(--vaw-dur-enter) var(--vaw-ease) backwards;
+  animation-delay: var(--vaw-enter-delay, 0s);
+}
+
 /* Reduced motion: no eased transitions, no smooth scrolling, no ambient loops. Framer Motion is
    handled by <MotionConfig reducedMotion="user"> in SiteShell. */
 @media (prefers-reduced-motion: reduce) {
@@ -420,6 +450,7 @@ html.splash-exiting .splash-boot {
     scroll-behavior: auto !important;
   }
 
+  .vaw-enter,
   .vaw-chat-bob,
   .vaw-globe-pin-dot,
   .vaw-globe-pin-dot::before,

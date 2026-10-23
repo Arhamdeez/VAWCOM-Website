@@ -91,11 +91,9 @@ export default function HeroSection() {
                 : 'items-start text-left pr-[6.5rem] sm:pr-[8rem] lg:pr-0'
             }`}
           >
-            <motion.h1
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DUR.enter, ease: EASE }}
-              className={`vaw-display m-0 leading-[0.94] tracking-[-0.03em] text-[#161615] ${
+            <h1
+              style={{ '--vaw-enter-delay': '0s' } as React.CSSProperties}
+              className={`vaw-enter vaw-display m-0 leading-[0.94] tracking-[-0.03em] text-[#161615] ${
                 CENTERED
                   ? 'max-w-[20ch] text-[clamp(2.2rem,5.6vw,4.5rem)]'
                   : 'max-w-[15ch] text-[clamp(2.2rem,5.8vw,4.75rem)]'
@@ -106,14 +104,12 @@ export default function HeroSection() {
               <span className="block" style={{ color: ACCENT }}>
                 technical part
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.ul
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DUR.enter, delay: 0.1, ease: EASE }}
+            <ul
+              style={{ '--vaw-enter-delay': '0.1s' } as React.CSSProperties}
               aria-label="What we build"
-              className={`m-0 flex list-none flex-col gap-y-1 p-0 font-semibold leading-[1.45] tracking-[-0.01em] text-[#161615] sm:flex-row sm:flex-wrap sm:gap-x-3 ${
+              className={`vaw-enter m-0 flex list-none flex-col gap-y-1 p-0 font-semibold leading-[1.45] tracking-[-0.01em] text-[#161615] sm:flex-row sm:flex-wrap sm:gap-x-3 ${
                 CENTERED
                   ? 'mt-6 items-center text-[clamp(0.95rem,1.7vw,1.3rem)] sm:justify-center'
                   : 'mt-5 items-start text-[clamp(0.95rem,1.9vw,1.3rem)]'
@@ -138,13 +134,11 @@ export default function HeroSection() {
                   ))}
                 </li>
               ))}
-            </motion.ul>
+            </ul>
 
-            <motion.p
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DUR.enter, delay: 0.16, ease: EASE }}
-              className={`leading-relaxed text-[#5c5a56] ${
+            <p
+              style={{ '--vaw-enter-delay': '0.16s' } as React.CSSProperties}
+              className={`vaw-enter leading-relaxed text-[#5c5a56] ${
                 CENTERED
                   ? 'mt-5 max-w-[46ch] text-[clamp(0.95rem,1.6vw,1.1rem)]'
                   : 'mt-5 max-w-[34ch] text-[clamp(0.95rem,1.6vw,1.05rem)]'
@@ -155,13 +149,11 @@ export default function HeroSection() {
                 start to finish
               </span>
               , whether you&apos;re a company or one person with an idea.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DUR.enter, delay: 0.2, ease: EASE }}
-              className={CENTERED ? 'mt-6' : 'mt-6'}
+            <div
+              style={{ '--vaw-enter-delay': '0.2s' } as React.CSSProperties}
+              className={`vaw-enter ${CENTERED ? 'mt-6' : 'mt-6'}`}
             >
               <Link
                 href="/contact"
@@ -172,13 +164,11 @@ export default function HeroSection() {
                 Start building
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DUR.enter, delay: 0.26, ease: EASE }}
-              className={`mt-7 flex w-full flex-col items-stretch gap-2.5 ${
+            <div
+              style={{ '--vaw-enter-delay': '0.26s' } as React.CSSProperties}
+              className={`vaw-enter mt-7 flex w-full flex-col items-stretch gap-2.5 ${
                 CENTERED ? 'max-w-[38rem] [&>div]:w-full [&>div]:max-w-full' : 'max-w-[28rem] lg:items-start'
               }`}
             >
@@ -196,7 +186,7 @@ export default function HeroSection() {
                   </button>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Mobile: bot slides in beside the headline instead of stacking below */}
             {!CENTERED && (

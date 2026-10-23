@@ -7,6 +7,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { SERVICE_TRACK } from '@/lib/services';
 import LiquidLens from './LiquidLens';
 import { EASE, DUR } from '@/lib/motion';
+import Reveal from '@/components/Reveal';
 
 /**
  * Desktop grid is 6 columns, each card spans 2. A short last row is centred under the full rows:
@@ -29,7 +30,7 @@ export default function ServicesSection() {
       className="vaw-hero relative z-[2] overflow-visible border-t border-black/[0.06] pb-10 pt-14 sm:pb-12 sm:pt-16"
     >
       <div className="mx-auto max-w-[1440px] px-6 sm:px-8">
-        <div className="mx-auto max-w-[40rem] text-center">
+        <Reveal className="mx-auto max-w-[40rem] text-center">
           <p className="mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
             Services
           </p>
@@ -39,9 +40,9 @@ export default function ServicesSection() {
           <p className="mx-auto mt-5 max-w-[34ch] text-[16px] leading-relaxed text-[#5c5a56]">
             Sites, apps, and AI for founders and teams — same people start to finish.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="relative mt-8 sm:mt-10">
+        <Reveal delay={0.08} className="relative mt-8 sm:mt-10">
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-x-8 -inset-y-10 -z-0 blur-3xl"
@@ -106,9 +107,9 @@ export default function ServicesSection() {
           <p className="mt-3 text-center text-[12.5px] text-[#8a8882] lg:hidden">
             Swipe to see all services
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:mt-16">
+        <Reveal delay={0.1} className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:mt-16">
           <Link
             href="/contact"
             className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-6 py-3 text-[14.5px] font-medium text-[#f5f3ee] hover:bg-[#0a9d77]"
@@ -122,7 +123,7 @@ export default function ServicesSection() {
             All services
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
