@@ -244,13 +244,15 @@ const FIXTURES: Fixture[] = [
     },
   },
   {
-    name: 'how are you → chitchat (Ollama path; offline fallback in CI)',
+    name: 'how are you → chitchat wellbeing',
     message: 'how are you?',
     expectIntent: 'chitchat',
+    useLocalFirst: true,
     assert: (reply) => {
-      assertShort(reply, 2);
+      assertHas(reply, /well|good|thanks|here/i, 'acknowledges wellbeing');
+      assertHas(reply, /\/services|build|project/i, 'soft steer');
       assertNoMeta(reply);
-      assertNoBrainstorm(reply);
+      assertShort(reply, 3);
     },
   },
   {
@@ -305,9 +307,51 @@ const FIXTURES: Fixture[] = [
     name: 'hru → chitchat',
     message: 'hru',
     expectIntent: 'chitchat',
+    useLocalFirst: true,
     assert: (reply) => {
       assertHas(reply, /\/services|build|launch|project/i, 'steer back');
       assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'how are u → chitchat wellbeing',
+    message: 'how are u',
+    expectIntent: 'chitchat',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /well|good|thanks|here/i, 'acknowledges wellbeing');
+      assertHas(reply, /\/services|build|project/i, 'soft steer');
+      if (/main goal: a site|not general Q&A/i.test(reply)) {
+        throw new Error(`wrong lane for how are u: ${reply}`);
+      }
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'what is your name → vawbot',
+    message: 'what is your name',
+    expectIntent: 'chitchat',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /Vawbot/i, 'names the bot');
+      assertHas(reply, /\/services|\/about/i, 'useful link');
+      if (/not general Q&A|outside what i cover/i.test(reply)) {
+        throw new Error(`treated name ask as off-topic: ${reply}`);
+      }
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'i dont need anything → polite close',
+    message: 'i dont need anything',
+    expectIntent: 'thanks',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /no problem|all good|sounds good|anytime|around/i, 'polite close');
+      if (/User Safety|Response Safety|main goal: a site/i.test(reply)) {
+        throw new Error(`bad decline reply: ${reply}`);
+      }
       assertShort(reply, 3);
     },
   },
@@ -374,6 +418,28 @@ const FIXTURES: Fixture[] = [
       if (/the user (just )?said|they('re| are) unsure/i.test(reply)) {
         throw new Error(`CoT leak: ${reply}`);
       }
+    },
+  },
+  {
+    name: 'who is your team → about',
+    message: 'who is your team?',
+    expectIntent: 'general',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /\/about/, 'about link');
+      assertHas(reply, /Arham|Shahbakht|founder/i, 'names founders');
+      assertNoMeta(reply);
+      assertShort(reply, 3);
+    },
+  },
+  {
+    name: 'tell me about the founders → about',
+    message: 'tell me about the founders',
+    expectIntent: 'general',
+    useLocalFirst: true,
+    assert: (reply) => {
+      assertHas(reply, /\/about/, 'about link');
+      assertHas(reply, /founder/i, 'mentions founders');
     },
   },
 ];
@@ -450,6 +516,17 @@ function runSanitizerChecks() {
     EMPTY_RETRIEVAL
   );
   assertNoBrainstorm(brainstorm);
+
+  const safetyLeak = applySafetyNets(
+    'User Safety: safe Response Safety: safe',
+    'thanks',
+    'i dont need anything',
+    EMPTY_RETRIEVAL,
+  );
+  if (/User Safety|Response Safety/i.test(safetyLeak)) {
+    throw new Error(`safety tags leaked: ${safetyLeak}`);
+  }
+  if (!safetyLeak.trim()) throw new Error('safety leak strip left empty reply');
 }
 
 function runPageContextChecks() {

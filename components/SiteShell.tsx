@@ -78,8 +78,10 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <CursorGlow />
       <SplashScreenWrapper cream={cream}>
         <main
-          className={`relative min-h-0 w-full supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))] ${
-            cream ? 'bg-[#f5f3ee]' : 'overflow-x-hidden bg-[#050a14]'
+          className={`relative min-h-0 w-full ${
+            cream
+              ? 'bg-[#f5f3ee]'
+              : 'overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]'
           }`}
         >
           {children}

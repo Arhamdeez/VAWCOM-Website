@@ -1,18 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { STEPS } from '@/lib/partners';
+import { railBoltKeys } from '@/lib/motion';
 
 /**
- * The five steps. The line draws itself and the cards settle in one after another the first time the
- * block reaches the screen (scroll check, not IntersectionObserver, so a fast jump can't skip it).
+ * The five steps. Cards settle in on first view; on desktop a glowing bolt runs the rail between
+ * the numbered nodes (same motion as About → Our process). Stacked below lg: number over card, no rail.
  */
 export default function StepFlow() {
-  const ref = useRef<HTMLOListElement>(null);
+  const reduce = useReducedMotion();
+  const uid = useId().replace(/:/g, '');
+  const listRef = useRef<HTMLOListElement>(null);
+  const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [seen, setSeen] = useState(false);
+  const [pathD, setPathD] = useState('');
+  const [rail, setRail] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
-    const el = ref.current;
+    const el = listRef.current;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const id = requestAnimationFrame(() => setSeen(true));
@@ -34,40 +41,118 @@ export default function StepFlow() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const root = list.getBoundingClientRect();
+      const points = nodeRefs.current
+        .map((el) => {
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          return {
+            x: r.left - root.left + r.width / 2,
+            y: r.top - root.top + r.height / 2,
+          };
+        })
+        .filter((p): p is { x: number; y: number } => p != null);
+
+      setRail({ w: root.width, h: root.height });
+
+      if (points.length < 2) {
+        setPathD('');
+        return;
+      }
+      const [first, ...rest] = points;
+      setPathD(
+        `M${first.x} ${first.y} ${rest.map((p) => `L${p.x} ${p.y}`).join(' ')}`,
+      );
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(list);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  const pathId = `${uid}-rail`;
+  const bolt = railBoltKeys(STEPS.length);
+
   return (
     <ol
-      ref={ref}
+      ref={listRef}
       className="relative m-0 grid list-none gap-5 p-0 lg:grid-cols-5 lg:gap-4"
     >
-      {/* drawn line: vertical on phones, horizontal from lg up */}
-      <span
+      <svg
         aria-hidden
-        className={`absolute bottom-6 left-[1.35rem] top-6 w-0.5 origin-top rounded-full bg-gradient-to-b from-[#0cb78b] to-[#0cb78b]/20 transition-transform duration-[1400ms] ease-out lg:hidden ${
-          seen ? 'scale-y-100' : 'scale-y-0'
-        }`}
-      />
-      <span
-        aria-hidden
-        className={`absolute left-[10%] right-[10%] top-[1.35rem] hidden h-0.5 origin-left rounded-full bg-gradient-to-r from-[#0cb78b] to-[#0cb78b]/25 transition-transform duration-[1600ms] ease-out lg:block ${
-          seen ? 'scale-x-100' : 'scale-x-0'
-        }`}
-      />
+        className="pointer-events-none absolute left-0 top-0 z-0 hidden overflow-visible lg:block"
+        width={Math.max(rail.w, 1)}
+        height={Math.max(rail.h, 1)}
+        viewBox={`0 0 ${Math.max(rail.w, 1)} ${Math.max(rail.h, 1)}`}
+      >
+        <defs>
+          {pathD ? <path id={pathId} d={pathD} /> : null}
+          <filter id={`${uid}-glow`} x="-120%" y="-120%" width="340%" height="340%">
+            <feGaussianBlur stdDeviation="2.4" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        {pathD ? (
+          <path
+            d={pathD}
+            fill="none"
+            stroke="rgba(12,183,139,0.35)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ) : null}
+        {!reduce && pathD && bolt ? (
+          <circle r={3.8} fill="#0cb78b" filter={`url(#${uid}-glow)`}>
+            <animateMotion
+              dur={bolt.dur}
+              repeatCount="indefinite"
+              calcMode="linear"
+              keyPoints={bolt.keyPoints}
+              keyTimes={bolt.keyTimes}
+            >
+              <mpath xlinkHref={`#${pathId}`} href={`#${pathId}`} />
+            </animateMotion>
+          </circle>
+        ) : null}
+      </svg>
+
       {STEPS.map((step, i) => (
         <li
           key={step.title}
-          className={`relative flex gap-4 transition-[opacity,transform] duration-enter lg:flex-col lg:items-center lg:gap-5 lg:text-center ${
-            seen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`}
-          style={{ transitionDelay: seen ? `${250 + i * 160}ms` : '0ms' }}
+          className="relative z-[1] flex flex-col items-center gap-3 lg:gap-5 lg:text-center"
         >
-          <span className="relative z-[1] flex h-11 w-11 flex-none items-center justify-center rounded-full border border-[#0cb78b]/40 bg-[#f5f3ee] font-mono text-[13px] font-semibold text-[#0a9d77] shadow-[0_0_0_5px_#f5f3ee,0_0_22px_rgba(12,183,139,0.25)]">
+          <span
+            ref={(el) => {
+              nodeRefs.current[i] = el;
+            }}
+            className="relative z-[1] flex h-11 w-11 flex-none items-center justify-center rounded-full border border-[#0cb78b]/40 bg-[#f5f3ee] font-mono text-[0.8125rem] font-semibold text-[#0a9d77] shadow-[0_0_0_0.3125rem_#f5f3ee,0_0_1.375rem_rgba(12,183,139,0.25)]"
+          >
             {String(i + 1).padStart(2, '0')}
           </span>
-          <div className="min-w-0 flex-1 rounded-[1.25rem] bg-white px-5 py-4 text-left shadow-[0_10px_28px_rgba(22,22,21,0.05)] lg:w-full lg:flex-none lg:text-center">
-            <h3 className="m-0 text-[15.5px] font-semibold tracking-[-0.01em] text-[#161615]">
+          <div
+            className={`w-full min-w-0 rounded-[1.25rem] bg-white px-5 py-4 text-left shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.05)] transition-[opacity,transform] duration-enter lg:text-center ${
+              seen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
+            style={{ transitionDelay: seen ? `${250 + i * 160}ms` : '0ms' }}
+          >
+            <h3 className="m-0 text-[0.9688rem] font-semibold tracking-[-0.01em] text-[#161615]">
               {step.title}
             </h3>
-            <p className="mb-0 mt-1.5 text-[13.5px] leading-relaxed text-[#5c5a56]">{step.body}</p>
+            <p className="mb-0 mt-1.5 text-[0.8438rem] leading-relaxed text-[#5c5a56]">{step.body}</p>
           </div>
         </li>
       ))}

@@ -441,7 +441,7 @@ export default function AsciiGlobe() {
           <div className="vaw-glass">
           <div className="vaw-glass-core rounded-[1.15rem] px-4 py-3.5">
             <div className="flex items-start justify-between gap-3">
-              <p className="m-0 text-[13px] font-medium uppercase tracking-[0.12em] text-[#8a8882]">
+              <p className="m-0 text-[0.8125rem] font-medium uppercase tracking-[0.12em] text-[#8a8882]">
                 {open.name}
               </p>
               <button
@@ -453,31 +453,31 @@ export default function AsciiGlobe() {
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
-            <p className="mt-2 mb-0 text-[13.5px] leading-snug text-[#161615]">{open.blurb}</p>
+            <p className="mt-2 mb-0 text-[0.8438rem] leading-snug text-[#161615]">{open.blurb}</p>
             <ul className="mt-3 mb-0 list-none space-y-1.5 p-0">
               {projectsForPlace(open).map((p) => (
                 <li key={p.id}>
                   {SHOW_GALLERY ? (
                     <Link
                       href={`/gallery#${p.id}`}
-                      className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                      className="inline-flex items-center gap-1 text-[0.8125rem] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
                     >
                       {p.title}
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </Link>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b]">
+                    <span className="inline-flex items-center gap-1 text-[0.8125rem] font-medium text-[#0cb78b]">
                       {p.title}
                     </span>
                   )}
-                  <p className="m-0 text-[12.5px] leading-snug text-[#5c5a56]">{p.summary}</p>
+                  <p className="m-0 text-[0.7813rem] leading-snug text-[#5c5a56]">{p.summary}</p>
                 </li>
               ))}
               {SHOW_GALLERY ? (
                 <li>
                   <Link
                     href="/gallery"
-                    className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                    className="inline-flex items-center gap-1 text-[0.8125rem] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
                   >
                     {projectsForPlace(open).length ? 'All public work' : 'See the gallery'}
                     <ArrowUpRight className="h-3.5 w-3.5" />

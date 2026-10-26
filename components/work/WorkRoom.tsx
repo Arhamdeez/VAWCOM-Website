@@ -472,13 +472,13 @@ export default function WorkRoom() {
     return (
       <div className="min-h-svh bg-[#f5f3ee] text-[#161615]">
         <div className="mx-auto max-w-lg px-5 pb-16 pt-28">
-          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+          <p className="mb-3 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
             Gallery
           </p>
           <h1 className="vaw-display m-0 text-[clamp(2rem,8vw,2.75rem)] tracking-[-0.03em] text-[#161615]">
             Selected work
           </h1>
-          <p className="mt-3 mb-0 max-w-[36ch] text-[15px] leading-relaxed text-[#5c5a56]">
+          <p className="mt-3 mb-0 max-w-[36ch] text-[0.9375rem] leading-relaxed text-[#5c5a56]">
             Tap a project for the full write-up.
           </p>
           <ul className="mt-8 m-0 list-none space-y-3 p-0">
@@ -487,15 +487,15 @@ export default function WorkRoom() {
                 <button
                   type="button"
                   onClick={() => openPanel(n)}
-                  className="flex w-full flex-col rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 text-left shadow-[0_10px_28px_rgba(22,22,21,0.05)] transition-colors hover:border-[#0cb78b]/35"
+                  className="flex w-full flex-col rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 text-left shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.05)] transition-colors hover:border-[#0cb78b]/35"
                 >
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
+                  <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
                     {domainLabel(slide.service)}
                   </span>
                   <span className="vaw-display mt-1.5 text-[1.35rem] tracking-[-0.02em] text-[#161615]">
                     {slide.title}
                   </span>
-                  <span className="mt-2 text-[14px] leading-snug text-[#5c5a56]">
+                  <span className="mt-2 text-[0.875rem] leading-snug text-[#5c5a56]">
                     {slide.summary}
                   </span>
                 </button>

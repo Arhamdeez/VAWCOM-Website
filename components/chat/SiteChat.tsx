@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 import Link from 'next/link';
@@ -16,8 +17,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Send, X } from 'lucide-react';
 import { DUR } from '@/lib/motion';
+import { isAllowedChatHref } from '@/lib/chatLinks';
 
 type ChatMsg = { role: 'user' | 'ai'; text: string };
+
+const MAX_DRAFT_CHARS = 800;
 
 type ChatContextValue = {
   messages: ChatMsg[];
@@ -53,10 +57,11 @@ function ChatRichText({ text, onNavigate }: { text: string; onNavigate: (href: s
     if (idx > last) nodes.push(text.slice(last, idx));
     const label = m[1];
     const href = m[2];
-    const internal = href.startsWith('/') || href.startsWith('#');
-    const cls = 'font-medium text-[#0cb78b] underline decoration-[#0cb78b]/70 underline-offset-[3px] hover:text-[#0a9d77]';
-    nodes.push(
-      internal ? (
+    const cls = 'font-medium text-[#0cb78b] underline decoration-[#0cb78b]/70 underline-offset-[0.1875rem] hover:text-[#0a9d77]';
+    if (!isAllowedChatHref(href)) {
+      nodes.push(<span key={i}>{label}</span>);
+    } else if (href.startsWith('/') || href.startsWith('#')) {
+      nodes.push(
         <Link
           key={i}
           href={href}
@@ -67,13 +72,15 @@ function ChatRichText({ text, onNavigate }: { text: string; onNavigate: (href: s
           className={cls}
         >
           {label}
-        </Link>
-      ) : (
+        </Link>,
+      );
+    } else {
+      nodes.push(
         <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={cls}>
           {label}
-        </a>
-      ),
-    );
+        </a>,
+      );
+    }
     i += 1;
     last = idx + m[0].length;
   }
@@ -91,6 +98,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [dockOpen, setDockOpen] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const [forceDock, setForceDock] = useState(false);
+  const askAbort = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (pathname !== '/') {
@@ -124,34 +132,50 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const ask = useCallback(
     async (q?: string) => {
-      const text = (q ?? draft).trim();
+      const text = (q ?? draft).trim().slice(0, MAX_DRAFT_CHARS);
       if (!text || typing) return;
       setDraft('');
       setClosed(false);
       const nextHistory = [...messages, { role: 'user' as const, text }];
       setMessages(nextHistory);
       setTyping(true);
+      askAbort.current?.abort();
+      const ctrl = new AbortController();
+      askAbort.current = ctrl;
       try {
+        // Prior turns only — server appends the current message (avoids duplicate user line).
+        const prior = messages.slice(-4).map((m) => ({
+          role: m.role === 'ai' ? 'assistant' : 'user',
+          text: m.text,
+        }));
         const res = await fetch('/api/chatbot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: ctrl.signal,
           body: JSON.stringify({
             message: text,
             path: pathname,
-            history: nextHistory.slice(-4).map((m) => ({
-              role: m.role === 'ai' ? 'assistant' : 'user',
-              text: m.text,
-            })),
+            history: prior,
           }),
         });
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (ctrl.signal.aborted) return;
         setMessages((m) => [
           ...m,
-          { role: 'ai', text: data.response || 'Something went wrong. Try again.' },
+          {
+            role: 'ai',
+            text:
+              (typeof data.response === 'string' && data.response) ||
+              (res.status === 429
+                ? 'Slow down a bit, then try again.'
+                : 'Something went wrong. Try again.'),
+          },
         ]);
-      } catch {
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
         setMessages((m) => [...m, { role: 'ai', text: 'Couldn’t reach VawBot. Try again.' }]);
       } finally {
+        if (askAbort.current === ctrl) askAbort.current = null;
         setTyping(false);
       }
     },
@@ -172,7 +196,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
-      if (e.key !== ' ' && e.key.length !== 1) return;
+      const key = e.key;
+      if (key == null || (key !== ' ' && key.length !== 1)) return;
       const target = e.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (target?.closest('a, button, [role="button"]')) return;
@@ -180,7 +205,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       e.preventDefault();
       setClosed(false);
       if (docked) setDockOpen(true);
-      setDraft((d) => d + e.key);
+      setDraft((d) => d + key);
       requestAnimationFrame(() => {
         const el =
           document.querySelector<HTMLInputElement>('#vaw-chat-input-dock') ??
@@ -287,7 +312,7 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           alt=""
           width={160}
           height={160}
-          className="pointer-events-none h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(22,22,21,0.18)]"
+          className="pointer-events-none h-full w-full object-contain drop-shadow-[0_0.5rem_1.125rem_rgba(22,22,21,0.18)]"
           priority
         />
       </button>
@@ -297,17 +322,17 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
   return (
     <div
       ref={panelRef}
-      className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] shadow-[0_12px_40px_rgba(22,22,21,0.1)] ${
+      className={`flex flex-col overflow-hidden border border-black/[0.08] bg-[#fffcf7] text-left shadow-[0_0.75rem_2.5rem_rgba(22,22,21,0.1)] ${
         placement === 'dock' ? 'vaw-pop-in ' : ''
       }${
         placement === 'hero'
-          ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[28px]'
-          : 'w-[min(22.5rem,calc(100vw-2rem))] rounded-[24px]'
+          ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[1.75rem]'
+          : 'w-[min(22.5rem,calc(100vw-2rem))] rounded-[1.5rem]'
       }`}
     >
       {placement === 'dock' || hasThread || typing ? (
         <div className="flex items-center justify-between gap-3 border-b border-black/[0.06] px-4 py-2.5">
-          <p className="text-[13px] font-medium text-[#161615]">
+          <p className="text-[0.8125rem] font-medium text-[#161615]">
             {placement === 'hero' ? 'VAWCOM' : 'Vawbot'}
           </p>
           <div className="flex items-center gap-1">
@@ -338,13 +363,15 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
         <div
           ref={logRef}
           className={`flex flex-col gap-2 overflow-auto px-3 py-3 ${
-            placement === 'hero' ? 'max-h-[min(32vh,16rem)]' : 'max-h-[min(50vh,22rem)]'
+            placement === 'hero'
+              ? 'max-h-[min(32vh,16rem)]'
+              : 'max-h-[min(50vh,22rem,calc(var(--vaw-chat-room,100vh)-7.5rem))]'
           }`}
         >
           {messages.map((m, i) => (
             <div
               key={`${i}-${m.text.slice(0, 16)}`}
-              className={`vaw-msg max-w-[90%] rounded-2xl px-3.5 py-2 text-[14.5px] leading-snug ${
+              className={`vaw-msg max-w-[90%] rounded-2xl px-3.5 py-2 text-[0.9063rem] leading-snug ${
                 m.role === 'user'
                   ? 'self-end bg-[#0cb78b] text-[#f5f3ee]'
                   : 'self-start bg-[#f0eee8] text-[#161615]'
@@ -355,10 +382,10 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           ))}
           {typing ? (
             <div
-              className="vaw-msg self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[14.5px] leading-snug"
+              className="vaw-msg self-start rounded-2xl bg-[#f0eee8] px-3.5 py-2 text-[0.9063rem] leading-snug"
               aria-label="Vawbot is typing"
             >
-              <span className="inline-flex h-[1.25em] items-center gap-[5px]" aria-hidden>
+              <span className="inline-flex h-[1.25em] items-center gap-[0.3125rem]" aria-hidden>
                 <span className="vaw-typing-dot h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
                 <span className="vaw-typing-dot vaw-typing-dot-2 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
                 <span className="vaw-typing-dot vaw-typing-dot-3 h-1.5 w-1.5 rounded-full bg-[#8a8882]" />
@@ -382,9 +409,10 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           id={`vaw-chat-input-${placement}`}
           ref={inputRef}
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => setDraft(e.target.value.slice(0, MAX_DRAFT_CHARS))}
+          maxLength={MAX_DRAFT_CHARS}
           placeholder="Ask what we do, or describe an idea…"
-          className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-[15px] text-[#161615] outline-none placeholder:text-[#8a8882]"
+          className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-[0.9375rem] text-[#161615] outline-none placeholder:text-[#8a8882]"
         />
         <button
           type="submit"
@@ -405,8 +433,34 @@ export function HeroChatSlot() {
   return <ChatPanel placement="hero" />;
 }
 
+/**
+ * iOS overlays the on-screen keyboard without resizing the layout viewport, so `fixed bottom-*`
+ * stays under it. Returns how much of the bottom is covered, plus the visible height.
+ */
+function useKeyboardInset() {
+  const [state, setState] = useState({ inset: 0, visible: 0 });
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      // Ignore toolbar-sized changes; only a keyboard covers this much.
+      setState({ inset: inset > 80 ? inset : 0, visible: Math.round(vv.height) });
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
+  return state;
+}
+
 function DockedChat() {
   const { docked, closed, reopen } = useSiteChat();
+  const kb = useKeyboardInset();
 
   return (
     <AnimatePresence>
@@ -430,7 +484,7 @@ function DockedChat() {
             alt=""
             width={160}
             height={160}
-            className="pointer-events-none h-full w-full object-contain drop-shadow-[0_8px_18px_rgba(22,22,21,0.18)]"
+            className="pointer-events-none h-full w-full object-contain drop-shadow-[0_0.5rem_1.125rem_rgba(22,22,21,0.18)]"
             priority
           />
         </motion.button>
@@ -439,7 +493,12 @@ function DockedChat() {
           key="dock"
           exit={{ opacity: 0, y: 8, scale: 0.98 }}
           transition={{ duration: DUR.micro }}
-          style={{ transformOrigin: 'bottom right' }}
+          style={
+            {
+              transformOrigin: 'bottom right',
+              ...(kb.inset ? { bottom: kb.inset + 8, '--vaw-chat-room': `${kb.visible - 16}px` } : null),
+            } as CSSProperties
+          }
           className="fixed bottom-5 right-5 z-[70]"
         >
           <ChatPanel placement="dock" />

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 import { PROCESS_STEPS } from '@/lib/process';
+import { railBoltKeys } from '@/lib/motion';
 
 const ICONS: LucideIcon[] = [Lightbulb, ListChecks, LayoutTemplate, Layers, Code2, Rocket];
 
@@ -57,6 +58,7 @@ export default function ProcessLightTrail() {
   }, []);
 
   const pathId = `${uid}-rail`;
+  const bolt = railBoltKeys(PROCESS_STEPS.length);
 
   return (
     <div className="relative mx-auto w-full max-w-[36rem]">
@@ -87,9 +89,15 @@ export default function ProcessLightTrail() {
               strokeLinecap="round"
             />
           ) : null}
-          {!reduce && pathD ? (
+          {!reduce && pathD && bolt ? (
             <circle r={3.8} fill="#0cb78b" filter={`url(#${uid}-glow)`}>
-              <animateMotion dur="4.5s" repeatCount="indefinite">
+              <animateMotion
+                dur={bolt.dur}
+                repeatCount="indefinite"
+                calcMode="linear"
+                keyPoints={bolt.keyPoints}
+                keyTimes={bolt.keyTimes}
+              >
                 <mpath xlinkHref={`#${pathId}`} href={`#${pathId}`} />
               </animateMotion>
             </circle>
@@ -105,20 +113,20 @@ export default function ProcessLightTrail() {
                   ref={(el) => {
                     nodeRefs.current[i] = el;
                   }}
-                  className="relative z-[1] flex h-11 w-11 items-center justify-center rounded-full border border-[#0cb78b]/35 bg-[#f5f3ee] text-[#0cb78b] shadow-[0_0_0_4px_rgba(245,243,238,1),0_0_18px_rgba(12,183,139,0.28)] sm:h-12 sm:w-12"
+                  className="relative z-[1] flex h-11 w-11 items-center justify-center rounded-full border border-[#0cb78b]/35 bg-[#f5f3ee] text-[#0cb78b] shadow-[0_0_0_0.25rem_rgba(245,243,238,1),0_0_1.125rem_rgba(12,183,139,0.28)] sm:h-12 sm:w-12"
                 >
                   <Icon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.85} />
                 </span>
-                <span className="mt-2 font-mono text-[11px] font-semibold tracking-[0.12em] text-[#0cb78b]">
+                <span className="mt-2 font-mono text-[0.6875rem] font-semibold tracking-[0.12em] text-[#0cb78b]">
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>
 
-              <div className="min-w-0 flex-1 rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 shadow-[0_10px_28px_rgba(22,22,21,0.05)] sm:px-6 sm:py-5">
+              <div className="min-w-0 flex-1 rounded-[1.25rem] border border-black/[0.06] bg-white px-5 py-4 shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.05)] sm:px-6 sm:py-5">
                 <h3 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#161615] sm:text-[1.5rem]">
                   {step.title}
                 </h3>
-                <p className="mt-1.5 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">
+                <p className="mt-1.5 mb-0 text-[0.9063rem] leading-relaxed text-[#5c5a56]">
                   {step.line}
                 </p>
               </div>

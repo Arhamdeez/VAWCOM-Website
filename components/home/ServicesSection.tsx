@@ -29,15 +29,15 @@ export default function ServicesSection() {
       id="services"
       className="vaw-hero relative z-[2] overflow-visible border-t border-black/[0.06] pb-10 pt-14 sm:pb-12 sm:pt-16"
     >
-      <div className="mx-auto max-w-[1440px] px-6 sm:px-8">
+      <div className="mx-auto max-w-[90rem] px-6 sm:px-8">
         <Reveal className="mx-auto max-w-[40rem] text-center">
-          <p className="mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
+          <p className="mb-4 text-[0.8125rem] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
             Services
           </p>
           <h2 className="vaw-display m-0 text-[clamp(2.1rem,4.8vw,3.75rem)] leading-[0.96] tracking-[-0.03em] text-[#161615]">
             What do you want to build?
           </h2>
-          <p className="mx-auto mt-5 max-w-[34ch] text-[16px] leading-relaxed text-[#5c5a56]">
+          <p className="mx-auto mt-5 max-w-[34ch] text-[1rem] leading-relaxed text-[#5c5a56]">
             Sites, apps, and AI for founders and teams — same people start to finish.
           </p>
         </Reveal>
@@ -84,7 +84,7 @@ export default function ServicesSection() {
                       {svc.title}
                     </span>
                     <span
-                      className={`mt-3 block text-[14.5px] leading-snug text-[#5c5a56] transition-opacity ${
+                      className={`mt-3 block text-[0.9063rem] leading-snug text-[#5c5a56] transition-opacity ${
                         open ? 'opacity-100' : 'opacity-75'
                       }`}
                     >
@@ -92,7 +92,7 @@ export default function ServicesSection() {
                     </span>
                     <Link
                       href={svc.href}
-                      className={`mt-5 inline-flex items-center gap-1 text-[13px] font-medium text-[#0cb78b] transition-opacity hover:text-[#0a9d77] ${
+                      className={`mt-5 inline-flex items-center gap-1 text-[0.8125rem] font-medium text-[#0cb78b] transition-opacity hover:text-[#0a9d77] ${
                         open ? 'opacity-100' : 'opacity-0'
                       }`}
                     >
@@ -104,7 +104,7 @@ export default function ServicesSection() {
               );
             })}
           </div>
-          <p className="mt-3 text-center text-[12.5px] text-[#8a8882] lg:hidden">
+          <p className="mt-3 text-center text-[0.7813rem] text-[#8a8882] lg:hidden">
             Swipe to see all services
           </p>
         </Reveal>
@@ -112,13 +112,13 @@ export default function ServicesSection() {
         <Reveal delay={0.1} className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:mt-16">
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-6 py-3 text-[14.5px] font-medium text-[#f5f3ee] hover:bg-[#0a9d77]"
+            className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-6 py-3 text-[0.9063rem] font-medium text-[#f5f3ee] hover:bg-[#0a9d77]"
           >
             Talk to us
           </Link>
           <Link
             href="/services"
-            className="inline-flex items-center gap-1 text-[14.5px] font-medium text-[#161615] hover:text-[#0cb78b]"
+            className="inline-flex items-center gap-1 text-[0.9063rem] font-medium text-[#161615] hover:text-[#0cb78b]"
           >
             All services
             <ArrowUpRight className="h-4 w-4" />

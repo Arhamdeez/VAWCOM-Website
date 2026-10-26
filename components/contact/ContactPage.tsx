@@ -17,9 +17,10 @@ const SERVICE_OPTIONS = [
   'Other',
 ] as const;
 
-const label = 'mb-2 block text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8a8882]';
+const label =
+  'mb-2 block text-center text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#8a8882]';
 const input =
-  'w-full rounded-xl border-0 bg-[#f5f3ee] px-4 py-3.5 text-[15px] text-[#161615] outline-none ring-0 placeholder:text-[#8a8882] focus:bg-white focus:shadow-[0_0_0_2px_rgba(12,183,139,0.35)]';
+  'w-full rounded-xl border-0 bg-[#f5f3ee] px-4 py-3.5 text-[0.9375rem] text-[#161615] outline-none ring-0 placeholder:text-[#8a8882] focus:bg-white focus:shadow-[0_0_0_2px_rgba(12,183,139,0.35)]';
 
 export default function ContactPage() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -88,31 +89,41 @@ export default function ContactPage() {
   return (
     <CreamPage nav="contact" footer={false}>
       <div className="vaw-hero">
-        <header className="mx-auto max-w-[1100px] px-6 pt-28 sm:px-8 lg:px-10 lg:pt-32">
-          <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+        <header className="vaw-shell-narrow flex flex-col items-center pt-[max(7rem,calc(env(safe-area-inset-top)+5.5rem))] text-center lg:pt-32">
+          <p className="m-0 mb-5 rounded-full border border-[#0cb78b]/30 bg-white/60 px-3.5 py-1.5 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
             Contact
           </p>
           <h1 className="vaw-display m-0 max-w-[14ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
             Tell us what you are
             <span className="text-[#0cb78b]"> building.</span>
           </h1>
-          <p className="mt-5 max-w-[42ch] text-[17px] leading-relaxed text-[#5c5a56]">
-            Use the form or email us. We usually reply within a business day.
+          <p className="mt-5 max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
+            Send the form first, or use the email below. We usually reply within a business day.
           </p>
         </header>
 
-        <div className="mx-auto grid max-w-[1100px] gap-8 px-6 pb-4 pt-12 sm:px-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.75fr)] lg:gap-10 lg:px-10 lg:pb-2 lg:pt-14">
+        <div className="vaw-shell-narrow flex flex-col items-center gap-5 pb-4 pt-12 lg:pb-2 lg:pt-14">
           <form
             ref={formRef}
             onSubmit={onSubmit}
-            className="rounded-[1.5rem] bg-white p-6 shadow-[0_12px_32px_rgba(22,22,21,0.06)] sm:p-8"
+            className="w-full max-w-[38rem] rounded-[1.5rem] bg-white p-6 shadow-[0_0.75rem_2rem_rgba(22,22,21,0.06)] sm:p-8"
           >
+            <div className="mb-7 text-center">
+              <p className="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+                Send a message
+              </p>
+              <h2 className="vaw-display m-0 mt-2 text-[clamp(1.35rem,2.4vw,1.6rem)] tracking-[-0.02em] text-[#161615]">
+                Project details
+              </h2>
+              <p className="m-0 mt-1.5 text-[0.8125rem] text-[#8a8882]">Asterisk (*) marks required fields.</p>
+            </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block">
                 <span className={label}>Name *</span>
                 <input
                   required
                   autoComplete="name"
+                  placeholder="John Doe"
                   value={form.name}
                   onChange={onChange('name')}
                   className={input}
@@ -124,6 +135,7 @@ export default function ContactPage() {
                   required
                   type="email"
                   autoComplete="email"
+                  placeholder="john@company.com"
                   value={form.email}
                   onChange={onChange('email')}
                   className={input}
@@ -133,6 +145,7 @@ export default function ContactPage() {
                 <span className={label}>Company</span>
                 <input
                   autoComplete="organization"
+                  placeholder="Company Inc."
                   value={form.company}
                   onChange={onChange('company')}
                   className={input}
@@ -143,6 +156,7 @@ export default function ContactPage() {
                 <input
                   type="tel"
                   autoComplete="tel"
+                  placeholder="+92 300 1234567"
                   value={form.phone}
                   onChange={onChange('phone')}
                   className={input}
@@ -177,18 +191,18 @@ export default function ContactPage() {
               />
             </label>
 
-            <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="mt-7 flex flex-col items-center gap-3 text-center">
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-7 py-3.5 text-[15px] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] disabled:opacity-50"
+                className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-7 py-3.5 text-[0.9375rem] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] disabled:opacity-50"
               >
                 {submitting ? 'Sending…' : status && !statusError ? 'Sent' : 'Send message'}
               </button>
               {status ? (
                 <p
                   role="status"
-                  className={`vaw-msg m-0 text-[14.5px] ${
+                  className={`vaw-msg m-0 text-[0.9063rem] ${
                     statusError ? 'text-[#c45c3a]' : 'text-[#0a9d77]'
                   }`}
                 >
@@ -198,34 +212,34 @@ export default function ContactPage() {
             </div>
           </form>
 
-          <Reveal as="aside" className="flex flex-col gap-4">
-            <div data-nav-contrast="dark" className="rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
-              <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
+          <Reveal as="aside" className="flex w-full max-w-[38rem] flex-col items-center gap-4 text-center">
+            <div data-nav-contrast="dark" className="w-full rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
+              <p className="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
                 Email us
               </p>
               <a
                 href={getGmailComposeUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 block whitespace-nowrap text-[clamp(13px,1.55vw,17px)] font-semibold tracking-[-0.015em] text-[#ece9e3] hover:text-[#0cb78b]"
+                className="mt-3 block break-all text-[clamp(0.9375rem,2.4vw,1.125rem)] font-semibold tracking-[-0.015em] text-[#ece9e3] hover:text-[#0cb78b]"
               >
                 {CONTACT_EMAIL}
               </a>
             </div>
 
             {SHOW_GALLERY ? (
-            <div className="flex min-h-[9rem] flex-col justify-between rounded-[1.5rem] bg-[#0cb78b] p-6 sm:p-7">
+            <div className="flex min-h-[9rem] w-full flex-col items-center justify-between rounded-[1.5rem] bg-[#0cb78b] p-6 sm:p-7">
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
                   See shipped work
                 </h2>
-                <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#0b0d0c]/75]">
+                <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#0b0d0c]/75]">
                   Browse projects before you write.
                 </p>
               </div>
               <Link
                 href="/gallery"
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[13.5px] font-medium text-[#ece9e3] hover:bg-[#161615]"
+                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[0.8438rem] font-medium text-[#ece9e3] hover:bg-[#161615]"
               >
                 Open gallery
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -235,7 +249,7 @@ export default function ContactPage() {
 
             <Link
               href="/services"
-              className="inline-flex items-center gap-1.5 self-start text-[14px] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
+              className="inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
             >
               Compare services
               <ArrowUpRight className="h-3.5 w-3.5" />

@@ -7,24 +7,61 @@ import {
   localReplyForIntent,
   offlineFallbackForIntent,
   retrieveKnowledge,
+  sanitizeChatHistory,
   splitIntentAndReply,
 } from '@/lib/chatKnowledge';
 import { generateChatReply } from '@/lib/chatLlm';
 
+const MAX_MESSAGE_CHARS = 800;
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 24;
+
+const rateHits = new Map<string, { n: number; t: number }>();
+
+function clientIp(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
+function allowRequest(ip: string): boolean {
+  const now = Date.now();
+  const cur = rateHits.get(ip);
+  if (!cur || now - cur.t > RATE_WINDOW_MS) {
+    rateHits.set(ip, { n: 1, t: now });
+    return true;
+  }
+  if (cur.n >= RATE_MAX) return false;
+  cur.n += 1;
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { message, history, path } = await request.json();
+    if (!allowRequest(clientIp(request))) {
+      return NextResponse.json(
+        { error: 'Too many requests', response: 'Slow down a bit, then try again.' },
+        { status: 429 },
+      );
+    }
 
-    if (!message || typeof message !== 'string') {
+    const body = await request.json().catch(() => null);
+    const message = typeof body?.message === 'string' ? body.message : '';
+    const path = typeof body?.path === 'string' ? body.path : '/';
+    const history = sanitizeChatHistory(body?.history, message);
+
+    if (!message.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    const trimmed = message.trim().slice(0, MAX_MESSAGE_CHARS);
     const started = Date.now();
-    const trimmed = message.trim();
-    const pagePath = typeof path === 'string' ? path : '/';
+    const pagePath = path;
     const retrieval = retrieveKnowledge(trimmed, pagePath);
 
-    // Instant local short-circuits only (no model). Everything else = one LLM call.
+    // Instant local short-circuits (most intents). Fuzzy “general” may still hit the LLM.
     const heuristicIntent = classifyIntent(trimmed, retrieval, history);
     const localResponse = localReplyForIntent(heuristicIntent, trimmed, retrieval, history);
     if (localResponse) {
@@ -44,7 +81,6 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      // Single pass: model classifies + replies in one completion (no second round-trip).
       const system = buildRagSystemPrompt(retrieval, {
         intent: heuristicIntent,
         message: trimmed,
@@ -53,7 +89,7 @@ export async function POST(request: NextRequest) {
       const messages = buildOllamaMessages(system, trimmed, history);
       const { text: raw, provider, model } = await generateChatReply({
         messages,
-        maxTokens: 220,
+        maxTokens: 160,
       });
       const split = splitIntentAndReply(raw);
       const intent = split.intent ?? heuristicIntent;
@@ -62,7 +98,7 @@ export async function POST(request: NextRequest) {
 
       const ms = Date.now() - started;
       console.info(
-        `[chatbot] ${provider}/${model} intent=${intent}(${intentSource}) page=${retrieval.page.path} primary=${retrieval.primaryService?.id ?? 'none'} ${ms}ms`
+        `[chatbot] ${provider}/${model} intent=${intent}(${intentSource}) page=${retrieval.page.path} primary=${retrieval.primaryService?.id ?? 'none'} ${ms}ms`,
       );
 
       return NextResponse.json({
@@ -98,7 +134,7 @@ export async function POST(request: NextRequest) {
     console.error('Chatbot API error:', error);
     return NextResponse.json(
       { error: 'Failed to process message', response: 'Something went wrong. Try again.' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

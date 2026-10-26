@@ -3,6 +3,7 @@ import { SERVICES, SERVICE_FAQS, getService, type Service } from '@/lib/services
 import { CHAT_SITE_LINKS, CONTACT_EMAIL, SHOW_GALLERY } from '@/lib/site';
 import { PROJECTS } from '@/lib/work';
 import { PROCESS_STEPS } from '@/lib/process';
+import { isAllowedChatHref } from '@/lib/chatLinks';
 
 export type KnowledgeChunk = {
   id: string;
@@ -71,33 +72,45 @@ function isVendorChoiceAsk(message: string): boolean {
   return VENDOR_CHOICE_RE.test(message.trim());
 }
 
+/** Strong VAWCOM / product signals — weak words like help/idea/build alone do not count. */
+const STRONG_SITE_RE =
+  /\b(vawcom|service|services|website|web\s*app|landing|mobile\s*app|ios|android|ecommerce|e-commerce|store|shop|inventory|checkout|voice\s*agent|phone\s*call|chatbot|automat|n8n|maintenance|rescue|bug|quote|pricing|price|cost|contact|about|gallery|portfolio|founders?|co-?founders?|team|lahore|karachi|saas|cms|seo|agency|studio|software company|developer|freelancer|outsource|partner|crm|erp|arham|shahbakht)\b/i;
+
+/** Studio / founders / location — route to About, never treat as trivia. */
+const TEAM_ASK_RE =
+  /\b(founders?|co-?founders?|(your|the|vawcom'?s?)\s+team|who('?s| is| are) (you|behind (this|vawcom)|on (the|your) team)|who (builds?|built|runs?|owns?|made) (this|vawcom|it)|meet the team|about (the )?(team|founders?|studio|company)|where (are you|is vawcom) (based|located|from)|based (in|where)|who('?s| is) (arham|shahbakht)|tell me about (you|yourselves|the (team|founders?|studio|company)))\b/i;
+
+function isTeamAsk(message: string): boolean {
+  return TEAM_ASK_RE.test(message.trim());
+}
+
 /**
  * General-knowledge / homework-style asks , any subject.
- * Not a domain blocklist: “what is X / explain Y / 1+1” when not about VAWCOM.
+ * Math and classic off-lane topics win even if the message also says “help”.
  */
 function looksLikeKnowledgeAsk(message: string): boolean {
   const t = message.trim();
-  if (!t || SITE_RELEVANT_RE.test(t) || isVendorChoiceAsk(t)) return false;
-  if (MATH_EXPR_RE.test(t)) return true;
-  if (
-    /\b(what (is|are|was|were|=)|what'?s|who (is|are|was|were)|explain|define|tell me (what|how|why|about)|calculate|solve|how (do|does|did) .+ work)\b/i.test(
-      t
-    )
-  ) {
-    return true;
-  }
-  // Short “why can’t you / what’s your problem with …” while arguing about a knowledge refuse
-  if (/\b(what'?s your problem with|why (won'?t|cant|can'?t) you (just )?(answer|tell|say)|not (a |asking (a )?)?(math|homework) question|ack?chually|actually)\b/i.test(t)) {
-    return false; // handled as correction / tone with history off-topic
-  }
-  return false;
+  if (!t || isVendorChoiceAsk(t) || isTeamAsk(t) || isBotIdentityAsk(t)) return false;
+  if (MATH_EXPR_RE.test(t) || OFF_TOPIC_RE.test(t)) return true;
+  if (STRONG_SITE_RE.test(t)) return false;
+  return /\b(what (is|are|was|were|=)|what'?s|who (is|are|was|were)|explain|define|tell me (what|how|why|about)|calculate|solve|how (do|does|did) .+ work)\b/i.test(
+    t,
+  );
 }
 
 const CHITCHAT_RE =
-  /\b((just )?wanna chat|want to chat|down to chat|how are you doing|how're you doing|how you doing|how('?s| is) it going)\b/i;
+  /\b((just )?wanna chat|want to chat|down to chat|how are you doing|how're you doing|how you doing|how u doing|how('?s| is) it going)\b/i;
 
 const WELLBEING_RE =
-  /^(hey[,!]?\s+)?((are you|are u|r u|you)\s+(ok|okay|alright|good|fine)|(how are you|how r you|how're you|how are you doing|how's it going|hows it going|how r u|hru|hbu|sup|wassup|wazzup|wyd))[\s?!.]*$/i;
+  /^(hey[,!]?\s+)?((are you|are u|r u|you)\s+(ok|okay|alright|good|fine)|(how are you|how are u|how r you|how r u|how're you|how are ya|how are you doing|how u doing|how you doing|how's it going|hows it going|howru|hru|hbu|sup|wassup|wazzup|wyd))[\s?!.]*$/i;
+
+/** Bot name / identity — not trivia, not a team/founders ask. */
+const BOT_IDENTITY_RE =
+  /^(hey[,!]?\s+)?((what('?s| is)|whats) your name|what do (i|you) call you|do you have a name|are you (vawbot|a chatbot|a bot|an ai)|who am i (talking|chatting|speaking) (to|with))[\s?!.]*$/i;
+
+function isBotIdentityAsk(message: string): boolean {
+  return BOT_IDENTITY_RE.test(message.trim());
+}
 
 const CORRECTION_RE =
   /\b(wdym|what do you mean|what are you (even )?saying|what pattern|you (just )?said|i didn'?t (apologi[sz]e|say that|ask)|why (did you|say)|that('?s| was) (weird|odd|wrong)|come again|huh+|that wasn'?t|i am not asking|i'?m not asking|not a .+ question|when did i (say|ask|mention)|i (never|didn'?t) (say|ask|mention)|who said i|narrow what|i'?m not (trying|looking) to (build|launch))\b/i;
@@ -127,6 +140,14 @@ const EXPLORE_RE =
 
 const REJECT_SIGNAL_RE =
   /\b((i\s+)?(don'?t|do not|dont)\s+(need|want|like)|not\s+(looking for|interested)|no\s+thanks|wrong\s+(one|service|lane)|pass\s+on)\b/i;
+
+/** Soft close: not rejecting a pitched service, just declining help for now. */
+const DECLINE_HELP_RE =
+  /^(hey[,!]?\s+)?(i\s+)?((don'?t|do not|dont)\s+need\s+(anything|any(thing)?(\s+else)?|help|it|that)|nothing(\s+for\s+now)?|i'?m\s+(good|fine|all set|okay|ok)|all good|no thanks|nope|nah)([\s,!.].*)?$/i;
+
+function isDeclineHelp(message: string): boolean {
+  return DECLINE_HELP_RE.test(message.trim());
+}
 
 const CATALOG_ASK =
   /what do you (offer|do)|what (services|can you offer)|your (services|work|capabilities)|show me (your )?services|list (your )?services/i;
@@ -427,6 +448,7 @@ function isExploreAsk(message: string): boolean {
 
 function isChitchatAsk(message: string): boolean {
   const t = message.trim();
+  if (isBotIdentityAsk(t)) return true;
   if (WELLBEING_RE.test(t) || SILLY_RE.test(t) || SILLY_ALSO_RE.test(t)) return true;
   if (
     /\b(friendly convo|nice (and )?friendly|just (want to |wanna )?chat|kinda sleepy|virtual (chai|coffee|tea)|what'?s on your mind)\b/i.test(
@@ -552,6 +574,17 @@ export function resolvePageContext(pathname?: string | null): PageContext {
     };
   }
 
+  if (path === '/partners') {
+    return {
+      path,
+      title: 'Partners',
+      summary: 'This is the white-label partners page for agencies outsourcing delivery to VAWCOM.',
+      blurb:
+        'Partners / white-label page: confidential delivery under the agency brand, NDAs, engagement models, and what VAWCOM can build. Prefer [Contact](/contact) for partnership inquiries.',
+      chunkIds: ['company', 'site-links'],
+    };
+  }
+
   return {
     path,
     title: path,
@@ -617,8 +650,15 @@ export function buildKnowledgeChunks(): KnowledgeChunk[] {
 
   chunks.push({
     id: 'founders',
-    terms: ['founder', 'founders', 'team', 'arham', 'shahbakht', 'who builds'],
-    text: `Founders: ${FOUNDERS.map((f) => `${f.name} (${f.role})`).join('; ')}. [/about](/about).`,
+    terms: [
+      'founder', 'founders', 'co-founder', 'team', 'arham', 'shahbakht', 'who builds',
+      'who are you', 'based', 'lahore', 'meet the team',
+    ],
+    text: [
+      `Founders: ${FOUNDERS.map((f) => `${f.name} (${f.role})`).join('; ')}.`,
+      'VAWCOM is founder-led and based in Lahore, Pakistan.',
+      'Full story, process, and profiles: [About](/about).',
+    ].join(' '),
   });
 
   chunks.push({
@@ -667,7 +707,7 @@ export function retrieveKnowledge(query: string, pathname?: string | null): Retr
       ? serviceRanked[1].chunk.id.replace(/^service-/, '')
       : null;
 
-  // On a service detail page, prefer that service unless the message clearly points elsewhere.
+  // Prefer the service page they’re on for context; only boost score (redirects) on real project asks.
   if (page.serviceId) {
     const pageHit = serviceRanked.find((r) => r.chunk.id === `service-${page.serviceId}`);
     const elsewhereStrong =
@@ -677,7 +717,9 @@ export function retrieveKnowledge(query: string, pathname?: string | null): Retr
       hasPositiveProjectSignal(query);
     if (!elsewhereStrong) {
       primaryId = page.serviceId;
-      primaryScore = Math.max(primaryScore, pageHit?.score ?? 6, 6);
+      primaryScore = hasPositiveProjectSignal(query)
+        ? Math.max(primaryScore, pageHit?.score ?? 6, 6)
+        : Math.max(primaryScore, pageHit?.score ?? 0);
       secondaryId =
         serviceRanked.find((r) => r.chunk.id !== `service-${page.serviceId}` && r.score >= 3)?.chunk.id.replace(
           /^service-/,
@@ -715,6 +757,11 @@ export function retrieveKnowledge(query: string, pathname?: string | null): Retr
     }
   }
   if (isVendorChoiceAsk(query)) add('company');
+  if (isTeamAsk(query)) {
+    add('founders');
+    add('company');
+    add('process');
+  }
   add('site-links');
 
   // Synthetic page chunk so the model always sees where they are.
@@ -779,7 +826,7 @@ export function classifyIntent(
   if (!t) return 'general';
 
   if (GREETING_RE.test(t)) return 'greeting';
-  if (THANKS_RE.test(t)) return 'thanks';
+  if (THANKS_RE.test(t) || isDeclineHelp(t)) return 'thanks';
 
   // Tone / correction before off-topic so pushback isn’t a domain lecture
   if (TONE_FEEDBACK_RE.test(t)) return 'tone_feedback';
@@ -797,6 +844,8 @@ export function classifyIntent(
   }
 
   if (isChitchatAsk(t)) return 'chitchat';
+
+  if (isTeamAsk(t)) return 'general';
 
   if (isOffTopic(t, retrieval, history)) return 'off_topic';
 
@@ -851,10 +900,28 @@ const THANKS_REPLIES = [
   'Of course. Glad I could help.',
 ] as const;
 
+const DECLINE_REPLIES = [
+  'No problem. If you ever want to build something, [services](/services) is here.',
+  'All good. Come back anytime, or browse [services](/services) when you’re ready.',
+  'Sounds good. I’m around if you need VAWCOM later.',
+] as const;
+
 const CHITCHAT_REPLIES = [
   'Ha, fair. I’m here when you want to talk through a project, or you can peek at [services](/services).',
   'All good. If you’ve got something to build, I’m happy to help, or browse [services](/services).',
   'Nice chatting. What are you trying to launch, or shall I point you to [services](/services)?',
+] as const;
+
+const WELLBEING_REPLIES = [
+  'Doing well, thanks. What are you hoping to build, or want to browse [services](/services)?',
+  'All good here. Got a project in mind, or shall I point you to [services](/services)?',
+  'Pretty good. Tell me what you need help with, or peek at [services](/services).',
+] as const;
+
+const BOT_IDENTITY_REPLIES = [
+  'I’m Vawbot, VAWCOM’s site chat. Ask what we build, browse [services](/services), or meet the studio on [About](/about).',
+  'Vawbot here. I help visitors find the right VAWCOM service. Start at [services](/services), or read [About](/about).',
+  'I’m Vawbot. I can point you to what we offer on [services](/services), or the team on [About](/about).',
 ] as const;
 
 const CORRECTION_REPLIES = [
@@ -1038,9 +1105,20 @@ function browseReply(message: string, history?: unknown): string {
   return pickVariantAvoidingLast(BROWSE_REPLIES, `${seed}|explore`, history);
 }
 
+function teamAboutReply(message: string, history?: unknown): string {
+  const names = FOUNDERS.map((f) => f.name).join(' and ');
+  const seed = `${message.trim().toLowerCase()}|${historyLen(history)}|team`;
+  const about = '[About](/about)';
+  const variants = [
+    `We’re a founder-led studio. ${names} run VAWCOM from Lahore. More on the team and how we work is on ${about}.`,
+    `VAWCOM is run by ${names}. Peek at ${about} for founders, process, and the studio story.`,
+    `Happy to share: ${names} are the founders. ${about} has the full team page, plus how we ship.`,
+  ] as const;
+  return pickVariantAvoidingLast(variants, seed, history);
+}
+
 /**
- * Local replies: greeting + browse/unsure (hard guarantee. No CoT leaks).
- * Everything else → LLM; templates also live in offlineFallbackForIntent / applySafetyNets.
+ * Prefer local templates for clear intents (fast + no CoT). LLM only for fuzzy “general”.
  */
 export function localReplyForIntent(
   intent: ChatIntent,
@@ -1060,13 +1138,40 @@ export function localReplyForIntent(
   ) {
     return retrieval.page.summary;
   }
+  if (isBotIdentityAsk(t)) return pickVariantAvoidingLast(BOT_IDENTITY_REPLIES, `${t.toLowerCase()}|bot`, history);
+  if (isDeclineHelp(t)) return pickVariantAvoidingLast(DECLINE_REPLIES, `${t.toLowerCase()}|decline`, history);
+  if (isTeamAsk(t)) return teamAboutReply(t, history);
   const seed = `${t.toLowerCase()}|${historyLen(history)}|${intent}`;
   if (intent === 'greeting') {
     return pickVariantAvoidingLast(GREETINGS, `${seed}|greeting`, history);
   }
-  // Unsure / “I don’t know” / catalog. Keep local so models can’t leak reasoning
-  if (intent === 'browse_services') {
-    return browseReply(t, history);
+  if (intent === 'thanks') return pickVariantAvoidingLast(THANKS_REPLIES, seed, history);
+  if (intent === 'off_topic') return offTopicReply(t, history);
+  if (intent === 'chitchat') {
+    if (WELLBEING_RE.test(t)) {
+      return pickVariantAvoidingLast(WELLBEING_REPLIES, `${seed}|well`, history);
+    }
+    return pickVariantAvoidingLast(CHITCHAT_REPLIES, seed, history);
+  }
+  if (intent === 'correction') return pickVariantAvoidingLast(CORRECTION_REPLIES, seed, history);
+  if (intent === 'tone_feedback') return pickVariantAvoidingLast(TONE_REPLIES, seed, history);
+  if (intent === 'sideways') return pickVariantAvoidingLast(SIDEWAYS_REPLIES, seed, history);
+  if (intent === 'reject_suggestion') return rejectReply(t, history);
+  if (intent === 'browse_services') return browseReply(t, history);
+  if (
+    intent === 'project_need' &&
+    retrieval.primaryService &&
+    shouldUseServiceRedirect(retrieval, t)
+  ) {
+    return serviceRedirectReply(
+      retrieval.primaryService,
+      retrieval.secondaryService,
+      t,
+      history,
+    );
+  }
+  if (intent === 'general' && isVendorChoiceAsk(t)) {
+    return promoteStudioReply(t, retrieval, history);
   }
   return null;
 }
@@ -1078,12 +1183,24 @@ export function offlineFallbackForIntent(
   history?: unknown
 ): string {
   const seed = `${message.trim().toLowerCase()}|${historyLen(history)}|offline|${intent}`;
+  if (isBotIdentityAsk(message)) {
+    return pickVariantAvoidingLast(BOT_IDENTITY_REPLIES, `${seed}|bot`, history);
+  }
+  if (isDeclineHelp(message)) {
+    return pickVariantAvoidingLast(DECLINE_REPLIES, `${seed}|decline`, history);
+  }
+  if (isTeamAsk(message)) return teamAboutReply(message, history);
   if (intent === 'greeting') {
     return pickVariantAvoidingLast(GREETINGS, seed, history);
   }
   if (intent === 'thanks') return pickVariantAvoidingLast(THANKS_REPLIES, seed, history);
   if (intent === 'off_topic') return offTopicReply(message, history);
-  if (intent === 'chitchat') return pickVariantAvoidingLast(CHITCHAT_REPLIES, seed, history);
+  if (intent === 'chitchat') {
+    if (WELLBEING_RE.test(message.trim())) {
+      return pickVariantAvoidingLast(WELLBEING_REPLIES, `${seed}|well`, history);
+    }
+    return pickVariantAvoidingLast(CHITCHAT_REPLIES, seed, history);
+  }
   if (intent === 'correction') return pickVariantAvoidingLast(CORRECTION_REPLIES, seed, history);
   if (intent === 'tone_feedback') return pickVariantAvoidingLast(TONE_REPLIES, seed, history);
   if (intent === 'sideways') return pickVariantAvoidingLast(SIDEWAYS_REPLIES, seed, history);
@@ -1242,6 +1359,7 @@ Hard rules:
 - No get-rich advice. No random service pitches.
 - You are the VAWCOM site desk. Brief banter is fine; always steer back to what someone might build, or [services](/services).
 - If they ask who to hire, the best place/company/agency to get something built, whether VAWCOM is a fit, or if they are in the right place: they already are. Say so plainly, invite [Contact](/contact), and link matching services. That is on-topic, not a deflect.
+- Team, founders, “who are you”, or where you’re based → answer briefly and link [About](/about). Never treat that as off-topic trivia.
 - When they need more than one thing (for example a website and an app), link each matching /services/{id} page. Do not collapse everything into one service.
 - Do not answer general knowledge, homework, trivia, or school subjects of any kind. Do not name the subject (“I can’t do math/physics”). Just say you’re here for VAWCOM projects and redirect.
 - When they have a clear build need, link the matching /services/{id} and [Contact](/contact).
@@ -1360,20 +1478,52 @@ ${context}`;
 
 /** Pull INTENT label + user-facing body from a single model completion. */
 export function splitIntentAndReply(raw: string): { intent: ChatIntent | null; reply: string } {
-  const text = raw.replace(/^\uFEFF/, '').trim();
+  let text = raw.replace(/^\uFEFF/, '').trim();
+  // Models sometimes wrap the label in markdown or prefix junk.
+  text = text.replace(/^```\w*\s*/i, '').replace(/\s*```$/i, '').trim();
   const tagged = text.match(/^INTENT\s+([a-z_]+)\s*(?:\n+|\r\n+)([\s\S]*)$/i);
   if (tagged) {
+    const reply = tagged[2]!.trim().replace(/^INTENT\s+[a-z_]+\s*/i, '').trim();
     return {
       intent: parseIntentLabel(tagged[1]!),
-      reply: tagged[2]!.trim(),
+      reply,
     };
   }
   const firstLine = text.split(/\n/, 1)[0] ?? '';
-  const maybe = parseIntentLabel(firstLine);
+  const maybe = parseIntentLabel(firstLine.replace(/^#+\s*/, ''));
   if (maybe && /\n/.test(text)) {
     return { intent: maybe, reply: text.slice(firstLine.length).trim() };
   }
-  return { intent: null, reply: text };
+  // Label alone on one line with no body → empty reply for safety nets.
+  if (maybe && !/\n/.test(text)) {
+    return { intent: maybe, reply: '' };
+  }
+  return { intent: null, reply: text.replace(/^INTENT\s+[a-z_]+\s*/i, '').trim() };
+}
+
+/** Normalize client history: roles, length, drop trailing duplicate of the current user message. */
+export function sanitizeChatHistory(
+  history: unknown,
+  currentMessage: string,
+): { role: 'user' | 'assistant'; text: string }[] {
+  if (!Array.isArray(history)) return [];
+  const current = currentMessage.trim();
+  const out: { role: 'user' | 'assistant'; text: string }[] = [];
+  for (const m of history.slice(-8)) {
+    const raw = typeof m?.text === 'string' ? m.text.trim() : '';
+    if (!raw) continue;
+    const text = raw.slice(0, 320);
+    const role = m?.role === 'assistant' || m?.role === 'ai' ? 'assistant' : 'user';
+    out.push({ role, text });
+  }
+  while (
+    out.length &&
+    out[out.length - 1]!.role === 'user' &&
+    out[out.length - 1]!.text === current
+  ) {
+    out.pop();
+  }
+  return out.slice(-4);
 }
 
 export function buildOllamaMessages(
@@ -1444,15 +1594,20 @@ export function looksLikeMetaNarration(text: string): boolean {
   );
 }
 
-/** Strip leaked model reasoning; keep only the user-facing answer when possible. */
+/** Strip leaked model reasoning / classifier tags; keep only the user-facing answer. */
 export function stripChainOfThought(text: string): string {
   let out = text
     .replace(/<think>[\s\S]*?<\/think>/gi, ' ')
-    .replace(/^INTENT\s+[a-z_]+\s*/i, '')
+    .replace(/<\/?think>/gi, ' ')
+    .replace(/^INTENT\s+[a-z_]+\s*/gim, '')
+    .replace(/\b(User|Response|Prompt|Content|Output|Request)\s*Safety:\s*\w+/gi, ' ')
+    .replace(/\bSafety:\s*(safe|unsafe|flagged)\b/gi, ' ')
     .replace(/^(?:okay[.]?\s*)?the user[\s\S]*?(?=\n\n|[A-Z][a-z]|$)/i, ' ')
     .replace(/\b(they('re| are) unsure[^.]*\.)\s*/gi, ' ')
     .replace(/\b(common for people[^.]*\.)\s*/gi, ' ')
-    .replace(/^thinking:\s*/i, '')
+    .replace(/^(thinking|analysis|reasoning):\s*/i, '')
+    .replace(/\bas an ai\b[^.!?]*[.!?]\s*/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
     .trim();
   return out;
 }
@@ -1481,14 +1636,8 @@ export function sanitizeAssistantReply(
     .replace(/,\s*,/g, ',')
     .trim();
 
-  out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi, (full, label, href: string) => {
-    try {
-      const u = new URL(href);
-      if (u.hostname.endsWith('vawcom.com') || u.hostname === 'localhost') return full;
-    } catch {
-      /* ignore */
-    }
-    return String(label);
+  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (full, label, href: string) => {
+    return isAllowedChatHref(String(href)) ? full : String(label);
   });
 
   out = out
@@ -1542,6 +1691,11 @@ export function applySafetyNets(
   let out = text;
 
   out = stripChainOfThought(out);
+
+  // Free models sometimes emit only classifier tags — treat as empty.
+  if (!out.trim() || /^(User|Response)\s*Safety/i.test(out.trim())) {
+    out = offlineFallbackForIntent(intent, message, retrieval, history);
+  }
 
   if (intent === 'off_topic' && looksLikeOffTopicAnswer(out)) {
     out = offTopicReply(message, history);

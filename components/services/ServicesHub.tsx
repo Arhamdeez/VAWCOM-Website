@@ -137,17 +137,17 @@ export default function ServicesHub() {
         />
 
         <motion.header
-          className="relative z-10 mx-auto max-w-[1100px] px-6 pt-28 text-center sm:px-8 lg:px-10 lg:pt-32"
+          className="vaw-shell-narrow relative z-10 pt-[max(7rem,calc(env(safe-area-inset-top)+5.5rem))] text-center lg:pt-32"
           {...anim}
         >
-          <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+          <p className="mb-4 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
             Services
           </p>
           <h1 className="vaw-display m-0 text-[clamp(2.6rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
             What we
             <span className="text-[#0cb78b]"> build.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-[42ch] text-[17px] leading-relaxed text-[#5c5a56]">
+          <p className="mx-auto mt-6 max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
             Open a card, or pick from Services in the nav, for the full write-up: process, stack,
             and what to bring.
           </p>
@@ -158,7 +158,7 @@ export default function ServicesHub() {
         </div>
         <div ref={deckEndRef} className="h-0 w-full" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-[1100px] px-6 pb-20 pt-28 sm:px-8 lg:px-10 lg:pl-24">
+        <div className="vaw-shell-narrow relative z-10 pb-20 pt-28 lg:pl-24">
           <motion.section {...anim}>
             <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
               How a project starts
@@ -167,7 +167,7 @@ export default function ServicesHub() {
               {START.map((step, i) => (
                 <li
                   key={step.title}
-                  className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 rounded-[1.5rem] bg-white px-5 py-6 shadow-[0_12px_32px_rgba(22,22,21,0.06)]"
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 rounded-[1.5rem] bg-white px-5 py-6 shadow-[0_0.75rem_2rem_rgba(22,22,21,0.06)]"
                 >
                   <span
                     aria-hidden
@@ -176,8 +176,8 @@ export default function ServicesHub() {
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <div className="min-w-0">
-                    <p className="m-0 text-[15px] font-semibold text-[#161615]">{step.title}</p>
-                    <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">
+                    <p className="m-0 text-[0.9375rem] font-semibold text-[#161615]">{step.title}</p>
+                    <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#5c5a56]">
                       {step.body}
                     </p>
                   </div>
@@ -198,7 +198,7 @@ export default function ServicesHub() {
           <motion.section className="mt-20" {...anim}>
             <div
               data-nav-contrast="dark"
-              className="flex flex-col items-center rounded-[1.5rem] px-7 py-14 text-center shadow-[0_18px_44px_rgba(6,20,18,0.35)] sm:px-9 sm:py-16"
+              className="flex flex-col items-center rounded-[1.5rem] px-7 py-14 text-center shadow-[0_1.125rem_2.75rem_rgba(6,20,18,0.35)] sm:px-9 sm:py-16"
               style={{
                 background:
                   'radial-gradient(120% 90% at 28% 18%, #2a4f47 0%, #152e2a 42%, #0a1916 78%, #061210 100%)',
@@ -207,13 +207,13 @@ export default function ServicesHub() {
               <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#f5f3ee]">
                 Still stuck?
               </h2>
-              <p className="mx-auto mt-4 mb-0 max-w-[42ch] text-[15px] leading-relaxed text-white">
+              <p className="mx-auto mt-4 mb-0 max-w-[42ch] text-[0.9375rem] leading-relaxed text-white">
                 Tell us what you are trying to get done. We will point you to the right service, or say
                 if it is not a fit.
               </p>
               <Link
                 href="/contact"
-                className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-6 py-3 text-[14px] font-medium text-[#0b0d0c] hover:bg-[#0a9d77]"
+                className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-6 py-3 text-[0.875rem] font-medium text-[#0b0d0c] hover:bg-[#0a9d77]"
               >
                 Get in touch
                 <ArrowUpRight className="h-4 w-4" />
@@ -224,7 +224,7 @@ export default function ServicesHub() {
           {SHOW_GALLERY ? (
             <Link
               href="/gallery"
-              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/15 px-5 py-2.5 text-[14px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
+              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/15 px-5 py-2.5 text-[0.875rem] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
             >
               See gallery
               <ArrowUpRight className="h-4 w-4" />

@@ -24,7 +24,7 @@ export const STACK_ICONS: Record<string, StackIcon> = {
   Python: { slug: 'python', color: '#3776AB' },
   'Node.js': { slug: 'nodedotjs', color: '#339933' },
   Stripe: { slug: 'stripe', color: '#635BFF' },
-  AWS: { slug: 'amazonaws', color: '#FF9900' },
+  AWS: { slug: 'amazonwebservices', color: '#FF9900' },
   Docker: { slug: 'docker', color: '#2496ED' },
   Django: { slug: 'django', color: '#092E20' },
   'Google Cloud': { slug: 'googlecloud', color: '#4285F4' },

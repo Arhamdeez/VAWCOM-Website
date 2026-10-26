@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        '3xl': '1920px',
+        '4xl': '2560px',
+      },
       // One motion scale (see lib/motion.ts). DEFAULT makes every bare `transition-*` utility use it.
       transitionTimingFunction: {
         DEFAULT: 'cubic-bezier(0.22, 1, 0.36, 1)',

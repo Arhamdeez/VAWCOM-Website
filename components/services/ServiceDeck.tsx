@@ -123,13 +123,13 @@ function TeaserCard({ service }: { service: Service }) {
       id={service.id}
       href={`/services/${service.id}`}
       data-nav-contrast={darkCard ? 'dark' : undefined}
-      className={`vaw-svc-card isolate scroll-mt-28 flex flex-col rounded-[1.4rem] border border-black/[0.05] shadow-[0_10px_28px_rgba(22,22,21,0.07)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(22,22,21,0.12)] ${SIZE_CLASS[size]} ${
+      className={`vaw-svc-card isolate scroll-mt-28 flex flex-col rounded-[1.4rem] border border-black/[0.05] shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.07)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_1rem_2.25rem_rgba(22,22,21,0.12)] ${SIZE_CLASS[size]} ${
         darkCard ? 'border-white/[0.06]' : ''
       }`}
       style={{ background: tone.wash }}
     >
       <p
-        className={`relative m-0 font-semibold uppercase tracking-[0.16em] ${size === 'short' ? 'text-[10px]' : 'text-[11px]'}`}
+        className={`relative m-0 font-semibold uppercase tracking-[0.16em] ${size === 'short' ? 'text-[0.625rem]' : 'text-[0.6875rem]'}`}
         style={{ color: tone.ink }}
       >
         {service.nav}
@@ -144,15 +144,15 @@ function TeaserCard({ service }: { service: Service }) {
           lands right above the pills instead of floating away from them. */}
       {!isWeb && !isApps ? <span className="relative mt-auto" aria-hidden /> : null}
       {size === 'tall' ? (
-        <p className="relative mt-3 mb-0 text-[14px] leading-relaxed" style={{ color: bodyColor }}>
+        <p className="relative mt-3 mb-0 text-[0.875rem] leading-relaxed" style={{ color: bodyColor }}>
           {service.lede}
         </p>
       ) : size === 'mid' ? (
-        <p className="relative mt-3 mb-0 line-clamp-3 text-[13px] leading-snug" style={{ color: bodyColor }}>
+        <p className="relative mt-3 mb-0 line-clamp-3 text-[0.8125rem] leading-snug" style={{ color: bodyColor }}>
           {service.lede}
         </p>
       ) : (
-        <p className="relative mt-1.5 mb-0 line-clamp-2 text-[12px] leading-snug" style={{ color: bodyColor }}>
+        <p className="relative mt-1.5 mb-0 line-clamp-2 text-[0.75rem] leading-snug" style={{ color: bodyColor }}>
           {service.help}
         </p>
       )}
@@ -189,7 +189,7 @@ function TeaserCard({ service }: { service: Service }) {
         {service.extras.slice(0, chips).map((x) => (
           <li
             key={x}
-            className={`rounded-full border px-2.5 py-[3px] font-medium ${tone.chip} ${size === 'short' ? 'text-[10.5px]' : 'text-[11.5px]'}`}
+            className={`rounded-full border px-2.5 py-[0.1875rem] font-medium ${tone.chip} ${size === 'short' ? 'text-[0.6563rem]' : 'text-[0.7188rem]'}`}
           >
             {x}
           </li>
@@ -197,7 +197,7 @@ function TeaserCard({ service }: { service: Service }) {
       </ul>
       <span
         className={`relative mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0cb78b] font-semibold text-[#0b0d0c] ${
-          size === 'short' ? 'px-3 py-1.5 text-[12px]' : 'px-3.5 py-2 text-[13px]'
+          size === 'short' ? 'px-3 py-1.5 text-[0.75rem]' : 'px-3.5 py-2 text-[0.8125rem]'
         }`}
       >
         Full details

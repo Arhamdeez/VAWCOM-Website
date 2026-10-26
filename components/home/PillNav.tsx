@@ -89,26 +89,26 @@ function MobileNav({
                   className="flex h-full flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
                 >
                   <div className="mb-4 flex items-center justify-between gap-3">
-                    <p className="m-0 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8a8882]">
+                    <p className="m-0 text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-[#8a8882]">
                       Menu
                     </p>
                     <button
                       type="button"
                       aria-label="Close menu"
                       onClick={() => setOpen(false)}
-                      className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-full border border-black/10 bg-white text-[#161615] shadow-[0_4px_16px_rgba(22,22,21,0.08)]"
+                      className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-full border border-black/10 bg-white text-[#161615] shadow-[0_0.25rem_1rem_rgba(22,22,21,0.08)]"
                     >
                       <X className="h-5 w-5" strokeWidth={2} />
                     </button>
                   </div>
 
                   <nav aria-label="Mobile" className="flex flex-1 flex-col gap-1 overflow-y-auto">
-                    <div className="rounded-2xl bg-white p-2 shadow-[0_8px_24px_rgba(22,22,21,0.06)]">
+                    <div className="rounded-2xl bg-white p-2 shadow-[0_0.5rem_1.5rem_rgba(22,22,21,0.06)]">
                       <button
                         type="button"
                         aria-expanded={svcOpen}
                         onClick={() => setSvcOpen((v) => !v)}
-                        className={`flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-[17px] ${
+                        className={`flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-[1.0625rem] ${
                           active === 'services'
                             ? 'font-medium text-[#0cb78b]'
                             : 'font-medium text-[#161615]'
@@ -132,7 +132,7 @@ function MobileNav({
                             <div className="flex flex-col gap-0.5 px-1 pb-2">
                               <Link
                                 href="/services"
-                                className="rounded-xl px-4 py-2.5 text-[14.5px] font-medium text-[#0cb78b]"
+                                className="rounded-xl px-4 py-2.5 text-[0.9063rem] font-medium text-[#0cb78b]"
                                 onClick={() => setOpen(false)}
                               >
                                 All services
@@ -141,11 +141,11 @@ function MobileNav({
                                 <Link
                                   key={s.id}
                                   href={`/services/${s.id}`}
-                                  className="rounded-xl px-4 py-2.5 text-[14.5px] text-[#5c5a56] hover:bg-[#f5f3ee] hover:text-[#161615]"
+                                  className="rounded-xl px-4 py-2.5 text-[0.9063rem] text-[#5c5a56] hover:bg-[#f5f3ee] hover:text-[#161615]"
                                   onClick={() => setOpen(false)}
                                 >
                                   <span className="font-medium text-[#161615]">{s.nav}</span>
-                                  <span className="mt-0.5 block text-[12.5px] text-[#8a8882]">
+                                  <span className="mt-0.5 block text-[0.7813rem] text-[#8a8882]">
                                     {s.title}
                                   </span>
                                 </Link>
@@ -171,9 +171,9 @@ function MobileNav({
                         href={item.href}
                         prefetch
                         onClick={() => setOpen(false)}
-                        className={`rounded-2xl px-4 py-3.5 text-[17px] ${
+                        className={`rounded-2xl px-4 py-3.5 text-[1.0625rem] ${
                           active === item.key
-                            ? 'bg-white font-medium text-[#0cb78b] shadow-[0_8px_24px_rgba(22,22,21,0.06)]'
+                            ? 'bg-white font-medium text-[#0cb78b] shadow-[0_0.5rem_1.5rem_rgba(22,22,21,0.06)]'
                             : 'font-medium text-[#161615]'
                         }`}
                       >
@@ -186,7 +186,7 @@ function MobileNav({
                     href="/contact"
                     prefetch
                     onClick={() => setOpen(false)}
-                    className="mt-4 inline-flex min-h-12 items-center justify-center rounded-full bg-[#0cb78b] px-6 text-[15px] font-medium text-[#0b0d0c]"
+                    className="mt-4 inline-flex min-h-12 items-center justify-center rounded-full bg-[#0cb78b] px-6 text-[0.9375rem] font-medium text-[#0b0d0c]"
                   >
                     Get Started
                   </Link>
@@ -223,14 +223,14 @@ function MobileNav({
           </Link>
           <div className="flex flex-none items-center gap-2">
             {active === 'contact' ? (
-              <span className="rounded-full bg-[#0cb78b] px-3.5 py-2 text-[13px] font-medium text-[#0b0d0c]">
+              <span className="rounded-full bg-[#0cb78b] px-3.5 py-2 text-[0.8125rem] font-medium text-[#0b0d0c]">
                 Contact
               </span>
             ) : (
               <Link
                 href="/contact"
                 prefetch
-                className="rounded-full bg-[#0cb78b] px-3.5 py-2 text-[13px] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85"
+                className="rounded-full bg-[#0cb78b] px-3.5 py-2 text-[0.8125rem] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85"
               >
                 Get Started
               </Link>
@@ -295,16 +295,16 @@ function DesktopNav({
     : 'font-medium text-[#161615] hover:text-[#0cb78b]';
   const on = onDark ? 'font-medium text-[#2dd4a8]' : 'font-medium text-[#0cb78b]';
   const cta =
-    'flex-none rounded-full bg-[#0cb78b] px-[18px] py-2.5 text-[14.5px] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85 hover:text-[#0b0d0c]';
+    'flex-none rounded-full bg-[#0cb78b] px-[1.125rem] py-2.5 text-[0.9063rem] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85 hover:text-[#0b0d0c]';
 
-  const linkMax = !collapsible ? undefined : full ? 760 : showLinks ? 420 : 0;
+  const linkMax = !collapsible ? undefined : full ? '47.5rem' : showLinks ? '26.25rem' : '0rem';
 
   return (
     <motion.div
       layout
       initial={false}
       animate={{
-        borderRadius: full ? 20 : 9999,
+        borderRadius: full ? '1.25rem' : '999rem',
       }}
       transition={{
         layout: morph,
@@ -313,12 +313,12 @@ function DesktopNav({
       className={`vaw-nav-glass overflow-visible transition-[background,border-color,box-shadow] duration-std ${
         onDark ? 'vaw-nav-glass-on-dark' : ''
       } ${embedded ? 'relative' : 'fixed left-0 right-0 top-5 z-[60]'} mx-auto px-4 py-2.5 pl-4 ${
-        full ? 'w-full max-w-none sm:px-5' : 'w-max max-w-[calc(100vw-32px)]'
+        full ? 'w-full max-w-[90rem] sm:px-5' : 'w-max max-w-[calc(100vw-2rem)]'
       }`}
     >
       <div
         className={`vaw-nav-glass-inner ${
-          full ? 'justify-between gap-4 sm:gap-6' : 'gap-[22px]'
+          full ? 'justify-between gap-4 sm:gap-6' : 'gap-[1.375rem]'
         }`}
       >
         <Link href="/" prefetch className="flex flex-none items-center gap-2.5 text-inherit">
@@ -345,7 +345,7 @@ function DesktopNav({
             maxWidth: morph,
             opacity: { duration: DUR.enter, ease: 'linear' },
           }}
-          className={`flex items-center gap-8 whitespace-nowrap text-[14.5px] ${
+          className={`flex items-center gap-8 whitespace-nowrap text-[0.9063rem] ${
             collapsible && !showLinks ? 'overflow-hidden' : 'overflow-visible'
           } ${full ? 'min-w-0 flex-1 justify-center' : ''}`}
           style={
@@ -383,11 +383,11 @@ function DesktopNav({
               aria-label="Services"
               className="invisible absolute left-0 top-full z-[70] -translate-y-1 pt-2 opacity-0 transition-[opacity,transform,visibility] delay-150 duration-std group-focus-within/svc:visible group-focus-within/svc:translate-y-0 group-focus-within/svc:opacity-100 group-focus-within/svc:delay-0 group-hover/svc:visible group-hover/svc:translate-y-0 group-hover/svc:opacity-100 group-hover/svc:delay-0"
             >
-              <div className="w-[min(17.5rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/50 bg-white/90 p-2 shadow-[0_20px_50px_rgba(22,22,21,0.12)]">
+              <div className="w-[min(17.5rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/50 bg-white/90 p-2 shadow-[0_1.25rem_3.125rem_rgba(22,22,21,0.12)]">
                 <Link
                   href="/services"
                   role="menuitem"
-                  className="block rounded-xl px-3 py-2.5 text-[13.5px] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/10"
+                  className="block rounded-xl px-3 py-2.5 text-[0.8438rem] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/10"
                 >
                   All services
                 </Link>
@@ -396,10 +396,10 @@ function DesktopNav({
                     key={s.id}
                     href={`/services/${s.id}`}
                     role="menuitem"
-                    className="block rounded-xl px-3 py-2.5 text-[13.5px] text-[#5c5a56] hover:bg-[#f5f3ee] hover:text-[#161615]"
+                    className="block rounded-xl px-3 py-2.5 text-[0.8438rem] text-[#5c5a56] hover:bg-[#f5f3ee] hover:text-[#161615]"
                   >
                     <span className="font-medium text-[#161615]">{s.nav}</span>
-                    <span className="mt-0.5 block text-[12px] text-[#8a8882]">{s.title}</span>
+                    <span className="mt-0.5 block text-[0.75rem] text-[#8a8882]">{s.title}</span>
                   </Link>
                 ))}
               </div>
@@ -420,9 +420,9 @@ function DesktopNav({
             <motion.div
               initial={false}
               animate={{
-                maxWidth: showContact ? 88 : 0,
+                maxWidth: showContact ? '5.5rem' : '0rem',
                 opacity: showContact ? 1 : 0,
-                marginLeft: showContact ? 0 : -32,
+                marginLeft: showContact ? '0rem' : '-2rem',
               }}
               transition={morph}
               className="overflow-hidden"

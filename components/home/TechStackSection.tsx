@@ -51,7 +51,7 @@ function TechPill({ tech }: { tech: Tech }) {
             }}
           />
         ) : null}
-        <span className="text-[13px] font-medium tracking-[-0.01em] text-[#161615] sm:text-[14px]">
+        <span className="text-[0.8125rem] font-medium tracking-[-0.01em] text-[#161615] sm:text-[0.875rem]">
           {tech.name}
         </span>
       </div>

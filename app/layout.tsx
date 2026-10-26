@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import SiteShell from '@/components/SiteShell';
-import { SPLASH_COOKIE } from '@/lib/splashBoot';
-
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -57,22 +54,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const jar = await cookies();
-  const seen = jar.get(SPLASH_COOKIE)?.value === '1';
-
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} bg-[#050a14] ${seen ? 'splash-complete' : 'splash-pending'}`}
+      className={`${jakarta.variable} bg-[#050a14] splash-pending`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className={`${jakarta.className} bg-[#050a14]`} suppressHydrationWarning>
+        {/* Runs before React. Clears a stuck splash-pending cream plate if hydration fails outright. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var r=document.documentElement;setTimeout(function(){if(r.classList.contains("splash-pending")||r.classList.contains("splash-exiting")){r.classList.remove("splash-pending","splash-exiting","splash-react-ready","splash-locked");r.classList.add("splash-complete");if(document.body)document.body.style.overflow=""}},9000)}catch(e){}})();`,
+          }}
+        />
         <noscript>
           <style>{`html.splash-pending,html.splash-pending body{overflow:auto!important}html.splash-pending .splash-boot{display:none!important}`}</style>
         </noscript>

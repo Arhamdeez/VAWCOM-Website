@@ -126,7 +126,9 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       const narrow = w < 1024;
       const scale = narrow ? w / SKIPER_W : Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
       const ox = (w - SKIPER_W * scale) / 2;
-      const stroke = Math.max(narrow ? 6 : 13, Math.min(18, 18 * scale));
+      // Large screens scale the root font size; keep the line weight in step with the type.
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16 || 1;
+      const stroke = Math.max(narrow ? 6 : 13, Math.min(18, 18 * scale)) * (narrow ? 1 : rem);
 
       // Join at the north pole of the ASCII disk. A cream disc in AsciiGlobe keeps the stroke off the globe.
       const ascii = slot.querySelector('[data-ascii-globe]');
@@ -161,6 +163,12 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
           ? prev
           : { skiper, w, h, stroke, gx, gy, gr },
       );
+      // The splash holds until the scribble is laid out to this screen.
+      const html = document.documentElement;
+      if (html.dataset.scribble !== 'ready') {
+        html.dataset.scribble = 'ready';
+        window.dispatchEvent(new Event('vaw:scribble-ready'));
+      }
     };
 
     measure();

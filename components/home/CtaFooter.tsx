@@ -21,7 +21,7 @@ export default function CtaFooter() {
 
   return (
     <footer
-      className="relative overflow-hidden text-[#161615]"
+      className="vaw-footer relative overflow-hidden text-[#161615]"
       style={{
         background:
           'linear-gradient(180deg, #f5f3ee 0%, #eef8f3 32%, #c5ebd8 72%, #9fdfc4 100%)',
@@ -55,7 +55,7 @@ export default function CtaFooter() {
         </span>
       </div>
 
-      <div className="relative z-[1] mx-auto flex max-w-[1440px] items-start justify-between gap-6 px-6 pt-8 sm:px-8 sm:pt-10 lg:px-10">
+      <div className="relative z-[1] mx-auto flex max-w-[90rem] items-start justify-between gap-6 px-6 pt-8 sm:px-8 sm:pt-10 lg:px-10">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <a
@@ -99,11 +99,11 @@ export default function CtaFooter() {
             href={getGmailComposeUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2.5 block whitespace-nowrap text-[clamp(12px,2.6vw,15px)] font-semibold tracking-[-0.015em] text-[#161615] hover:text-[#0a9d77]"
+            className="mt-2.5 block whitespace-nowrap text-[clamp(0.75rem,2.6vw,0.9375rem)] font-semibold tracking-[-0.015em] text-[#161615] hover:text-[#0a9d77]"
           >
             {CONTACT_EMAIL}
           </a>
-          <p className="mt-1 mb-0 text-[13px] text-[#3d4a45]">Lahore, Pakistan</p>
+          <p className="mt-1 mb-0 text-[0.8125rem] text-[#3d4a45]">Lahore, Pakistan</p>
         </div>
 
         <nav aria-label="Footer" className="flex shrink-0 flex-col gap-1.5 text-right">
@@ -111,7 +111,7 @@ export default function CtaFooter() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-[14px] font-semibold tracking-[-0.015em] text-[#161615] hover:text-[#0a9d77] sm:text-[15px]"
+              className="text-[0.875rem] font-semibold tracking-[-0.015em] text-[#161615] hover:text-[#0a9d77] sm:text-[0.9375rem]"
             >
               {item.label}
             </Link>
@@ -121,8 +121,8 @@ export default function CtaFooter() {
 
       <div className="relative z-[1] h-[clamp(4rem,12vw,7rem)]" aria-hidden />
 
-      <div className="relative z-[1] mx-auto max-w-[1440px] px-6 pb-3 sm:px-8 lg:px-10">
-        <p className="m-0 text-[12px] text-[#3d4a45]/85">
+      <div className="relative z-[1] mx-auto max-w-[90rem] px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-8 lg:px-10">
+        <p className="m-0 text-[0.75rem] text-[#3d4a45]/85">
           © {year} VAWCOM. All rights reserved.
         </p>
       </div>

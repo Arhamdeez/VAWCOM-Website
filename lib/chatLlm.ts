@@ -11,7 +11,7 @@ export type ChatMessage = {
 const FREE_ROUTER = 'openrouter/free';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1';
 const FETCH_MS = () =>
-  Number(process.env.OPENROUTER_TIMEOUT_MS || process.env.OLLAMA_TIMEOUT_MS) || 45000;
+  Number(process.env.OPENROUTER_TIMEOUT_MS || process.env.OLLAMA_TIMEOUT_MS) || 25000;
 
 export function openRouterApiKey() {
   return process.env.OPENROUTER_API_KEY?.trim() || '';

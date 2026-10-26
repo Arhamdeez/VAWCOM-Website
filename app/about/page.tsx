@@ -30,42 +30,42 @@ export default function About() {
     <CreamPage nav="about">
       <div className="vaw-hero">
         <motion.header
-          className="relative z-10 mx-auto max-w-[1100px] px-6 pt-28 text-center sm:px-8 lg:px-10 lg:pt-32"
+          className="vaw-shell-narrow relative z-10 pt-[max(7rem,calc(env(safe-area-inset-top)+5.5rem))] text-center lg:pt-32"
           {...anim}
         >
-          <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+          <p className="mb-4 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
             About
           </p>
           <h1 className="vaw-display m-0 text-[clamp(2.6rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
             A studio that ships the
             <span className="text-[#0cb78b]"> whole thing.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-[42ch] text-[17px] leading-relaxed text-[#5c5a56]">
+          <p className="mx-auto mt-6 max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
             Web, apps, voice, and AI from one team. Design and build stay together so what you launch
             feels like one product, not a pile of parts.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-5 py-2.5 text-[14px] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-5 py-2.5 text-[0.875rem] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85"
             >
               Start a project
               <ArrowUpRight className="h-4 w-4" />
             </Link>
             <a
               href="#process"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-[14px] font-medium text-[#161615] shadow-[0_1px_0_rgba(22,22,21,0.06)] hover:bg-[#f5f3ee]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-[0.875rem] font-medium text-[#161615] shadow-[0_1px_0_rgba(22,22,21,0.06)] hover:bg-[#f5f3ee]"
             >
               How we work
             </a>
           </div>
         </motion.header>
 
-        <div className="relative z-10 mx-auto max-w-[1100px] px-6 pb-20 pt-16 sm:px-8 lg:px-10">
+        <div className="vaw-shell-narrow relative z-10 pb-20 pt-16">
           <motion.section {...anim} aria-label="Company film">
             <div
               data-nav-contrast="dark"
-              className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_12px_32px_rgba(22,22,21,0.08)]"
+              className="overflow-hidden rounded-[1.5rem] bg-[#161615] shadow-[0_0.75rem_2rem_rgba(22,22,21,0.08)]"
             >
               <CompanyFilm />
             </div>
@@ -87,7 +87,7 @@ export default function About() {
             <div className="mt-8 text-center">
               <Link
                 href="/services"
-                className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                className="inline-flex items-center gap-1.5 text-[0.8438rem] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
               >
                 See this on services
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -103,13 +103,21 @@ export default function About() {
               {FOUNDERS.map((person) => (
                 <div
                   key={person.name}
-                  className="flex flex-col items-center rounded-[1.5rem] bg-white px-6 py-8 text-center shadow-[0_12px_32px_rgba(22,22,21,0.06)]"
+                  className="flex flex-col items-center rounded-[1.5rem] bg-white px-6 py-8 text-center shadow-[0_0.75rem_2rem_rgba(22,22,21,0.06)]"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0cb78b] text-[15px] font-semibold text-[#0b0d0c]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0cb78b] text-[0.9375rem] font-semibold text-[#0b0d0c]">
                     {person.initials}
                   </div>
-                  <h3 className="mt-4 m-0 text-[17px] font-semibold text-[#161615]">{person.name}</h3>
-                  <p className="mt-1 mb-0 text-[14px] text-[#5c5a56]">{person.role}</p>
+                  <h3 className="mt-4 m-0 text-[1.0625rem] font-semibold text-[#161615]">{person.name}</h3>
+                  <p className="mt-1 mb-0 text-[0.875rem] text-[#5c5a56]">{person.role}</p>
+                  {'email' in person && person.email ? (
+                    <a
+                      href={`mailto:${person.email}`}
+                      className="mt-1.5 text-[0.8438rem] font-medium text-[#0cb78b] hover:text-[#0a9d77]"
+                    >
+                      {person.email}
+                    </a>
+                  ) : null}
                   <div className="mt-5 flex gap-2">
                     <Link
                       href={person.linkedin}
@@ -138,45 +146,55 @@ export default function About() {
                 href={SOCIAL.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[14px] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
+                className="text-[0.875rem] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
               >
                 VAWCOM on LinkedIn
               </Link>
             </p>
           </motion.section>
 
-          <div className="mt-14 grid gap-4 sm:grid-cols-2">
+          <div
+            className={
+              SHOW_GALLERY
+                ? 'mt-14 grid gap-4 sm:grid-cols-2'
+                : 'mt-14 flex justify-center'
+            }
+          >
             {SHOW_GALLERY ? (
             <div className="flex min-h-[10.5rem] flex-col justify-between rounded-[1.35rem] bg-white p-6 shadow-[0_1px_0_rgba(22,22,21,0.06)] sm:p-7">
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#161615]">
                   See the work
                 </h2>
-                <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#5c5a56]">
+                <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#5c5a56]">
                   Browse projects in the gallery.
                 </p>
               </div>
               <Link
                 href="/gallery"
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#161615] px-4 py-2.5 text-[13.5px] font-medium text-[#ece9e3] hover:bg-[#0b0d0c]"
+                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#161615] px-4 py-2.5 text-[0.8438rem] font-medium text-[#ece9e3] hover:bg-[#0b0d0c]"
               >
                 Open gallery
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
             ) : null}
-            <div className="flex min-h-[10.5rem] flex-col justify-between rounded-[1.35rem] bg-[#0cb78b] p-6 sm:p-7">
+            <div
+              className={`flex min-h-[10.5rem] flex-col justify-between rounded-[1.35rem] bg-[#0cb78b] p-6 sm:p-7${
+                SHOW_GALLERY ? '' : ' w-full max-w-[28rem]'
+              }`}
+            >
               <div>
                 <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
                   Compare services
                 </h2>
-                <p className="mt-2 mb-0 text-[14.5px] leading-relaxed text-[#0b0d0c]/75]">
+                <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#0b0d0c]/75]">
                   See everything we build on one page.
                 </p>
               </div>
               <Link
                 href="/services"
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[13.5px] font-medium text-[#ece9e3] hover:bg-[#161615]"
+                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[0.8438rem] font-medium text-[#ece9e3] hover:bg-[#161615]"
               >
                 All services
                 <ArrowUpRight className="h-3.5 w-3.5" />

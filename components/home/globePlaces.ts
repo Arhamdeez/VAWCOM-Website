@@ -12,6 +12,14 @@ export type GlobePlace = {
 /** Client markets on the home globe. Add `projectIds` when a public write-up exists. */
 export const GLOBE_PLACES: GlobePlace[] = [
   {
+    id: 'usa',
+    name: 'USA',
+    lat: 39.8,
+    lon: -98.5,
+    blurb: 'We have worked with clients in the USA.',
+    projectIds: [],
+  },
+  {
     id: 'france',
     name: 'France',
     lat: 46.6,

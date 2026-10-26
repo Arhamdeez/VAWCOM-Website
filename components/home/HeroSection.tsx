@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
@@ -34,7 +34,7 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
           : { opacity: 1, y: 0, pointerEvents: 'auto' as const }
       }
       transition={reduce ? { duration: 0 } : { duration: DUR.std, ease: EASE }}
-      className="fixed inset-x-3 top-3 z-[61] flex h-10 items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
+      className="fixed inset-x-3 top-3 z-[61] mx-auto flex h-10 max-w-[90rem] items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
     >
       <div className="flex items-center gap-1">
         <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className={item} aria-label="Instagram">
@@ -51,7 +51,7 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
         href={getGmailComposeUrl()}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[12.5px] text-white/75 hover:text-[#2dd4a8]"
+        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[0.7813rem] text-white/75 hover:text-[#2dd4a8]"
       >
         <IconMail size={15} />
         <span className="hidden sm:inline">{CONTACT_EMAIL}</span>
@@ -74,9 +74,29 @@ export default function HeroSection() {
     return () => mq.removeEventListener('change', sync);
   }, []);
 
+  // Safari's toolbar resizes the viewport (and svh on newer iOS) while scrolling, which
+  // re-centred the hero text. Lock the height at load; only a width change (rotation) re-measures.
+  const heroRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let width = window.innerWidth;
+    const lock = () => {
+      if (heroRef.current) heroRef.current.style.minHeight = `${window.innerHeight}px`;
+    };
+    lock();
+    const onResize = () => {
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      lock();
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   return (
     <section id="top" className="vaw-hero relative z-[2] overflow-visible">
-      <div className={`relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 ${
+      <div
+        ref={heroRef}
+        className={`relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[90rem] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 ${
         CENTERED ? 'sm:pt-44 lg:px-8 lg:pt-48' : 'sm:pt-52 lg:pt-56 lg:pl-20 xl:pl-24'
       }`}>
         <div
@@ -116,16 +136,22 @@ export default function HeroSection() {
               }`}
             >
               {SERVICE_ROWS.map((row, r) => (
-                <li key={row[0]} className="flex items-center gap-2 whitespace-nowrap sm:gap-3">
+                <li
+                  key={row[0]}
+                  className={`flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 max-[374px]:gap-x-3 sm:gap-3 ${
+                    CENTERED ? 'justify-center' : 'justify-start'
+                  }`}
+                >
                   {r > 0 && (
                     <span aria-hidden className="hidden font-normal sm:inline" style={{ color: ACCENT }}>
                       |
                     </span>
                   )}
                   {row.map((name, i) => (
-                    <span key={name} className="flex items-center gap-2 sm:gap-3">
+                    <span key={name} className="flex items-center gap-x-2 sm:gap-3">
+                      {/* Under 375px the row wraps; a bar would start the next line */}
                       {i > 0 && (
-                        <span aria-hidden className="font-normal" style={{ color: ACCENT }}>
+                        <span aria-hidden className="font-normal max-[374px]:hidden" style={{ color: ACCENT }}>
                           |
                         </span>
                       )}
@@ -158,7 +184,7 @@ export default function HeroSection() {
               <Link
                 href="/contact"
                 className={`inline-flex items-center gap-2 rounded-full bg-[#0cb78b] font-semibold uppercase tracking-[0.06em] text-[#f5f3ee] transition-colors hover:bg-[#0a9d77] ${
-                  CENTERED ? 'px-6 py-3.5 text-[14px]' : 'px-5 py-3 text-[13.5px]'
+                  CENTERED ? 'px-6 py-3.5 text-[0.875rem]' : 'px-5 py-3 text-[0.8438rem]'
                 }`}
               >
                 Start building
@@ -180,7 +206,7 @@ export default function HeroSection() {
                     type="button"
                     disabled={typing}
                     onClick={() => void ask(label)}
-                    className="rounded-full border border-black/[0.08] bg-white/40 px-3.5 py-1.5 text-[13px] text-[#5c5a56] transition-colors hover:border-[#0cb78b]/50 hover:text-[#161615] disabled:opacity-40"
+                    className="rounded-full border border-black/[0.08] bg-white/40 px-3.5 py-1.5 text-[0.8125rem] text-[#5c5a56] transition-colors hover:border-[#0cb78b]/50 hover:text-[#161615] disabled:opacity-40"
                   >
                     {label}
                   </button>

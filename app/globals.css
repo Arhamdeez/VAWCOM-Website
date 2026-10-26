@@ -16,6 +16,45 @@
   --vaw-dur-std: 250ms;
   --vaw-dur-enter: 500ms;
   --vaw-dur-morph: 750ms;
+  /* Content shell: phone → 49" displays stay readable, not stretched edge-to-edge */
+  --vaw-shell: 90rem; /* 1440px */
+  --vaw-shell-narrow: 68.75rem; /* 1100px */
+  --vaw-shell-pad: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vaw-shell-pad: 2rem;
+  }
+}
+
+/* Large screens: grow the whole site (all sizes are rem) instead of leaving a small island
+   in the middle. 16px up to a 1440×900 laptop; 1.2× at 1920×1080, 1.6× at 2560×1440, 2× cap at 4K.
+   Whichever of width or height is tighter wins, so ultrawides don't blow up. */
+html {
+  font-size: clamp(100%, min(1.1111vw, 1.7778vh), 200%);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+.vaw-shell {
+  width: 100%;
+  max-width: var(--vaw-shell);
+  margin-inline: auto;
+  padding-inline: max(var(--vaw-shell-pad), env(safe-area-inset-left, 0px))
+    max(var(--vaw-shell-pad), env(safe-area-inset-right, 0px));
+}
+
+.vaw-shell-narrow {
+  width: 100%;
+  max-width: var(--vaw-shell-narrow);
+  margin-inline: auto;
+  padding-inline: max(var(--vaw-shell-pad), env(safe-area-inset-left, 0px))
+    max(var(--vaw-shell-pad), env(safe-area-inset-right, 0px));
 }
 
 html {
@@ -113,8 +152,20 @@ html.splash-complete:has(.vaw-hero) body {
   background-color: #f5f3ee !important;
 }
 
-html.splash-pending body,
-html.splash-exiting body {
+/* iOS paints the area under Safari's bottom toolbar (and any bounce) with the root background:
+   match the footer's last colour there; body keeps the cream. */
+html:has(.vaw-footer) {
+  overscroll-behavior-y: none;
+}
+html.splash-complete:has(.vaw-footer) {
+  background-color: #9fdfc4 !important;
+}
+
+/* Never lock scroll on splash-pending alone — a missed React mount left mobile
+   users on a cream plate with overflow:hidden and no way to navigate. Scroll
+   locks only while the live React splash is showing (.splash-locked). */
+html.splash-locked,
+html.splash-locked body {
   overflow: hidden !important;
 }
 
@@ -129,28 +180,65 @@ html.splash-exiting body {
   pointer-events: none;
 }
 
-html.splash-pending .splash-boot {
-  display: block;
+/* Only pages whose first paint is wrong until JS runs (the home scribble) get the plate; keep
+   this :has() list in sync with needsSplash() in SplashScreenWrapper. Swallows touches so nobody
+   scrolls the page underneath; the inline failsafe in layout.tsx drops it. */
+html.splash-pending:has(.vaw-follow-span) .splash-boot,
+html.splash-pending.splash-forced .splash-boot,
+html.splash-exiting .splash-boot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   inset: 0;
   z-index: 9998;
-  opacity: 1;
+  padding-inline: 1.5rem;
   background: #f5f3ee;
-  transition: opacity var(--vaw-dur-enter) var(--vaw-ease);
+  opacity: 1;
+  pointer-events: auto;
+  touch-action: none;
 }
 
-html.splash-pending.splash-react-ready .splash-boot {
-  opacity: 0;
+html.splash-pending:not(.splash-react-ready):has(.vaw-follow-span),
+html.splash-pending:not(.splash-react-ready):has(.vaw-follow-span) body {
+  overflow: hidden;
 }
 
-html.splash-complete .splash-boot,
+/* Delayed so a fast load is just a brief cream frame, never a logo flash. Keep the delay in
+   sync with LOGO_DELAY_MS in SplashScreen. */
+.splash-boot img {
+  animation: splash-logo-in 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms backwards;
+}
+
+/* Logo leaves first, then the plate dissolves to reveal the page. */
 html.splash-exiting .splash-boot {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1) 150ms;
+}
+html.splash-exiting .splash-boot img {
+  animation: none;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+
+@keyframes splash-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.splash-pending .splash-boot {
-    transition: opacity 0.15s ease;
+  .splash-boot img {
+    animation-duration: 200ms;
+  }
+  html.splash-exiting .splash-boot,
+  html.splash-exiting .splash-boot img {
+    transform: none;
+    transition-duration: 200ms;
+    transition-delay: 0ms;
   }
 }
 

@@ -59,9 +59,9 @@ export default function CompanyFilm() {
     <div ref={frameRef} className="relative">
       <video
         ref={videoRef}
-        className="block aspect-video w-full bg-[#161615] object-contain"
+        className="block aspect-video w-full bg-[#161615] object-contain object-[center_calc(50%-0.75rem)]"
         src="/vawcom_video.mp4"
-        poster="/vawcom_video_poster.jpg"
+        poster="/thumbnail.png"
         controls={started}
         playsInline
         preload="metadata"
@@ -88,8 +88,8 @@ export default function CompanyFilm() {
           <span
             ref={bubbleRef}
             aria-hidden
-            className={`pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-white/95 text-[#161615] shadow-[0_6px_20px_rgba(0,0,0,0.28)] transition-[width,height,padding] duration-micro ${
-              hovering ? 'h-9 px-4 text-[13px] font-medium' : 'h-11 w-11'
+            className={`pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-white/95 text-[#161615] shadow-[0_0.375rem_1.25rem_rgba(0,0,0,0.28)] transition-[width,height,padding] duration-micro ${
+              hovering ? 'h-9 px-4 text-[0.8125rem] font-medium' : 'h-11 w-11'
             }`}
           >
             <Play className={`fill-current ${hovering ? 'h-3 w-3' : 'ml-0.5 h-4 w-4'}`} />

@@ -71,7 +71,7 @@ export default function ServiceJump({
         <div className="sticky top-[4.75rem] z-40 bg-[#f5f3ee]/90 backdrop-blur-md lg:hidden">
           <div className="flex gap-2 overflow-x-auto px-6 py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SERVICES.map((s) => {
-              const className = `flex-none rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+              const className = `flex-none rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium transition-colors ${
                 active === s.id
                   ? 'bg-[#0cb78b] text-[#f5f3ee]'
                   : 'bg-black/[0.04] text-[#5c5a56]'
@@ -105,7 +105,7 @@ export default function ServiceJump({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
               transition={{ duration: DUR.std, ease: EASE }}
-              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-[width] duration-std ${
+              className={`pointer-events-auto flex max-h-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_0.75rem_2.5rem_rgba(0,0,0,0.4)] transition-[width] duration-std ${
                 open ? 'w-[11.5rem]' : 'w-11'
               }`}
             >
@@ -118,7 +118,7 @@ export default function ServiceJump({
               >
                 <List className="h-4 w-4" strokeWidth={2} />
                 <span
-                  className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+                  className="text-[0.625rem] font-semibold uppercase tracking-[0.18em]"
                   style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
                 >
                   Jump
@@ -134,12 +134,12 @@ export default function ServiceJump({
                   open ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
               >
-                <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
+                <p className="mb-2 px-3 text-[0.625rem] font-medium uppercase tracking-[0.14em] text-[#8a8882]">
                   Services
                 </p>
                 <ul className="space-y-0.5">
                   {SERVICES.map((s) => {
-                    const itemClass = `block w-full rounded-lg px-3 py-1.5 text-left text-[13px] transition-colors ${
+                    const itemClass = `block w-full rounded-lg px-3 py-1.5 text-left text-[0.8125rem] transition-colors ${
                       active === s.id
                         ? 'bg-[#0cb78b]/20 font-medium text-[#0cb78b]'
                         : 'text-[#c4c2bb] hover:bg-white/[0.06] hover:text-white'

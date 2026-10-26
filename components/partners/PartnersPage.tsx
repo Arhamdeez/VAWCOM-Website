@@ -60,11 +60,11 @@ const ICONS: Record<string, LucideIcon> = {
   calendar: CalendarRange,
 };
 
-const shell = 'mx-auto w-full max-w-[1100px] px-6 sm:px-8 lg:px-10';
-const eyebrow = 'mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]';
+const shell = 'vaw-shell-narrow';
+const eyebrow = 'mb-3 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]';
 const h2 =
   'vaw-display m-0 text-[clamp(1.8rem,3.6vw,2.7rem)] leading-[1] tracking-[-0.03em] text-[#161615]';
-const lede = 'mt-4 mb-0 max-w-[46ch] text-[16px] leading-relaxed text-[#5c5a56]';
+const lede = 'mt-4 mb-0 max-w-[46ch] text-[1rem] leading-relaxed text-[#5c5a56]';
 
 const contactHref = `/contact?service=${encodeURIComponent(PARTNER_CONTACT_SERVICE)}`;
 
@@ -87,11 +87,11 @@ export default function PartnersPage() {
               className="vaw-enter mb-5 flex flex-wrap items-center gap-2"
               style={{ '--vaw-enter-delay': '0s' } as React.CSSProperties}
             >
-              <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#0a9d77] shadow-[0_6px_18px_rgba(22,22,21,0.06)]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#0a9d77] shadow-[0_0.375rem_1.125rem_rgba(22,22,21,0.06)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0cb78b]" />
                 White-label partnerships
               </span>
-              <span className="rounded-full border border-black/[0.08] px-3 py-1.5 text-[12px] font-medium text-[#5c5a56]">
+              <span className="rounded-full border border-black/[0.08] px-3 py-1.5 text-[0.75rem] font-medium text-[#5c5a56]">
                 Also offered by VAWCOM
               </span>
             </div>
@@ -103,7 +103,7 @@ export default function PartnersPage() {
               <span className="block text-[#0cb78b]">We build it.</span>
             </h1>
             <p
-              className="vaw-enter mb-0 mt-5 max-w-[34rem] text-[17px] leading-relaxed text-[#5c5a56]"
+              className="vaw-enter mb-0 mt-5 max-w-[34rem] text-[1.0625rem] leading-relaxed text-[#5c5a56]"
               style={{ '--vaw-enter-delay': '0.14s' } as React.CSSProperties}
             >
               Your brand gets the credit. We design, build and maintain web apps, mobile apps, SaaS
@@ -116,14 +116,14 @@ export default function PartnersPage() {
             >
               <Link
                 href={contactHref}
-                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-6 py-3.5 text-[14.5px] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] hover:text-[#0b0d0c]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-6 py-3.5 text-[0.9063rem] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] hover:text-[#0b0d0c]"
               >
                 Become a partner
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center gap-2 rounded-full border border-black/[0.1] bg-white px-6 py-3.5 text-[14.5px] font-medium text-[#161615] hover:border-[#0cb78b]/50 hover:text-[#0a9d77]"
+                className="inline-flex items-center gap-2 rounded-full border border-black/[0.1] bg-white px-6 py-3.5 text-[0.9063rem] font-medium text-[#161615] hover:border-[#0cb78b]/50 hover:text-[#0a9d77]"
               >
                 See how it works
               </a>
@@ -137,10 +137,10 @@ export default function PartnersPage() {
         {/* ───────── "Also offered" note ───────── */}
         <div className={`${shell} pb-6`}>
           <Reveal className="flex flex-col gap-4 rounded-[1.5rem] border border-[#0cb78b]/25 bg-[#e6faf3]/70 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-white text-[#0cb78b] shadow-[0_6px_18px_rgba(12,183,139,0.18)]">
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-white text-[#0cb78b] shadow-[0_0.375rem_1.125rem_rgba(12,183,139,0.18)]">
               <Layers className="h-5 w-5" strokeWidth={1.9} />
             </span>
-            <p className="m-0 flex-1 text-[15px] leading-relaxed text-[#2b3a35]">
+            <p className="m-0 flex-1 text-[0.9375rem] leading-relaxed text-[#2b3a35]">
               <strong className="font-semibold text-[#161615]">A side of what we do.</strong>{' '}
               Building websites, apps, voice agents and AI for our own clients is our main work.
               White-label partnership is something we also offer, for agencies and studios who want
@@ -148,7 +148,7 @@ export default function PartnersPage() {
             </p>
             <Link
               href="/services"
-              className="inline-flex flex-none items-center gap-1 text-[14px] font-medium text-[#0a9d77] hover:text-[#067055]"
+              className="inline-flex flex-none items-center gap-1 text-[0.875rem] font-medium text-[#0a9d77] hover:text-[#067055]"
             >
               Our core services
               <ArrowUpRight className="h-4 w-4" />
@@ -175,7 +175,7 @@ export default function PartnersPage() {
                 <Reveal
                   key={item.title}
                   delay={(i % 3) * 0.07}
-                  className={`group rounded-[1.5rem] border border-black/[0.05] bg-white p-6 shadow-[0_10px_28px_rgba(22,22,21,0.05)] transition-[transform,box-shadow,border-color] duration-std hover:-translate-y-1 hover:border-[#0cb78b]/40 hover:shadow-[0_18px_40px_rgba(12,183,139,0.14)] lg:col-span-2 ${centredLast(
+                  className={`group rounded-[1.5rem] border border-black/[0.05] bg-white p-6 shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.05)] transition-[transform,box-shadow,border-color] duration-std hover:-translate-y-1 hover:border-[#0cb78b]/40 hover:shadow-[0_1.125rem_2.5rem_rgba(12,183,139,0.14)] lg:col-span-2 ${centredLast(
                     i,
                     WHITE_LABEL.length,
                   )}`}
@@ -183,10 +183,10 @@ export default function PartnersPage() {
                   <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#0cb78b]/15 text-[#0a9d77] transition-[transform,background-color] duration-std group-hover:scale-110 group-hover:bg-[#0cb78b]/20">
                     <Icon className="h-5 w-5" strokeWidth={1.9} />
                   </span>
-                  <h3 className="m-0 text-[16.5px] font-semibold tracking-[-0.01em] text-[#161615]">
+                  <h3 className="m-0 text-[1.0313rem] font-semibold tracking-[-0.01em] text-[#161615]">
                     {item.title}
                   </h3>
-                  <p className="mb-0 mt-2 text-[14.5px] leading-relaxed text-[#5c5a56]">{item.body}</p>
+                  <p className="mb-0 mt-2 text-[0.9063rem] leading-relaxed text-[#5c5a56]">{item.body}</p>
                 </Reveal>
               );
             })}
@@ -235,26 +235,26 @@ export default function PartnersPage() {
                 <Reveal
                   key={m.name}
                   delay={i * 0.08}
-                  className="group relative overflow-hidden rounded-[1.5rem] border border-black/[0.05] bg-white p-6 shadow-[0_10px_28px_rgba(22,22,21,0.05)] transition-[transform,box-shadow,border-color] duration-std hover:-translate-y-1 hover:border-[#0cb78b]/40 hover:shadow-[0_18px_40px_rgba(12,183,139,0.14)]"
+                  className="group relative overflow-hidden rounded-[1.5rem] border border-black/[0.05] bg-white p-6 shadow-[0_0.625rem_1.75rem_rgba(22,22,21,0.05)] transition-[transform,box-shadow,border-color] duration-std hover:-translate-y-1 hover:border-[#0cb78b]/40 hover:shadow-[0_1.125rem_2.5rem_rgba(12,183,139,0.14)]"
                 >
                   <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#0cb78b]/15 text-[#0a9d77]">
                     <Icon className="h-5 w-5" strokeWidth={1.9} />
                   </span>
-                  <h3 className="m-0 text-[18px] font-semibold tracking-[-0.015em] text-[#161615]">
+                  <h3 className="m-0 text-[1.125rem] font-semibold tracking-[-0.015em] text-[#161615]">
                     {m.name}
                   </h3>
-                  <p className="mb-0 mt-3 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-[#8a8882]">
+                  <p className="mb-0 mt-3 text-[0.7188rem] font-semibold uppercase tracking-[0.12em] text-[#8a8882]">
                     Best for
                   </p>
-                  <p className="mb-0 mt-1 text-[14.5px] font-medium leading-snug text-[#161615]">
+                  <p className="mb-0 mt-1 text-[0.9063rem] font-medium leading-snug text-[#161615]">
                     {m.best}
                   </p>
-                  <p className="mb-0 mt-3 text-[14px] leading-relaxed text-[#5c5a56]">{m.how}</p>
+                  <p className="mb-0 mt-3 text-[0.875rem] leading-relaxed text-[#5c5a56]">{m.how}</p>
                 </Reveal>
               );
             })}
           </div>
-          <Reveal as="p" className="mb-0 mt-5 text-center text-[14.5px] text-[#5c5a56]">
+          <Reveal as="p" className="mb-0 mt-5 text-center text-[0.9063rem] text-[#5c5a56]">
             Not sure which fits? We&apos;ll recommend an engagement model during the first call.
           </Reveal>
         </section>
@@ -275,7 +275,7 @@ export default function PartnersPage() {
                 {COUNTRIES.map((c, i) => (
                   <li
                     key={c}
-                    className="flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#161615]"
+                    className="flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[0.8125rem] font-medium text-[#161615]"
                   >
                     <span
                       className="vaw-dot h-1.5 w-1.5 rounded-full bg-[#0cb78b]"
@@ -293,10 +293,10 @@ export default function PartnersPage() {
                     <Check className="h-4 w-4" strokeWidth={2.6} />
                   </span>
                   <div>
-                    <h3 className="m-0 text-[16.5px] font-semibold tracking-[-0.01em] text-[#161615]">
+                    <h3 className="m-0 text-[1.0313rem] font-semibold tracking-[-0.01em] text-[#161615]">
                       {w.title}
                     </h3>
-                    <p className="mb-0 mt-1 text-[14.5px] leading-relaxed text-[#5c5a56]">{w.body}</p>
+                    <p className="mb-0 mt-1 text-[0.9063rem] leading-relaxed text-[#5c5a56]">{w.body}</p>
                   </div>
                 </Reveal>
               ))}
@@ -328,7 +328,7 @@ export default function PartnersPage() {
             }}
           >
             <h2 className={`${h2} !text-[#f5f3ee]`}>Ready to partner with us?</h2>
-            <p className="mx-auto mb-0 mt-4 max-w-[46ch] text-[15.5px] leading-relaxed text-white/85">
+            <p className="mx-auto mb-0 mt-4 max-w-[46ch] text-[0.9688rem] leading-relaxed text-white/85">
               Tell us what you&apos;re building. We&apos;ll get back to you within one business day
               with initial feedback, likely next steps and a path to scope the work, free and with no
               obligation.
@@ -336,7 +336,7 @@ export default function PartnersPage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/contact?service=Consultation"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-6 py-3.5 text-[14.5px] font-semibold text-[#0b0d0c] hover:bg-[#2dd4a8] hover:text-[#0b0d0c]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0cb78b] px-6 py-3.5 text-[0.9063rem] font-semibold text-[#0b0d0c] hover:bg-[#2dd4a8] hover:text-[#0b0d0c]"
               >
                 Book a free consultation
                 <ArrowUpRight className="h-4 w-4" />
@@ -345,13 +345,13 @@ export default function PartnersPage() {
                 href={getGmailComposeUrl('White-label partnership inquiry')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-[14.5px] font-medium text-white hover:border-white/60 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-[0.9063rem] font-medium text-white hover:border-white/60 hover:text-white"
               >
                 <Mail className="h-4 w-4" />
                 {CONTACT_EMAIL}
               </a>
             </div>
-            <p className="mx-auto mb-0 mt-6 max-w-[48ch] text-[13px] leading-relaxed text-white/60">
+            <p className="mx-auto mb-0 mt-6 max-w-[48ch] text-[0.8125rem] leading-relaxed text-white/60">
               Your details are treated confidentially. We can discuss an NDA before reviewing sensitive
               project information.
             </p>
