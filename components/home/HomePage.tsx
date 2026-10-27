@@ -11,7 +11,7 @@ import TechStackSection from './TechStackSection';
 import WhyChooseUs from './WhyChooseUs';
 import AiPromoSection from './AiPromoSection';
 import CtaFooter from './CtaFooter';
-import { EASE, DUR } from '@/lib/motion';
+import { NAV_MORPH } from '@/lib/motion';
 
 function HomeChrome() {
   const [navOpen, setNavOpen] = useState<NavOpen>('full');
@@ -67,7 +67,7 @@ function HomeChrome() {
         initial={false}
         // transform instead of `top`: same 54 → 16 travel without a layout pass per frame
         animate={{ y: atTop ? '0rem' : '-2.375rem' }}
-        transition={{ duration: DUR.morph, ease: EASE }}
+        transition={NAV_MORPH}
       >
         <div className="pointer-events-auto flex w-full justify-center">
           <PillNav collapsible open={navOpen} active="home" embedded />

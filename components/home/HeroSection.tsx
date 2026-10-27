@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { CONTACT_EMAIL, HERO_CENTERED_TRYOUT as CENTERED, SOCIAL, getGmailComposeUrl } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
 import { CHAT_PROMPTS, HeroChatSlot, useSiteChat } from '@/components/chat/SiteChat';
-import { EASE, DUR } from '@/lib/motion';
+import { EASE, DUR, NAV_MORPH } from '@/lib/motion';
 
 const VawcomBot = dynamic(() => import('./VawcomBot'), { ssr: false });
 
@@ -30,10 +30,16 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
       initial={false}
       animate={
         hidden
-          ? { opacity: 0, y: -12, pointerEvents: 'none' as const }
-          : { opacity: 1, y: 0, pointerEvents: 'auto' as const }
+          ? { opacity: 0, pointerEvents: 'none' as const }
+          : { opacity: 1, pointerEvents: 'auto' as const }
       }
-      transition={reduce ? { duration: 0 } : { duration: DUR.std, ease: EASE }}
+      transition={
+        reduce
+          ? { duration: 0 }
+          : hidden
+            ? { duration: 0.2, ease: NAV_MORPH.ease }
+            : { duration: 0.3, ease: NAV_MORPH.ease, delay: 0.15 }
+      }
       className="fixed inset-x-3 top-3 z-[61] mx-auto flex h-10 max-w-[90rem] items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
     >
       <div className="flex items-center gap-1">

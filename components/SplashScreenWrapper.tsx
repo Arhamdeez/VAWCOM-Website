@@ -112,6 +112,11 @@ export default function SplashScreenWrapper({
       <div className="splash-boot" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo-mark.png" alt="" width={690} height={370} className={SPLASH_LOGO_CLASS} />
+        <span className="splash-dots">
+          <span />
+          <span />
+          <span />
+        </span>
       </div>
       <div id="vawcom-app" className="relative">
         {children}

@@ -9,7 +9,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { servicesInNavOrder } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
-import { EASE, DUR } from '@/lib/motion';
+import { EASE, DUR, NAV_MORPH } from '@/lib/motion';
 
 export type NavOpen = 'full' | 'half' | 'compact';
 
@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ease = EASE;
-const morph = { duration: DUR.morph, ease };
+const morph = NAV_MORPH;
 
 function MobileNav({
   active,
@@ -300,20 +300,13 @@ function DesktopNav({
   const linkMax = !collapsible ? undefined : full ? '47.5rem' : showLinks ? '26.25rem' : '0rem';
 
   return (
-    <motion.div
-      layout
-      initial={false}
-      animate={{
-        borderRadius: full ? '1.25rem' : '999rem',
-      }}
-      transition={{
-        layout: morph,
-        borderRadius: morph,
-      }}
-      className={`vaw-nav-glass overflow-visible transition-[background,border-color,box-shadow] duration-std ${
+    <div
+      className={`vaw-nav-glass vaw-nav-morph overflow-visible ${
         onDark ? 'vaw-nav-glass-on-dark' : ''
       } ${embedded ? 'relative' : 'fixed left-0 right-0 top-5 z-[60]'} mx-auto px-4 py-2.5 pl-4 ${
-        full ? 'w-full max-w-[90rem] sm:px-5' : 'w-max max-w-[calc(100vw-2rem)]'
+        full
+          ? 'w-full max-w-[90rem] rounded-[1.25rem] sm:px-5'
+          : 'w-max max-w-[calc(100vw-2rem)] rounded-full'
       }`}
     >
       <div
@@ -442,6 +435,6 @@ function DesktopNav({
           </Link>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

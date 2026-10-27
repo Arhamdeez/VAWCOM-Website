@@ -195,6 +195,23 @@ body:has(.vaw-home) {
     0 12px 36px rgba(0, 0, 0, 0.28);
 }
 
+/* Width grows with the box itself. `layout` scaled the pill and kicked it up under the social bar. */
+.vaw-nav-morph {
+  interpolate-size: allow-keywords;
+  transition:
+    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-nav-morph {
+    transition-duration: 0.01ms;
+  }
+}
+
 .vaw-nav-glass-inner {
   position: relative;
   z-index: 1;

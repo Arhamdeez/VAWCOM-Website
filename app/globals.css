@@ -187,8 +187,10 @@ html.splash-pending:has(.vaw-follow-span) .splash-boot,
 html.splash-pending.splash-forced .splash-boot,
 html.splash-exiting .splash-boot {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1.25rem;
   position: fixed;
   inset: 0;
   z-index: 9998;
@@ -204,10 +206,29 @@ html.splash-pending:not(.splash-react-ready):has(.vaw-follow-span) body {
   overflow: hidden;
 }
 
-/* Delayed so a fast load is just a brief cream frame, never a logo flash. Keep the delay in
-   sync with LOGO_DELAY_MS in SplashScreen. */
-.splash-boot img {
-  animation: splash-logo-in 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms backwards;
+/* Same entrance, no delay, so the mark and the dots show up together. */
+.splash-boot img,
+.splash-dots {
+  animation: splash-logo-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.splash-dots {
+  display: flex;
+  gap: 0.55rem;
+}
+.splash-dots span {
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #0cb78b;
+  animation: splash-dot 0.9s ease-in-out infinite;
+}
+.splash-dots span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+.splash-dots span:nth-child(3) {
+  animation-delay: 0.28s;
 }
 
 /* Logo leaves first, then the plate dissolves to reveal the page. */
@@ -216,11 +237,14 @@ html.splash-exiting .splash-boot {
   pointer-events: none;
   transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1) 150ms;
 }
-html.splash-exiting .splash-boot img {
+html.splash-exiting .splash-boot img,
+html.splash-exiting .splash-dots {
   animation: none;
   opacity: 0;
-  transform: scale(0.94);
   transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+html.splash-exiting .splash-boot img {
+  transform: scale(0.94);
 }
 
 @keyframes splash-logo-in {
@@ -230,12 +254,30 @@ html.splash-exiting .splash-boot img {
   }
 }
 
+@keyframes splash-dot {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .splash-boot img {
+  .splash-boot img,
+  .splash-dots {
     animation-duration: 200ms;
   }
+  .splash-dots span {
+    animation: none;
+    opacity: 0.7;
+  }
   html.splash-exiting .splash-boot,
-  html.splash-exiting .splash-boot img {
+  html.splash-exiting .splash-boot img,
+  html.splash-exiting .splash-dots {
     transform: none;
     transition-duration: 200ms;
     transition-delay: 0ms;

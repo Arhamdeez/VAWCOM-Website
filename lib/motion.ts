@@ -17,6 +17,13 @@ export const DUR = {
   morph: 0.75,
 } as const;
 
+/** Homepage navbar expand and the social bar. A plain tween so the bar does not spring. */
+export const NAV_MORPH = {
+  type: 'tween' as const,
+  duration: 0.45,
+  ease: [0.4, 0, 0.2, 1] as const,
+};
+
 /**
  * SVG animateMotion keys that pause briefly at each of `nodeCount` evenly spaced path nodes.
  * Travel:pause unit ratio is 2:1. `calcMode` must be `"linear"`.

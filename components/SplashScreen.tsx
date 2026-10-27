@@ -16,8 +16,6 @@ export const SPLASH_LOGO_CLASS =
  * Drives the server-rendered `.splash-boot` plate (globals.css owns the visuals): holds it
  * until the page is ready, then flips `splash-exiting` so the logo and plate fade out.
  */
-/** Logo fade-in delay in globals.css (`.splash-boot img`). */
-const LOGO_DELAY_MS = 300;
 /** Logo out (300ms) overlapping plate fade (150ms delay + 500ms), see globals.css. */
 const FADE_OUT_MS = 650;
 /** Never hold the user longer than this, even if something never reports ready. */
@@ -38,12 +36,10 @@ function pageReady(): Promise<void> {
   ]);
 }
 
-/** A logo that has started fading in finishes before leaving; one still in its delay is skipped. */
+/** Let the shared entrance finish so the splash never leaves on dots alone. */
 function logoSettled(): Promise<void> {
   const logo = document.querySelector('.splash-boot img');
-  const running = (logo?.getAnimations?.() ?? []).filter(
-    (a) => a.playState === 'running' && Number(a.currentTime) > LOGO_DELAY_MS,
-  );
+  const running = (logo?.getAnimations?.() ?? []).filter((a) => a.playState === 'running');
   return Promise.all(running.map((a) => a.finished.catch(() => undefined))).then(() => undefined);
 }
 
