@@ -10,14 +10,6 @@ function wantsForcedSplash(pathname: string, search: string): boolean {
   return /(?:\?|&)splash(?:=|&|$)/.test(search);
 }
 
-/** Splash covers a full page load (not client-side navigations) only while the page isn't ready. */
-let bootSplashShown = false;
-
-/** Pages whose first paint is wrong until JS runs; mirrors the :has() gate in globals.css. */
-function needsSplash(): boolean {
-  return !!document.querySelector('.vaw-follow-span');
-}
-
 function setSplashPending(pending: boolean, forced = false) {
   const root = document.documentElement;
   root.classList.toggle('splash-pending', pending);
@@ -81,23 +73,19 @@ export default function SplashScreenWrapper({
 
     if (forced) {
       completedRef.current = false;
-      bootSplashShown = true;
       setSplashPending(true, true);
       setShowSplash(true);
       return;
     }
 
     if (activeRef.current) return;
-    if (hasSeenSplash() || completedRef.current || bootSplashShown || !needsSplash()) {
-      bootSplashShown = true;
+    if (hasSeenSplash() || completedRef.current) {
       completedRef.current = true;
       setSplashComplete();
       return;
     }
 
-    bootSplashShown = true;
     activeRef.current = true;
-    markSplashSeen();
     setSplashPending(true);
     setShowSplash(true);
   }, [finishSplash, pathname]);

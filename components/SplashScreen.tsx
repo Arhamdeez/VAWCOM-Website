@@ -21,7 +21,7 @@ const FADE_OUT_MS = 650;
 /** Never hold the user longer than this, even if something never reports ready. */
 const MAX_WAIT_MS = 6000;
 /** Floor so a cached production load still leaves the mark readable. */
-const MIN_VISIBLE_MS = 1800;
+const MIN_VISIBLE_MS = 1400;
 
 /** Webfonts + (on home) the measured scribble, then two frames so it has painted. */
 function pageReady(): Promise<void> {

@@ -4,16 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 
 /**
- * Company film. Before it starts, a "Play" bubble follows the pointer over the whole frame
- * (click anywhere to play, with sound). On touch screens, and at rest, it sits in the centre.
- * Once playing, the native controls take over.
+ * Company film. A centred play button starts it with sound. Once playing, the native controls take over.
  */
 export default function CompanyFilm() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const bubbleRef = useRef<HTMLSpanElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
-  const [hovering, setHovering] = useState(false);
 
   const play = useCallback(() => {
     const v = videoRef.current;
@@ -36,27 +31,8 @@ export default function CompanyFilm() {
     return () => v.removeEventListener('ended', onEnded);
   }, []);
 
-  // Bubble tracks the pointer directly (no React state per move).
-  const move = useCallback((e: React.PointerEvent) => {
-    if (e.pointerType === 'touch') return;
-    const frame = frameRef.current;
-    const bubble = bubbleRef.current;
-    if (!frame || !bubble) return;
-    const r = frame.getBoundingClientRect();
-    bubble.style.left = `${e.clientX - r.left}px`;
-    bubble.style.top = `${e.clientY - r.top}px`;
-  }, []);
-
-  const enter = useCallback((e: React.PointerEvent) => {
-    if (e.pointerType === 'touch') return;
-    setHovering(true);
-    move(e);
-    // Start buffering now so the click plays straight away.
-    if (videoRef.current) videoRef.current.preload = 'auto';
-  }, [move]);
-
   return (
-    <div ref={frameRef} className="relative">
+    <div className="relative">
       <video
         ref={videoRef}
         className="block aspect-video w-full bg-[#161615] object-contain object-[center_calc(50%-0.75rem)]"
@@ -72,28 +48,14 @@ export default function CompanyFilm() {
         <button
           type="button"
           onClick={play}
-          onPointerEnter={enter}
-          onPointerMove={move}
-          onPointerLeave={() => {
-            setHovering(false);
-            // back to the centre resting spot
-            if (bubbleRef.current) {
-              bubbleRef.current.style.left = '';
-              bubbleRef.current.style.top = '';
-            }
-          }}
           aria-label="Play the company film with sound"
-          className="vaw-film-hit absolute inset-0 block h-full w-full border-0 bg-transparent p-0"
+          className="absolute inset-0 block h-full w-full border-0 bg-transparent p-0"
         >
           <span
-            ref={bubbleRef}
             aria-hidden
-            className={`pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1.5 rounded-full bg-white/95 text-[#161615] shadow-[0_0.375rem_1.25rem_rgba(0,0,0,0.28)] transition-[width,height,padding] duration-micro ${
-              hovering ? 'h-9 px-4 text-[0.8125rem] font-medium' : 'h-11 w-11'
-            }`}
+            className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#161615] shadow-[0_0.375rem_1.25rem_rgba(0,0,0,0.28)]"
           >
-            <Play className={`fill-current ${hovering ? 'h-3 w-3' : 'ml-0.5 h-4 w-4'}`} />
-            {hovering ? <span>Play</span> : null}
+            <Play className="ml-0.5 h-4 w-4 fill-current" />
           </span>
         </button>
       )}

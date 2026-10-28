@@ -61,64 +61,6 @@ html {
   -ms-overflow-style: none;
 }
 
-/* Theme cursors (fine pointers only — leave touch alone) */
-@media (pointer: fine) {
-  :root {
-    /* Hotspots = green tip after dual outline (dark + white) for contrast on brand green */
-    --vaw-cursor-arrow: image-set(
-        url('/cursors/vaw-arrow.png') 1x,
-        url('/cursors/vaw-arrow@2x.png') 2x
-      )
-      2 2,
-      -webkit-image-set(
-        url('/cursors/vaw-arrow.png') 1x,
-        url('/cursors/vaw-arrow@2x.png') 2x
-      )
-      2 2,
-      url('/cursors/vaw-arrow.png') 2 2,
-      auto;
-    --vaw-cursor-hand: image-set(
-        url('/cursors/vaw-hand.png') 1x,
-        url('/cursors/vaw-hand@2x.png') 2x
-      )
-      6 2,
-      -webkit-image-set(
-        url('/cursors/vaw-hand.png') 1x,
-        url('/cursors/vaw-hand@2x.png') 2x
-      )
-      6 2,
-      url('/cursors/vaw-hand.png') 6 2,
-      pointer;
-  }
-
-  html,
-  body {
-    cursor: var(--vaw-cursor-arrow);
-  }
-
-  a,
-  button:not(:disabled),
-  [role='button']:not([aria-disabled='true']),
-  summary,
-  label[for],
-  select,
-  .cursor-pointer {
-    cursor: var(--vaw-cursor-hand);
-  }
-
-  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='button']):not([type='submit']):not([type='reset']),
-  textarea,
-  [contenteditable='true'] {
-    cursor: text;
-  }
-
-  :disabled,
-  [aria-disabled='true'],
-  .cursor-not-allowed {
-    cursor: not-allowed;
-  }
-}
-
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
@@ -176,11 +118,9 @@ html.splash-locked body {
   pointer-events: none;
 }
 
-/* Only pages whose first paint is wrong until JS runs (the home scribble) get the plate; keep
-   this :has() list in sync with needsSplash() in SplashScreenWrapper. Swallows touches so nobody
+/* First visit (no splash cookie) paints this plate on every page. Swallows touches so nobody
    scrolls the page underneath; the inline failsafe in layout.tsx drops it. */
-html.splash-pending:has(.vaw-follow-span) .splash-boot,
-html.splash-pending.splash-forced .splash-boot,
+html.splash-pending .splash-boot,
 html.splash-exiting .splash-boot {
   display: flex;
   flex-direction: column;
@@ -196,8 +136,8 @@ html.splash-exiting .splash-boot {
   touch-action: none;
 }
 
-html.splash-pending:not(.splash-react-ready):has(.vaw-follow-span),
-html.splash-pending:not(.splash-react-ready):has(.vaw-follow-span) body {
+html.splash-pending:not(.splash-react-ready),
+html.splash-pending:not(.splash-react-ready) body {
   overflow: hidden;
 }
 
@@ -349,17 +289,6 @@ html.splash-exiting .splash-boot img {
 
   .vaw-bot-shadow {
     opacity: 0.35;
-  }
-}
-
-/* Company film: the Play bubble is the cursor, so hide the real one (touch keeps its normal tap). */
-.vaw-film-hit {
-  cursor: none !important;
-}
-
-@media (pointer: coarse) {
-  .vaw-film-hit {
-    cursor: pointer !important;
   }
 }
 

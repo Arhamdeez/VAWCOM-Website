@@ -120,7 +120,7 @@ export const WHY = [
   },
 ] as const;
 
-export const COUNTRIES = ['USA', 'France', 'Germany', 'Nigeria', 'Australia'] as const;
+export const COUNTRIES = ['France', 'Germany', 'Nigeria', 'Pakistan', 'Australia', 'USA', 'UK'] as const;
 
 export const MODELS = [
   {

@@ -268,8 +268,8 @@ export default function PartnersPage() {
                 A partner you can actually rely on.
               </h2>
               <p className={lede}>
-                We work with clients across the world, including the USA, France, Germany, Nigeria and
-                Australia, and coordinate communication across time zones.
+                We work with clients across the world, including France, Germany, Nigeria, Pakistan,
+                Australia, the USA, and the UK, and coordinate communication across time zones.
               </p>
               <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0">
                 {COUNTRIES.map((c, i) => (

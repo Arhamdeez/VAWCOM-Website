@@ -12,14 +12,6 @@ export type GlobePlace = {
 /** Client markets on the home globe. Add `projectIds` when a public write-up exists. */
 export const GLOBE_PLACES: GlobePlace[] = [
   {
-    id: 'usa',
-    name: 'USA',
-    lat: 39.8,
-    lon: -98.5,
-    blurb: 'We have worked with clients in the USA.',
-    projectIds: [],
-  },
-  {
     id: 'france',
     name: 'France',
     lat: 46.6,
@@ -50,6 +42,30 @@ export const GLOBE_PLACES: GlobePlace[] = [
     lon: 69.3,
     blurb: 'Based in Lahore, with client work across Pakistan.',
     projectIds: ['hisaab'],
+  },
+  {
+    id: 'australia',
+    name: 'Australia',
+    lat: -25.3,
+    lon: 133.8,
+    blurb: 'We have worked with clients in Australia.',
+    projectIds: [],
+  },
+  {
+    id: 'usa',
+    name: 'USA',
+    lat: 39.8,
+    lon: -98.5,
+    blurb: 'We have worked with clients in the USA.',
+    projectIds: [],
+  },
+  {
+    id: 'uk',
+    name: 'UK',
+    lat: 54.2,
+    lon: -2.5,
+    blurb: 'We have worked with clients in the UK.',
+    projectIds: [],
   },
 ];
 

@@ -74,7 +74,7 @@
   position: absolute;
   inset: 0;
   z-index: 5;
-  cursor: var(--vaw-cursor-hand, pointer);
+  cursor: pointer;
 }
 
 .vaw-cover.is-open .vaw-cover-hits {
@@ -93,7 +93,7 @@
   border: 0;
   border-radius: 2rem;
   background: transparent;
-  cursor: var(--vaw-cursor-hand, pointer);
+  cursor: pointer;
   transform: translateX(-50%);
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -200,7 +200,7 @@
   border-radius: 999px;
   background: rgba(245, 243, 238, 0.88);
   color: var(--ink);
-  cursor: var(--vaw-cursor-hand, pointer);
+  cursor: pointer;
   transition: opacity 280ms ease;
 }
 
@@ -330,7 +330,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
   color: rgba(22, 22, 21, 0.45);
-  cursor: var(--vaw-cursor-hand, pointer);
+  cursor: pointer;
 }
 
 .vaw-pop-x:hover {

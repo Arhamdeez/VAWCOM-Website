@@ -8,6 +8,8 @@ import Reveal from '@/components/Reveal';
 
 const AsciiGlobe = dynamic(() => import('./AsciiGlobe'), { ssr: false });
 
+const COUNTRIES = ['France', 'Germany', 'Nigeria', 'Pakistan', 'Australia', 'the USA', 'the UK'] as const;
+
 const POINTS = [
   {
     title: 'Founder-led',
@@ -47,8 +49,15 @@ export default function WhyChooseUs({
               We work across the map.
             </h2>
             <p className="mt-5 max-w-[36ch] text-[1rem] leading-relaxed text-[#5c5a56]">
-              Clients in France, Germany, Nigeria, and Pakistan, and we can take on every
-              kind of global requirement. If you need it built for your market, we can do it.
+              Clients in{' '}
+              {COUNTRIES.map((name, i) => (
+                <span key={name}>
+                  {i > 0 ? (i === COUNTRIES.length - 1 ? ', and ' : ', ') : null}
+                  <span className="font-semibold text-[#161615]">{name}</span>
+                </span>
+              ))}
+              . We can take on every kind of global requirement. If you need it built for your
+              market, we can do it.
             </p>
             <ul className="mt-8 w-full space-y-3 sm:w-[80%]">
               {POINTS.map((p) => (
