@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, animate, motion, useMotionValue } from 'framer-motion';
 import { servicesInNavOrder } from '@/lib/services';
 import { SHOW_GALLERY } from '@/lib/site';
-import { EASE, DUR, NAV_MORPH } from '@/lib/motion';
+import { EASE, DUR } from '@/lib/motion';
 
 export type NavOpen = 'full' | 'half' | 'compact';
 
@@ -28,7 +28,6 @@ type Props = {
 };
 
 const ease = EASE;
-const morph = NAV_MORPH;
 
 function MobileNav({
   active,
@@ -203,7 +202,7 @@ function MobileNav({
       <div
         className={`vaw-nav-glass w-full max-w-none overflow-visible rounded-[1.25rem] transition-[background,border-color,box-shadow] duration-std ${
           onDark ? 'vaw-nav-glass-on-dark' : ''
-        } ${embedded ? 'relative' : 'fixed left-0 right-0 top-4 z-[60]'} mx-auto px-3 py-2`}
+        } ${embedded ? 'relative' : 'fixed left-0 right-0 top-4 z-[60]'} mx-auto px-3 py-3.5`}
       >
         <div className="vaw-nav-glass-inner justify-between gap-3">
           <Link
@@ -275,7 +274,6 @@ export default function PillNav(props: Props) {
 }
 
 function DesktopNav({
-  collapsible = false,
   expanded = false,
   open,
   active = 'home',
@@ -286,6 +284,19 @@ function DesktopNav({
   const showLinks = mode !== 'compact';
   const full = mode === 'full';
   const showContact = active === 'home' && full;
+  const hostRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const linksInnerRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const width = useMotionValue(0);
+  const radius = useMotionValue(full ? 20 : 999);
+  const ready = useRef(false);
+  const animating = useRef(false);
+  const [moving, setMoving] = useState(false);
+  // Pixel width stays off until measured. A 0px start piles the logo, links, and button into one spot.
+  const [locked, setLocked] = useState(false);
+  const clip = moving || !showLinks;
 
   const link = onDark
     ? 'text-white/72 hover:text-[#2dd4a8]'
@@ -295,61 +306,158 @@ function DesktopNav({
     : 'font-medium text-[#161615] hover:text-[#0cb78b]';
   const on = onDark ? 'font-medium text-[#2dd4a8]' : 'font-medium text-[#0cb78b]';
   const cta =
-    'flex-none rounded-full bg-[#0cb78b] px-[1.125rem] py-2.5 text-[0.9063rem] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85 hover:text-[#0b0d0c]';
+    'shrink-0 rounded-full bg-[#0cb78b] px-[1.125rem] py-2.5 text-[0.9063rem] font-medium text-[#0b0d0c] hover:bg-[#0cb78b]/85 hover:text-[#0b0d0c]';
 
-  const linkMax = !collapsible ? undefined : full ? '47.5rem' : showLinks ? '26.25rem' : '0rem';
+  useLayoutEffect(() => {
+    const host = hostRef.current;
+    const bar = barRef.current;
+    const logo = logoRef.current;
+    const links = linksInnerRef.current;
+    const ctaEl = ctaRef.current;
+    if (!host || !bar || !logo || !links || !ctaEl) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const linksWidth = () => {
+      const w = links.offsetWidth;
+      if (w > 8) return w;
+      const clone = links.cloneNode(true) as HTMLElement;
+      clone.style.cssText =
+        'position:fixed;left:0;top:0;visibility:hidden;width:max-content;height:auto;pointer-events:none;';
+      document.body.appendChild(clone);
+      const measured = clone.offsetWidth;
+      clone.remove();
+      return measured;
+    };
+
+    const measure = () => {
+      const hostW = host.clientWidth;
+      if (hostW < 8) return 0;
+      if (full) return hostW;
+      const cs = getComputedStyle(bar);
+      const pad =
+        parseFloat(cs.paddingLeft) +
+        parseFloat(cs.paddingRight) +
+        parseFloat(cs.borderLeftWidth) +
+        parseFloat(cs.borderRightWidth);
+      const content = pad + logo.offsetWidth + ctaEl.offsetWidth + (showLinks ? linksWidth() : 0);
+      return Math.min(hostW, Math.ceil(content));
+    };
+
+    const snap = () => {
+      const next = measure();
+      if (next < 8) return;
+      width.set(next);
+      radius.set(full ? 20 : 999);
+      ready.current = true;
+      animating.current = false;
+      setMoving(false);
+      setLocked(true);
+    };
+
+    let stopped = false;
+    let controls: { stop: () => void } | null = null;
+    let radiusControls: { stop: () => void } | null = null;
+
+    const go = (shouldAnimate: boolean) => {
+      const target = measure();
+      if (target < 8) return;
+      const radiusTarget = full ? 20 : 999;
+      // Never ease out of an unmeasured 0px bar. That is the open-page pile-up.
+      if (!shouldAnimate || reduce || !ready.current || width.get() < 8 || Math.abs(width.get() - target) < 1) {
+        snap();
+        return;
+      }
+      controls?.stop();
+      radiusControls?.stop();
+      animating.current = true;
+      setMoving(true);
+      controls = animate(width, target, {
+        duration: 0.6,
+        ease: [...EASE],
+        onComplete: () => {
+          if (stopped) return;
+          animating.current = false;
+          setMoving(false);
+          const next = measure();
+          if (next >= 8) width.set(next);
+        },
+      });
+      radiusControls = animate(radius, radiusTarget, { duration: 0.6, ease: [...EASE] });
+    };
+
+    go(true);
+
+    const track = () => {
+      if (animating.current) return;
+      const next = measure();
+      if (next < 8) return;
+      width.set(next);
+      if (!ready.current) {
+        ready.current = true;
+        radius.set(full ? 20 : 999);
+        setLocked(true);
+      }
+    };
+    const ro = new ResizeObserver(track);
+    ro.observe(host);
+    ro.observe(logo);
+    ro.observe(links);
+    window.addEventListener('resize', track);
+    const fonts = document.fonts?.ready.then(() => {
+      if (!stopped) track();
+    });
+
+    return () => {
+      stopped = true;
+      controls?.stop();
+      radiusControls?.stop();
+      animating.current = false;
+      ro.disconnect();
+      window.removeEventListener('resize', track);
+      void fonts;
+    };
+  }, [full, showLinks, showContact, radius, width]);
 
   return (
-    <div
-      className={`vaw-nav-glass vaw-nav-morph overflow-visible ${
-        onDark ? 'vaw-nav-glass-on-dark' : ''
-      } ${embedded ? 'relative' : 'fixed left-0 right-0 top-5 z-[60]'} mx-auto px-4 py-2.5 pl-4 ${
-        full
-          ? 'w-full max-w-[90rem] rounded-[1.25rem] sm:px-5'
-          : 'w-max max-w-[calc(100vw-2rem)] rounded-full'
+    <div ref={hostRef} className="w-full min-w-0">
+    <motion.div
+      ref={barRef}
+      style={locked ? { width, borderRadius: radius } : { borderRadius: radius }}
+      className={`vaw-nav-glass vaw-nav-morph mx-auto min-w-0 px-6 py-4 sm:px-8 ${
+        locked ? '' : full ? 'w-full' : 'w-max max-w-full'
+      } ${
+        clip ? 'overflow-hidden' : 'overflow-visible'
+      } ${moving ? 'is-morphing' : ''} ${onDark ? 'vaw-nav-glass-on-dark' : ''} ${
+        embedded ? 'relative' : 'fixed left-0 right-0 top-5 z-[60]'
       }`}
     >
-      <div
-        className={`vaw-nav-glass-inner ${
-          full ? 'justify-between gap-4 sm:gap-6' : 'gap-[1.375rem]'
-        }`}
-      >
-        <Link href="/" prefetch className="flex flex-none items-center gap-2.5 text-inherit">
-          <Image
-            src="/logo-mark.png"
-            alt="VAWCOM"
-            width={69}
-            height={37}
-            className="h-6 w-auto"
-            priority
-          />
-        </Link>
-        <motion.div
-          initial={false}
-          animate={
-            collapsible
-              ? {
-                  maxWidth: linkMax,
-                  opacity: showLinks ? 1 : 0,
-                }
-              : undefined
-          }
-          transition={{
-            maxWidth: morph,
-            opacity: { duration: DUR.enter, ease: 'linear' },
-          }}
-          className={`flex items-center gap-8 whitespace-nowrap text-[0.9063rem] ${
-            collapsible && !showLinks ? 'overflow-hidden' : 'overflow-visible'
-          } ${full ? 'min-w-0 flex-1 justify-center' : ''}`}
-          style={
-            collapsible
-              ? {
-                  pointerEvents: showLinks ? 'auto' : 'none',
-                  overflow: showLinks ? 'visible' : 'hidden',
-                }
-              : undefined
-          }
+      <div className="vaw-nav-glass-inner">
+        <div ref={logoRef} className="shrink-0 pr-8">
+          <Link href="/" prefetch className="flex items-center gap-2.5 text-inherit">
+            <Image
+              src="/logo-mark.png"
+              alt="VAWCOM"
+              width={69}
+              height={37}
+              className="h-6 w-auto"
+              priority
+            />
+          </Link>
+        </div>
+        <div
+          inert={!showLinks}
+          aria-hidden={!showLinks}
+          className={`flex min-w-0 flex-1 items-center ${
+            clip ? 'overflow-hidden' : 'overflow-visible'
+          } ${showLinks ? '' : 'pointer-events-none'}`}
         >
+          <div
+            ref={linksInnerRef}
+            className={`mx-auto flex w-max items-center gap-10 whitespace-nowrap pr-8 text-[0.9063rem] transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              showLinks ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
           <div className="group/svc relative">
             <div className="inline-flex items-center gap-0.5">
               <Link
@@ -409,32 +517,24 @@ function DesktopNav({
           <Link href="/partners" prefetch className={active === 'partners' ? on : link}>
             Partners
           </Link>
-          {active === 'home' ? (
-            <motion.div
-              initial={false}
-              animate={{
-                maxWidth: showContact ? '5.5rem' : '0rem',
-                opacity: showContact ? 1 : 0,
-                marginLeft: showContact ? '0rem' : '-2rem',
-              }}
-              transition={morph}
-              className="overflow-hidden"
-              style={{ pointerEvents: showContact ? 'auto' : 'none' }}
-            >
-              <Link href="/contact" prefetch className={link}>
-                Contact
-              </Link>
-            </motion.div>
+          {showContact ? (
+            <Link href="/contact" prefetch className={link}>
+              Contact
+            </Link>
           ) : null}
-        </motion.div>
-        {active === 'contact' ? (
-          <span className={cta}>Contact</span>
-        ) : (
-          <Link href="/contact" prefetch className={cta}>
-            Get Started
-          </Link>
-        )}
+          </div>
+        </div>
+        <div ref={ctaRef} className="shrink-0">
+          {active === 'contact' ? (
+            <span className={cta}>Contact</span>
+          ) : (
+            <Link href="/contact" prefetch className={cta}>
+              Get Started
+            </Link>
+          )}
+        </div>
       </div>
+    </motion.div>
     </div>
   );
 }

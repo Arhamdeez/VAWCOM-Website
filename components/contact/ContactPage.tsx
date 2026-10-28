@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 import CreamPage from '@/components/services/CreamPage';
 import CtaFooter from '@/components/home/CtaFooter';
-import { CONTACT_EMAIL, getGmailComposeUrl, SHOW_GALLERY } from '@/lib/site';
+import { CONTACT_EMAIL, getGmailComposeUrl } from '@/lib/site';
 import { SERVICES } from '@/lib/services';
-import Reveal from '@/components/Reveal';
 
 const SERVICE_OPTIONS = [
   'Select a service',
@@ -17,24 +16,24 @@ const SERVICE_OPTIONS = [
   'Other',
 ] as const;
 
-const label =
-  'mb-2 block text-center text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#8a8882]';
-const input =
-  'w-full rounded-xl border-0 bg-[#f5f3ee] px-4 py-3.5 text-[0.9375rem] text-[#161615] outline-none ring-0 placeholder:text-[#8a8882] focus:bg-white focus:shadow-[0_0_0_2px_rgba(12,183,139,0.35)]';
+const label = 'mb-1.5 block text-left text-[0.8125rem] font-medium text-[#3d4a45]';
+const field =
+  'w-full min-h-12 rounded-2xl border border-black/[0.06] bg-[#f7f6f2] px-4 py-3.5 text-left text-base text-[#161615] outline-none transition-[background,box-shadow,border-color] duration-200 placeholder:text-[#a3a199] focus:border-[#0cb78b]/50 focus:bg-white focus:shadow-[0_0_0_4px_rgba(12,183,139,0.12)]';
+
+const emptyForm = {
+  name: '',
+  email: '',
+  company: '',
+  phone: '',
+  service: 'Select a service',
+  message: '',
+};
 
 export default function ContactPage() {
-  const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    company: '',
-    phone: '',
-    service: 'Select a service',
-    message: '',
-  });
+  const router = useRouter();
+  const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState('');
-  const [statusError, setStatusError] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get('service');
@@ -47,16 +46,14 @@ export default function ContactPage() {
     (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setForm((f) => ({ ...f, [key]: e.target.value }));
-      setStatus('');
-      setStatusError(false);
+      setError('');
     };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setStatus('');
-    setStatusError(false);
+    setError('');
     try {
       const payload = {
         ...form,
@@ -69,19 +66,9 @@ export default function ContactPage() {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error || 'Failed to send message');
-      setStatus('Got it. We will reply within a business day.');
-      setForm({
-        name: '',
-        email: '',
-        company: '',
-        phone: '',
-        service: 'Select a service',
-        message: '',
-      });
+      router.push('/contact/thanks');
     } catch (err) {
-      setStatusError(true);
-      setStatus(err instanceof Error ? err.message : 'Failed to send. Please try again.');
-    } finally {
+      setError(err instanceof Error ? err.message : 'Failed to send. Please try again.');
       setSubmitting(false);
     }
   };
@@ -89,44 +76,42 @@ export default function ContactPage() {
   return (
     <CreamPage nav="contact" footer={false}>
       <div className="vaw-hero">
-        <header className="vaw-shell-narrow flex flex-col items-center pt-[max(7rem,calc(env(safe-area-inset-top)+5.5rem))] text-center lg:pt-32">
-          <p className="m-0 mb-5 rounded-full border border-[#0cb78b]/30 bg-white/60 px-3.5 py-1.5 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
-            Contact
-          </p>
-          <h1 className="vaw-display m-0 max-w-[14ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
-            Tell us what you are
-            <span className="text-[#0cb78b]"> building.</span>
-          </h1>
-          <p className="mt-5 max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
-            Send the form first, or use the email below. We usually reply within a business day.
-          </p>
-        </header>
+        <div className="vaw-shell-narrow grid items-start gap-10 pb-16 pt-[max(7.5rem,calc(env(safe-area-inset-top)+5.75rem))] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.05fr)] lg:gap-16 lg:pb-24 lg:pt-36">
+          <header className="lg:sticky lg:top-28">
+            <p className="m-0 mb-5 inline-flex rounded-full border border-[#0cb78b]/30 bg-white/70 px-3.5 py-1.5 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+              Contact
+            </p>
+            <h1 className="vaw-display m-0 max-w-[12ch] text-[clamp(2.15rem,8vw,4.25rem)] leading-[0.92] tracking-[-0.04em] text-[#161615] sm:text-[clamp(2.5rem,5.4vw,4.25rem)]">
+              Tell us what you are
+              <span className="text-[#0cb78b]"> building.</span>
+            </h1>
+            <p className="mt-5 max-w-[28ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
+              We reply within a business day.
+            </p>
+            <a
+              href={getGmailComposeUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-block max-w-full break-all text-[0.9375rem] font-medium text-[#161615] underline decoration-[#0cb78b]/40 underline-offset-4 hover:text-[#0a9d77]"
+            >
+              {CONTACT_EMAIL}
+            </a>
+          </header>
 
-        <div className="vaw-shell-narrow flex flex-col items-center gap-5 pb-4 pt-12 lg:pb-2 lg:pt-14">
           <form
-            ref={formRef}
             onSubmit={onSubmit}
-            className="w-full max-w-[38rem] rounded-[1.5rem] bg-white p-6 shadow-[0_0.75rem_2rem_rgba(22,22,21,0.06)] sm:p-8"
+            className="rounded-[1.75rem] border border-black/[0.05] bg-white p-5 shadow-[0_1.25rem_3.5rem_rgba(22,22,21,0.07)] sm:p-8"
           >
-            <div className="mb-7 text-center">
-              <p className="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
-                Send a message
-              </p>
-              <h2 className="vaw-display m-0 mt-2 text-[clamp(1.35rem,2.4vw,1.6rem)] tracking-[-0.02em] text-[#161615]">
-                Project details
-              </h2>
-              <p className="m-0 mt-1.5 text-[0.8125rem] text-[#8a8882]">Asterisk (*) marks required fields.</p>
-            </div>
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={label}>Name *</span>
                 <input
                   required
                   autoComplete="name"
-                  placeholder="John Doe"
+                  placeholder="Your name"
                   value={form.name}
                   onChange={onChange('name')}
-                  className={input}
+                  className={field}
                 />
               </label>
               <label className="block">
@@ -135,20 +120,20 @@ export default function ContactPage() {
                   required
                   type="email"
                   autoComplete="email"
-                  placeholder="john@company.com"
+                  placeholder="you@company.com"
                   value={form.email}
                   onChange={onChange('email')}
-                  className={input}
+                  className={field}
                 />
               </label>
               <label className="block">
                 <span className={label}>Company</span>
                 <input
                   autoComplete="organization"
-                  placeholder="Company Inc."
+                  placeholder="Optional"
                   value={form.company}
                   onChange={onChange('company')}
-                  className={input}
+                  className={field}
                 />
               </label>
               <label className="block">
@@ -156,105 +141,61 @@ export default function ContactPage() {
                 <input
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+92 300 1234567"
+                  placeholder="Optional"
                   value={form.phone}
                   onChange={onChange('phone')}
-                  className={input}
+                  className={field}
                 />
               </label>
             </div>
 
-            <label className="mt-5 block">
+            <label className="mt-4 block">
               <span className={label}>Service</span>
-              <select
-                value={form.service}
-                onChange={onChange('service')}
-                className={`${input} appearance-none pr-10`}
-              >
-                {SERVICE_OPTIONS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <span className="relative block">
+                <select
+                  value={form.service}
+                  onChange={onChange('service')}
+                  className={`${field} appearance-none pr-11`}
+                >
+                  {SERVICE_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a8882]" />
+              </span>
             </label>
 
-            <label className="mt-5 block">
+            <label className="mt-4 block">
               <span className={label}>Message *</span>
               <textarea
                 required
                 rows={5}
                 value={form.message}
                 onChange={onChange('message')}
-                placeholder="What you are building, who it is for, and any date you are working towards."
-                className={`${input} min-h-[8.5rem] resize-y`}
+                placeholder="What you are building, and any date you are working toward."
+                className={`${field} min-h-[9rem] resize-y`}
               />
             </label>
 
-            <div className="mt-7 flex flex-col items-center gap-3 text-center">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex items-center justify-center rounded-full bg-[#0cb78b] px-7 py-3.5 text-[0.9375rem] font-semibold text-[#0b0d0c] hover:bg-[#0a9d77] disabled:opacity-50"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#0cb78b] px-7 py-3.5 text-base font-semibold text-[#0b0d0c] transition-colors hover:bg-[#0a9d77] disabled:opacity-50 sm:w-auto"
               >
-                {submitting ? 'Sending…' : status && !statusError ? 'Sent' : 'Send message'}
+                {submitting ? 'Sending…' : 'Send message'}
               </button>
-              {status ? (
-                <p
-                  role="status"
-                  className={`vaw-msg m-0 text-[0.9063rem] ${
-                    statusError ? 'text-[#c45c3a]' : 'text-[#0a9d77]'
-                  }`}
-                >
-                  {status}
-                </p>
-              ) : null}
+              <p className="m-0 text-[0.8125rem] text-[#8a8882]">* Required</p>
             </div>
-          </form>
 
-          <Reveal as="aside" className="flex w-full max-w-[38rem] flex-col items-center gap-4 text-center">
-            <div data-nav-contrast="dark" className="w-full rounded-[1.5rem] bg-[#161615] p-6 sm:p-7">
-              <p className="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#0cb78b]">
-                Email us
+            {error ? (
+              <p role="alert" className="m-0 mt-4 text-[0.9063rem] text-[#c45c3a]">
+                {error}
               </p>
-              <a
-                href={getGmailComposeUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block break-all text-[clamp(0.9375rem,2.4vw,1.125rem)] font-semibold tracking-[-0.015em] text-[#ece9e3] hover:text-[#0cb78b]"
-              >
-                {CONTACT_EMAIL}
-              </a>
-            </div>
-
-            {SHOW_GALLERY ? (
-            <div className="flex min-h-[9rem] w-full flex-col items-center justify-between rounded-[1.5rem] bg-[#0cb78b] p-6 sm:p-7">
-              <div>
-                <h2 className="vaw-display m-0 text-[1.35rem] tracking-[-0.02em] text-[#0b0d0c]">
-                  See shipped work
-                </h2>
-                <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#0b0d0c]/75]">
-                  Browse projects before you write.
-                </p>
-              </div>
-              <Link
-                href="/gallery"
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#0b0d0c] px-4 py-2.5 text-[0.8438rem] font-medium text-[#ece9e3] hover:bg-[#161615]"
-              >
-                Open gallery
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
             ) : null}
-
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-[#5c5a56] hover:text-[#0cb78b]"
-            >
-              Compare services
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </Reveal>
+          </form>
         </div>
       </div>
 

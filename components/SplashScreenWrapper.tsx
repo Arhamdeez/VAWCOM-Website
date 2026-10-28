@@ -3,6 +3,7 @@
 import { useState, useLayoutEffect, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import SplashScreen, { SPLASH_LOGO_CLASS } from './SplashScreen';
+import { hasSeenSplash, markSplashSeen } from '@/lib/splashBoot';
 
 function wantsForcedSplash(pathname: string, search: string): boolean {
   if (pathname === '/splash') return true;
@@ -57,6 +58,7 @@ export default function SplashScreenWrapper({
   const activeRef = useRef(false);
 
   const finishSplash = useCallback(() => {
+    markSplashSeen();
     // Stay on cream overlay until home is mounted. Unmounting on /splash
     // shows the navy html/body shell.
     if (forcedRef.current && window.location.pathname === '/splash') {
@@ -86,14 +88,16 @@ export default function SplashScreenWrapper({
     }
 
     if (activeRef.current) return;
-    if (completedRef.current || bootSplashShown || !needsSplash()) {
+    if (hasSeenSplash() || completedRef.current || bootSplashShown || !needsSplash()) {
       bootSplashShown = true;
+      completedRef.current = true;
       setSplashComplete();
       return;
     }
 
     bootSplashShown = true;
     activeRef.current = true;
+    markSplashSeen();
     setSplashPending(true);
     setShowSplash(true);
   }, [finishSplash, pathname]);

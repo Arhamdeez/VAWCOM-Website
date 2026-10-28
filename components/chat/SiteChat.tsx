@@ -261,6 +261,15 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const prevTyping = useRef(typing);
+  const [placeholder, setPlaceholder] = useState('Ask what we do, or describe an idea…');
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 380px)');
+    const sync = () => setPlaceholder(mq.matches ? 'Ask what we do…' : 'Ask what we do, or describe an idea…');
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
   const active = placement === 'hero' || dockOpen;
   const hasThread = messages.length > 1;
 
@@ -326,8 +335,8 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
         placement === 'dock' ? 'vaw-pop-in ' : ''
       }${
         placement === 'hero'
-          ? 'w-[min(36rem,calc(100vw-2rem))] rounded-[1.75rem]'
-          : 'w-[min(22.5rem,calc(100vw-2rem))] rounded-[1.5rem]'
+          ? 'w-full max-w-[36rem] rounded-[1.75rem]'
+          : 'w-[min(22.5rem,calc(100vw-2rem-env(safe-area-inset-left)-env(safe-area-inset-right)))] rounded-[1.5rem]'
       }`}
     >
       {placement === 'dock' || hasThread || typing ? (
@@ -411,8 +420,8 @@ function ChatPanel({ placement }: { placement: 'hero' | 'dock' }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_DRAFT_CHARS))}
           maxLength={MAX_DRAFT_CHARS}
-          placeholder="Ask what we do, or describe an idea…"
-          className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-[0.9375rem] text-[#161615] outline-none placeholder:text-[#8a8882]"
+          placeholder={placeholder}
+          className="min-w-0 flex-1 bg-transparent px-2.5 py-2 text-base text-[#161615] outline-none placeholder:text-[#8a8882]"
         />
         <button
           type="submit"
@@ -477,7 +486,7 @@ function DockedChat() {
           }}
           onClick={reopen}
           aria-label="Open chat"
-          className="vaw-chat-bob fixed bottom-5 right-5 z-[70] block h-[4.75rem] w-[4.75rem] cursor-pointer bg-transparent p-0"
+          className="vaw-chat-bob fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-[70] block h-14 w-14 cursor-pointer bg-transparent p-0 sm:h-[4.75rem] sm:w-[4.75rem]"
         >
           <Image
             src="/bothead.png"
@@ -499,7 +508,7 @@ function DockedChat() {
               ...(kb.inset ? { bottom: kb.inset + 8, '--vaw-chat-room': `${kb.visible - 16}px` } : null),
             } as CSSProperties
           }
-          className="fixed bottom-5 right-5 z-[70]"
+          className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-[70]"
         >
           <ChatPanel placement="dock" />
         </motion.div>

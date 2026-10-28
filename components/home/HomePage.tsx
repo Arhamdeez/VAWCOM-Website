@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import './home.css';
 import PillNav, { type NavOpen } from './PillNav';
 import HeroSection, { HeroBanner } from './HeroSection';
@@ -11,13 +10,13 @@ import TechStackSection from './TechStackSection';
 import WhyChooseUs from './WhyChooseUs';
 import AiPromoSection from './AiPromoSection';
 import CtaFooter from './CtaFooter';
-import { NAV_MORPH } from '@/lib/motion';
 
 function HomeChrome() {
   const [navOpen, setNavOpen] = useState<NavOpen>('full');
   const lastY = useRef(0);
   const modeRef = useRef<NavOpen>('full');
-  const halfUntil = useRef(0);
+  const travel = useRef(0);
+  const dir = useRef(0);
 
   useEffect(() => {
     if (window.location.hash.slice(1) === 'services') {
@@ -37,21 +36,23 @@ function HomeChrome() {
       const dy = y - lastY.current;
       lastY.current = y;
       if (y <= 20) {
+        travel.current = 0;
+        dir.current = 0;
         apply('full');
         return;
       }
-      if (dy < -4) {
-        halfUntil.current = performance.now() + 2800;
-        apply('half');
-        return;
+      if (dy === 0) return;
+      // A flick oscillates by a few pixels. Only a sustained direction changes the bar,
+      // so one fast scroll settles on one size instead of restarting the morph.
+      const next = dy > 0 ? 1 : -1;
+      if (next !== dir.current) {
+        dir.current = next;
+        travel.current = 0;
       }
-      if (dy <= 4) return;
-      // Leave half only after the hold, or a clear push down.
-      if (modeRef.current === 'half') {
-        if (performance.now() < halfUntil.current && dy < 28) return;
-        if (dy < 14) return;
-      }
-      apply('compact');
+      travel.current += Math.abs(dy);
+      if (travel.current < 56) return;
+      travel.current = 0;
+      apply(next < 0 ? 'half' : 'compact');
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -62,17 +63,19 @@ function HomeChrome() {
   return (
     <>
       <HeroBanner hidden={!atTop} />
-      <motion.div
-        className="pointer-events-none fixed inset-x-0 top-[3.375rem] z-[60] flex justify-center px-3 sm:px-4"
-        initial={false}
-        // transform instead of `top`: same 54 → 16 travel without a layout pass per frame
-        animate={{ y: atTop ? '0rem' : '-2.375rem' }}
-        transition={NAV_MORPH}
+      <div
+        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center pl-[max(var(--vaw-shell-pad),env(safe-area-inset-left))] pr-[max(var(--vaw-shell-pad),env(safe-area-inset-right))] transition-[top] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{
+          // 52px under the social buttons. 3rem higher once they hide, just below the status area.
+          top: atTop
+            ? 'calc(max(0.75rem, env(safe-area-inset-top)) + 3.25rem)'
+            : 'calc(max(0.75rem, env(safe-area-inset-top)) + 0.25rem)',
+        }}
       >
         <div className="pointer-events-auto flex w-full justify-center">
           <PillNav collapsible open={navOpen} active="home" embedded />
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

@@ -38,11 +38,13 @@ export default function FaqItem({
         <span>{q}</span>
         <span
           aria-hidden
-          className={`flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#0cb78b]/15 text-[1.125rem] font-normal leading-none text-[#0cb78b] transition-transform duration-std ${
+          className={`relative grid h-8 w-8 flex-none place-items-center rounded-full bg-[#0cb78b]/15 text-[#0cb78b] transition-transform duration-std ${
             open ? 'rotate-45' : ''
           }`}
         >
-          +
+          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+            <path d="M8 3.25v9.5M3.25 8h9.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
         </span>
       </button>
       <div

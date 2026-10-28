@@ -9,3 +9,14 @@ export function splashCookieHeader() {
 export function clearSplashCookieHeader() {
   return `${SPLASH_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
+
+export function hasSeenSplash() {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.split('; ').includes(`${SPLASH_COOKIE}=1`);
+}
+
+/** Remember this browser so a refresh does not replay the splash. */
+export function markSplashSeen() {
+  if (typeof document === 'undefined') return;
+  document.cookie = splashCookieHeader();
+}

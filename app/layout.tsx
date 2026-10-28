@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { cookies, headers } from 'next/headers';
 import './globals.css';
 import SiteShell from '@/components/SiteShell';
+import { SPLASH_COOKIE } from '@/lib/splashBoot';
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -54,15 +56,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [jar, hdrs] = await Promise.all([cookies(), headers()]);
+  const forceSplash = hdrs.get('x-force-splash') === '1';
+  const seenSplash = jar.get(SPLASH_COOKIE)?.value === '1';
+  const splashClass = forceSplash || !seenSplash ? 'splash-pending' : 'splash-complete';
+
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} bg-[#050a14] splash-pending`}
+      className={`${jakarta.variable} bg-[#050a14] ${splashClass}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

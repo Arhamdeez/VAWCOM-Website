@@ -23,7 +23,7 @@ const SERVICE_ROWS = [
 export function HeroBanner({ hidden }: { hidden: boolean }) {
   const reduce = useReducedMotion();
   const item =
-    'inline-flex items-center justify-center rounded-full p-1.5 text-white/75 transition-colors hover:text-[#2dd4a8]';
+    'inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black text-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.65)] transition-colors hover:text-[#2dd4a8]';
 
   return (
     <motion.div
@@ -40,26 +40,26 @@ export function HeroBanner({ hidden }: { hidden: boolean }) {
             ? { duration: 0.2, ease: NAV_MORPH.ease }
             : { duration: 0.3, ease: NAV_MORPH.ease, delay: 0.15 }
       }
-      className="fixed inset-x-3 top-3 z-[61] mx-auto flex h-10 max-w-[90rem] items-center justify-between gap-3 rounded-[1.25rem] border border-white/10 bg-black px-4 sm:inset-x-4 sm:px-5"
+      className="pointer-events-none fixed z-[61] mx-auto flex max-w-[90rem] items-center justify-between top-[max(0.75rem,env(safe-area-inset-top))] left-[max(0.75rem,env(safe-area-inset-left))] right-[max(0.75rem,env(safe-area-inset-right))] sm:left-[max(1rem,env(safe-area-inset-left))] sm:right-[max(1rem,env(safe-area-inset-right))]"
     >
-      <div className="flex items-center gap-1">
+      <div className="pointer-events-auto flex items-center gap-2">
         <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className={item} aria-label="Instagram">
-          <IconInstagram size={15} />
+          <IconInstagram size={18} />
         </a>
         <a href={SOCIAL.linkedin} target="_blank" rel="noopener noreferrer" className={item} aria-label="LinkedIn">
-          <IconLinkedIn size={15} />
+          <IconLinkedIn size={18} />
         </a>
         <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" className={item} aria-label="GitHub">
-          <IconGitHub size={15} />
+          <IconGitHub size={18} />
         </a>
       </div>
       <a
         href={getGmailComposeUrl()}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[0.7813rem] text-white/75 hover:text-[#2dd4a8]"
+        className="pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full border border-white/15 bg-black px-3.5 text-[0.8125rem] text-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.65)] hover:text-[#2dd4a8]"
       >
-        <IconMail size={15} />
+        <IconMail size={18} />
         <span className="hidden sm:inline">{CONTACT_EMAIL}</span>
         <span className="sm:hidden">Email</span>
       </a>
@@ -80,10 +80,11 @@ export default function HeroSection() {
     return () => mq.removeEventListener('change', sync);
   }, []);
 
-  // Safari's toolbar resizes the viewport (and svh on newer iOS) while scrolling, which
-  // re-centred the hero text. Lock the height at load; only a width change (rotation) re-measures.
+  // Safari's toolbar resizes the viewport while scrolling and re-centred the hero text.
+  // Phones lock the height. A mouse or trackpad follows the window so a drag stays in step.
   const heroRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (window.matchMedia('(pointer: fine)').matches) return;
     let width = window.innerWidth;
     const lock = () => {
       if (heroRef.current) heroRef.current.style.minHeight = `${window.innerHeight}px`;
@@ -102,8 +103,8 @@ export default function HeroSection() {
     <section id="top" className="vaw-hero relative z-[2] overflow-visible">
       <div
         ref={heroRef}
-        className={`relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[90rem] flex-col justify-center px-6 pb-16 pt-36 sm:px-8 sm:pb-24 ${
-        CENTERED ? 'sm:pt-44 lg:px-8 lg:pt-48' : 'sm:pt-52 lg:pt-56 lg:pl-20 xl:pl-24'
+        className={`relative z-[2] mx-auto flex min-h-[100svh] w-full max-w-[90rem] flex-col justify-center pb-16 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] pt-[max(9rem,calc(env(safe-area-inset-top)+8.25rem))] sm:pb-24 sm:pl-[max(2rem,env(safe-area-inset-left))] sm:pr-[max(2rem,env(safe-area-inset-right))] ${
+        CENTERED ? 'sm:pt-44 lg:pt-48' : 'sm:pt-52 lg:pt-56 lg:pl-20 xl:pl-24'
       }`}>
         <div
           className={`relative grid grid-cols-1 items-center gap-6 ${

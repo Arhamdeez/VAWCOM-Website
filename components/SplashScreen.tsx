@@ -20,6 +20,8 @@ export const SPLASH_LOGO_CLASS =
 const FADE_OUT_MS = 650;
 /** Never hold the user longer than this, even if something never reports ready. */
 const MAX_WAIT_MS = 6000;
+/** Floor so a cached production load still leaves the mark readable. */
+const MIN_VISIBLE_MS = 1800;
 
 /** Webfonts + (on home) the measured scribble, then two frames so it has painted. */
 function pageReady(): Promise<void> {
@@ -63,7 +65,12 @@ export default function SplashScreen({ onExiting, onComplete }: SplashScreenProp
 
     let cancelled = false;
     let doneId = 0;
+    const started = performance.now();
+    const minVisible = reduceMotion === true ? 500 : MIN_VISIBLE_MS;
     pageReady().then(logoSettled).then(() => {
+      const remaining = Math.max(0, minVisible - (performance.now() - started));
+      return new Promise<void>((resolve) => window.setTimeout(resolve, remaining));
+    }).then(() => {
       if (cancelled) return;
       onExiting();
       document.body.style.overflow = '';

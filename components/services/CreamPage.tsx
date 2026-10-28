@@ -72,7 +72,7 @@ export default function CreamPage({ children, nav = 'services', footer = true }:
   return (
     <div className="vaw-home bg-[#f5f3ee]">
       <motion.div
-        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-3 pt-[env(safe-area-inset-top)] sm:px-4"
+        className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center pl-[max(var(--vaw-shell-pad),env(safe-area-inset-left))] pr-[max(var(--vaw-shell-pad),env(safe-area-inset-right))] pt-[env(safe-area-inset-top)]"
         initial={false}
         animate={{ top: expanded ? '4rem' : '1.25rem' }}
         transition={{ duration: reduce ? 0 : DUR.enter, ease: EASE }}

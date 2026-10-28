@@ -123,12 +123,17 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       const globeTop = sr.top - cr.top;
       // Always scale the drawing uniformly (never stretch it). Wide screens fit it to the space above
       // the globe; narrow screens fit it to the width and a thread carries on down to the globe.
-      const narrow = w < 1024;
-      const scale = narrow ? w / SKIPER_W : Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
+      // Blend across the desktop breakpoint so the stroke does not jump when the window crosses it.
+      const blend = Math.min(1, Math.max(0, (w - 880) / 144));
+      const narrowScale = w / SKIPER_W;
+      const wideScale = Math.min(w / SKIPER_W, Math.max(globeTop, 1) / SKIPER_H);
+      const scale = narrowScale + (wideScale - narrowScale) * blend;
       const ox = (w - SKIPER_W * scale) / 2;
       // Large screens scale the root font size; keep the line weight in step with the type.
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16 || 1;
-      const stroke = Math.max(narrow ? 6 : 13, Math.min(18, 18 * scale)) * (narrow ? 1 : rem);
+      const strokeNarrow = Math.max(6, Math.min(18, 18 * scale));
+      const strokeWide = Math.max(13, Math.min(18, 18 * scale)) * rem;
+      const stroke = strokeNarrow + (strokeWide - strokeNarrow) * blend;
 
       // Join at the north pole of the ASCII disk. A cream disc in AsciiGlobe keeps the stroke off the globe.
       const ascii = slot.querySelector('[data-ascii-globe]');
@@ -148,9 +153,8 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       }
       const join: Pt = [gx, gy - gr];
 
-      // Narrow screens: start the drawing below the fixed social bar + navbar so its first loops
-      // are not tucked behind them.
-      const top = narrow ? 120 : 0;
+      // Phones start the drawing below the social bar and navbar. The offset eases out toward desktop.
+      const top = 132 * (1 - blend);
       let skiper = trimLastCommands(scaleSkiper(scale, scale, ox, top), 2);
       skiper += connect(endPt(skiper), endTan(skiper), join);
       setFrame((prev) =>
@@ -171,10 +175,18 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
       }
     };
 
+    let rafId = 0;
+    const schedule = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        measure();
+      });
+    };
+
     measure();
-    const raf = requestAnimationFrame(measure);
     const root = rootOf();
-    const ro = new ResizeObserver(measure);
+    const ro = new ResizeObserver(schedule);
     if (root) {
       ro.observe(root);
       const slot = globeSlotRef.current ?? root.querySelector('[data-globe-slot]');
@@ -184,11 +196,11 @@ export default function HeroFollowLine({ containerRef, globeSlotRef }: Props) {
         if (ascii) ro.observe(ascii);
       }
     }
-    window.addEventListener('resize', measure);
+    window.addEventListener('resize', schedule);
     return () => {
-      cancelAnimationFrame(raf);
+      cancelAnimationFrame(rafId);
       ro.disconnect();
-      window.removeEventListener('resize', measure);
+      window.removeEventListener('resize', schedule);
     };
   }, [containerRef, globeSlotRef]);
 

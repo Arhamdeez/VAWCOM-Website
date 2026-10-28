@@ -81,37 +81,44 @@ export async function POST(request: NextRequest) {
       message,
     });
 
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = await import('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const { data, error } = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-          to: recipientEmail,
-          replyTo: email,
-          subject: emailSubject,
-          text: emailBody,
-          html,
-        });
-        if (error) throw error;
-        return NextResponse.json({
-          success: true,
-          message: 'Message sent successfully to ' + recipientEmail,
-          id: data?.id,
-        });
-      } catch (error) {
-        console.error('Resend error:', error);
-      }
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Contact form: RESEND_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'Email service not configured. Add RESEND_API_KEY so messages can be delivered.' },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Email service not configured',
-        message: 'Message received but email could not be sent.',
-      },
-      { status: 500 }
-    );
+    try {
+      const { Resend } = await import('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { data, error } = await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+        to: recipientEmail,
+        replyTo: email,
+        subject: emailSubject,
+        text: emailBody,
+        html,
+      });
+      if (error) {
+        console.error('Resend error:', error);
+        return NextResponse.json(
+          { error: 'Email could not be sent. Check the Resend key and sender address.' },
+          { status: 502 }
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        message: 'Message sent successfully to ' + recipientEmail,
+        id: data?.id,
+      });
+    } catch (error) {
+      console.error('Resend error:', error);
+      return NextResponse.json(
+        { error: 'Email could not be sent. Check the Resend key and sender address.' },
+        { status: 502 }
+      );
+    }
   } catch (error) {
     console.error('Contact form error:', error);
     return NextResponse.json(
