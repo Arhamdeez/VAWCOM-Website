@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import SiteShell from '@/components/SiteShell';
-import { SPLASH_BOOT_SCRIPT } from '@/lib/splashBoot';
-
-const inter = Inter({ 
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-jakarta',
   display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-  adjustFontFallback: true,
 });
 
 export const viewport = {
@@ -64,14 +62,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="bg-[#050a14]"
+      className={`${jakarta.variable} bg-[#050a14] splash-pending`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
-      </head>
-      <body className={`${inter.className} bg-[#050a14]`}>
+      <body className={`${jakarta.className} bg-[#050a14]`} suppressHydrationWarning>
+        {/* Runs before React. Clears a stuck splash-pending cream plate if hydration fails outright. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var r=document.documentElement;setTimeout(function(){if(r.classList.contains("splash-pending")||r.classList.contains("splash-exiting")){r.classList.remove("splash-pending","splash-exiting","splash-react-ready","splash-locked");r.classList.add("splash-complete");if(document.body)document.body.style.overflow=""}},9000)}catch(e){}})();`,
+          }}
+        />
+        <noscript>
+          <style>{`html.splash-pending,html.splash-pending body{overflow:auto!important}html.splash-pending .splash-boot{display:none!important}`}</style>
+        </noscript>
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

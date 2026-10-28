@@ -13,13 +13,13 @@ export default function NotFound() {
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="btn-glass-primary inline-flex min-h-[44px] w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-medium text-white sm:w-auto"
+            className="btn-glass-primary inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-medium text-white sm:w-auto"
           >
             Back to home
           </Link>
           <Link
             href="/contact"
-            className="btn-glass-muted inline-flex min-h-[44px] w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-medium text-slate-300 sm:w-auto"
+            className="btn-glass-muted inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-xl px-6 py-2.5 text-sm font-medium text-slate-300 sm:w-auto"
           >
             Contact us
           </Link>

@@ -1,0 +1,490 @@
+/*
+ * "From first idea to launch": one centred card on the page. Click opens a translucent popup where
+ * the eight cards fade in place, row two continuing row one's stagger. Closing plays it backwards, then the popup unmounts.
+ * Each element has two transition sets: the base rule is the CLOSING timing, the [data-open='true'] rule
+ * is the OPENING timing, because a transition uses the timing of the state it is heading to.
+ * Phones/tablets: staggered list instead of 3D.
+ */
+
+.vaw-fold {
+  --fold-gap: 1.25rem;
+  --k: 0.55; /* speed knob: every duration/delay below is multiplied by this (1 = original, smaller = faster) */
+  --ease-close: cubic-bezier(0.6, 0, 0.2, 1); /* in-out, so closing steps hand over to each other instead of stalling */
+  --close-d: calc(350ms * var(--k)); /* when closing, the card starts re-forming while the cards are still leaving */
+  /* brand-green gradients (top-left dark -> bottom-right bright), echoing the reference card */
+  --g0: linear-gradient(165deg, #0a1b17 0%, #0f3a30 55%, #12896a 100%);
+  --g1: linear-gradient(165deg, #0b1f1b 0%, #0d4237 60%, #0a9a74 100%);
+  --g2: linear-gradient(165deg, #0e1d19 0%, #1a4a3e 55%, #429f7f 100%);
+  --g3: linear-gradient(165deg, #091a1a 0%, #0c3f44 55%, #159a8a 100%);
+}
+
+/* ───── the single card / heading ───── */
+.vaw-fold__head {
+  position: relative;
+  z-index: 3;
+}
+
+.vaw-fold__card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: min(100%, 21.5rem);
+  min-height: 30rem;
+  margin-inline: auto;
+  padding: 1.1rem;
+  border: 0;
+  border-radius: 2rem;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow:
+    0 40px 90px rgba(10, 60, 48, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform var(--vaw-dur-std) var(--vaw-ease);
+}
+
+.vaw-fold__card:focus-visible {
+  outline: 2px solid #0cb78b;
+  outline-offset: 3px;
+}
+
+.vaw-fold__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 75% 38% at 100% 100%, rgba(45, 212, 168, 0.5), transparent 72%),
+    radial-gradient(ellipse 70% 50% at 0% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    var(--g1);
+  transition: opacity calc(700ms * var(--k)) var(--ease-close) var(--close-d);
+}
+
+.vaw-fold__card:hover {
+  transform: translateY(-4px);
+}
+
+.vaw-fold__chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vaw-fold__glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.vaw-fold__glass--icon {
+  width: 2.5rem;
+  flex: none;
+}
+
+.vaw-fold__glass--pill {
+  gap: 0.4rem;
+  padding-inline: 1rem;
+  white-space: nowrap;
+}
+
+/* the middle: big title + two-tone text */
+.vaw-fold__title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.5rem, 4.4vw, 3.1rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.vaw-fold__text {
+  margin: 1rem 0 0;
+  max-width: 44ch;
+  font-size: 0.9688rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.vaw-fold__text strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* footer: segmented dashes + two glass pills */
+.vaw-fold__dashes {
+  display: flex;
+  gap: 0.3125rem;
+  margin-bottom: 0.9rem;
+}
+
+.vaw-fold__dashes span {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.vaw-fold__dashes span:first-child {
+  background: #fff;
+}
+
+.vaw-fold__hint {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.vaw-fold__hint-arrow {
+  animation: vaw-fold-nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes vaw-fold-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 3px;
+  }
+}
+
+.vaw-fold__hint-tap {
+  display: inline;
+}
+.vaw-fold__hint-hover {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vaw-fold__hint-tap {
+    display: none;
+  }
+  .vaw-fold__hint-hover {
+    display: inline;
+  }
+}
+
+/* ───── the cards ───── */
+.vaw-fold__wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows calc(600ms * var(--k)) var(--vaw-ease) calc(300ms * var(--k));
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__wrap {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows calc(700ms * var(--k)) var(--vaw-ease) 0s;
+}
+
+.vaw-fold__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.vaw-fold__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .vaw-fold__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.vaw-fold__item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity calc(300ms * var(--k)) var(--vaw-ease) 0s,
+    transform calc(300ms * var(--k)) var(--vaw-ease) 0s;
+}
+
+.vaw-fold[data-open='true'] .vaw-fold__item {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity calc(500ms * var(--k)) var(--vaw-ease) calc((calc(250ms * var(--k)) + var(--n, 0) * calc(60ms * var(--k))) * var(--k)),
+    transform calc(600ms * var(--k)) var(--vaw-ease) calc((calc(250ms * var(--k)) + var(--n, 0) * calc(60ms * var(--k))) * var(--k));
+}
+
+.vaw-fold__flip,
+.vaw-fold__face {
+  height: 100%;
+}
+
+.vaw-fold__face {
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.5rem;
+  background: var(--ga);
+  color: #fff;
+  box-shadow:
+    0 18px 40px rgba(10, 60, 48, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform var(--vaw-dur-std) var(--vaw-ease);
+}
+
+.vaw-fold__face--front.vaw-fold__face--b {
+  background: var(--gb);
+}
+
+.vaw-fold__face:hover {
+  filter: brightness(1.08);
+}
+
+/* ───── desktop popup: both rows fade in place ───── */
+@media (min-width: 1024px) {
+  .vaw-fold--popup .vaw-fold__wrap {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+
+  .vaw-fold--popup .vaw-fold__inner {
+    overflow: visible;
+  }
+
+  .vaw-fold--popup .vaw-fold__list {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 1fr;
+    gap: var(--fold-gap);
+    margin-top: 0;
+    visibility: hidden;
+    transition: visibility 0s linear calc(1500ms * var(--k));
+  }
+
+  .vaw-fold--popup[data-open='true'] .vaw-fold__list {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .vaw-fold--popup .vaw-fold__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* Both rows fade in right where they sit (no sliding), row 2 continuing row 1's stagger.
+     Closing runs it backwards: row 2 leaves first, row 1 last. */
+  .vaw-fold--popup .vaw-fold__item--a {
+    --open-i: var(--c);
+    --item-close: calc(600ms * var(--k) + var(--c) * 30ms * var(--k));
+  }
+
+  .vaw-fold--popup .vaw-fold__item--b {
+    --open-i: calc(var(--c) + 4);
+    --item-close: calc((3 - var(--c)) * 30ms * var(--k));
+  }
+
+  .vaw-fold--popup .vaw-fold__item--a,
+  .vaw-fold--popup .vaw-fold__item--b {
+    position: relative;
+    opacity: 0;
+    transition: opacity calc(700ms * var(--k)) var(--ease-close) var(--item-close);
+  }
+
+  .vaw-fold--popup[data-open='true'] .vaw-fold__item--a,
+  .vaw-fold--popup[data-open='true'] .vaw-fold__item--b {
+    opacity: 1;
+    transition: opacity calc(650ms * var(--k)) linear calc((calc(250ms * var(--k)) + var(--open-i) * calc(100ms * var(--k))) * var(--k));
+  }
+}
+
+/* ───── translucent popup shell ───── */
+.vaw-fold-pop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  /* While fading out, opacity hits 0 before unmount — don't trap taps on a blank plate */
+  pointer-events: none;
+}
+
+.vaw-fold-pop[data-open='true'] {
+  pointer-events: auto;
+}
+
+.vaw-fold-pop__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(11, 13, 12, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 480ms var(--vaw-ease);
+}
+
+.vaw-fold-pop[data-open='true'] .vaw-fold-pop__backdrop {
+  opacity: 1;
+}
+
+.vaw-fold-pop__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 72rem);
+  max-height: min(92vh, 52rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1.25rem 1.25rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 1.75rem;
+  background: rgba(245, 243, 238, 0.28);
+  box-shadow: 0 28px 80px rgba(11, 13, 12, 0.16);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  opacity: 0;
+  transform: translateY(18px) scale(0.97);
+  transition:
+    opacity 520ms var(--vaw-ease),
+    transform 520ms var(--vaw-ease);
+}
+
+.vaw-fold-pop[data-open='true'] .vaw-fold-pop__panel {
+  opacity: 1;
+  transform: none;
+}
+
+@media (min-width: 640px) {
+  .vaw-fold-pop {
+    padding: 1.5rem;
+  }
+
+  .vaw-fold-pop__panel {
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+}
+
+.vaw-fold-pop__bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.vaw-fold-pop__eyebrow {
+  margin: 0 0 0.4rem;
+  color: #0cb78b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.vaw-fold-pop__title {
+  margin: 0;
+  max-width: 22ch;
+  color: #161615;
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.vaw-fold-pop__close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(22, 22, 21, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  color: #161615;
+  cursor: pointer;
+  transition:
+    background var(--vaw-dur-micro) var(--vaw-ease),
+    color var(--vaw-dur-micro) var(--vaw-ease);
+}
+
+.vaw-fold-pop__close:hover {
+  background: #0cb78b;
+  color: #0b0d0c;
+}
+
+.vaw-fold-pop__close:focus-visible {
+  outline: 2px solid #0cb78b;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-fold-pop__backdrop,
+  .vaw-fold-pop__panel {
+    transition-duration: 0.15s;
+  }
+
+  .vaw-fold-pop__panel {
+    transform: none;
+  }
+}
+
+.vaw-fold--popup .vaw-fold__list {
+  margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-fold__hint-arrow {
+    animation: none;
+  }
+}
+
+/* ───── phones/tablets popup: the whole dialog just fades; no height, stagger or blur work ───── */
+@media (max-width: 1023.98px) {
+  .vaw-fold--popup .vaw-fold__wrap,
+  .vaw-fold--popup[data-open='true'] .vaw-fold__wrap {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+
+  .vaw-fold--popup .vaw-fold__item,
+  .vaw-fold--popup[data-open='true'] .vaw-fold__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .vaw-fold-pop__backdrop {
+    background: rgba(11, 13, 12, 0.45);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .vaw-fold-pop__panel {
+    background: #f5f3ee;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform: none;
+  }
+
+  .vaw-fold-pop[data-open='true'] .vaw-fold-pop__panel {
+    transform: none;
+  }
+}

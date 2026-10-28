@@ -1,0 +1,237 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import CreamPage from './CreamPage';
+import ServiceDeck from './ServiceDeck';
+import ServiceJump from './ServiceJump';
+import FaqGrid from './FaqGrid';
+import { SERVICES, SERVICE_FAQS } from '@/lib/services';
+import { SHOW_GALLERY } from '@/lib/site';
+import { EASE, DUR } from '@/lib/motion';
+
+const START = [
+  {
+    title: 'Talk',
+    body: 'A short call or the form. You talk to the people who will build it.',
+  },
+  {
+    title: 'Lock a slice',
+    body: 'We lock a first slice with a date, not a vague phase.',
+  },
+  {
+    title: 'Ship & decide',
+    body: 'We build that slice, you use it, then we decide the next one.',
+  },
+] as const;
+
+function fade(reduce: boolean | null) {
+  return reduce
+    ? { initial: false, whileInView: undefined, viewport: undefined, transition: undefined }
+    : {
+        initial: { opacity: 0, y: 22 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: '-8% 0px' },
+        transition: { duration: DUR.enter, ease: EASE },
+      };
+}
+
+export default function ServicesHub() {
+  const reduce = useReducedMotion();
+  const [active, setActive] = useState<string>(SERVICES[0]?.id ?? '');
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const [pastDeck, setPastDeck] = useState(false);
+  const pastDeckRef = useRef(false);
+  const deckWrapRef = useRef<HTMLDivElement>(null);
+  const deckEndRef = useRef<HTMLDivElement>(null);
+  const anim = fade(reduce);
+
+  useEffect(() => {
+    const marker = deckEndRef.current;
+    const wrap = deckWrapRef.current;
+    if (!marker) return;
+
+    const sync = () => {
+      // Deck mounts null then expands — ignore until it has real height.
+      const deckH = wrap?.getBoundingClientRect().height ?? 0;
+      if (deckH < 160) {
+        if (pastDeckRef.current) {
+          pastDeckRef.current = false;
+          setPastDeck(false);
+          setJumpOpen(false);
+        }
+        return;
+      }
+      const past = marker.getBoundingClientRect().top < window.innerHeight * 0.42;
+      if (past === pastDeckRef.current) return;
+      pastDeckRef.current = past;
+      setPastDeck(past);
+      if (!past) setJumpOpen(false);
+    };
+
+    let raf = 0;
+    const onScroll = () => {
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          sync();
+        });
+      }
+    };
+    sync();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    const ro = wrap ? new ResizeObserver(sync) : null;
+    if (wrap && ro) ro.observe(wrap);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      ro?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const scrollHash = () => {
+      const id = window.location.hash.slice(1);
+      if (!id || !SERVICES.some((s) => s.id === id)) return;
+      requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    };
+    scrollHash();
+    window.addEventListener('hashchange', scrollHash);
+
+    const nodes = SERVICES.map((s) => document.getElementById(s.id)).filter(Boolean) as HTMLElement[];
+    if (!nodes.length) {
+      return () => window.removeEventListener('hashchange', scrollHash);
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit?.target.id) setActive(hit.target.id);
+      },
+      { rootMargin: '-30% 0px -45% 0px', threshold: [0.1, 0.35, 0.6] },
+    );
+    nodes.forEach((n) => io.observe(n));
+    return () => {
+      io.disconnect();
+      window.removeEventListener('hashchange', scrollHash);
+    };
+  }, []);
+
+  return (
+    <CreamPage nav="services">
+      <div className="vaw-hero">
+        <ServiceJump
+          active={active}
+          open={jumpOpen}
+          setOpen={setJumpOpen}
+          visible={pastDeck}
+          mobileWhenVisible
+          link
+        />
+
+        <motion.header
+          className="vaw-shell-narrow relative z-10 pt-[max(7rem,calc(env(safe-area-inset-top)+5.5rem))] text-center lg:pt-32"
+          {...anim}
+        >
+          <p className="mb-4 text-[0.75rem] font-semibold uppercase tracking-[0.16em] text-[#0cb78b]">
+            Services
+          </p>
+          <h1 className="vaw-display m-0 text-[clamp(2.6rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em] text-[#161615]">
+            What we
+            <span className="text-[#0cb78b]"> build.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#5c5a56]">
+            Open a card, or pick from Services in the nav, for the full write-up: process, stack,
+            and what to bring.
+          </p>
+        </motion.header>
+
+        <div ref={deckWrapRef} className="relative z-0 mt-4 w-full bg-transparent">
+          <ServiceDeck />
+        </div>
+        <div ref={deckEndRef} className="h-0 w-full" aria-hidden />
+
+        <div className="vaw-shell-narrow relative z-10 pb-20 pt-28 lg:pl-24">
+          <motion.section {...anim}>
+            <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
+              How a project starts
+            </h2>
+            <ol className="mt-10 grid gap-5 sm:grid-cols-3">
+              {START.map((step, i) => (
+                <li
+                  key={step.title}
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 rounded-[1.5rem] bg-white px-5 py-6 shadow-[0_0.75rem_2rem_rgba(22,22,21,0.06)]"
+                >
+                  <span
+                    aria-hidden
+                    className="vaw-display select-none text-[3.25rem] leading-none tracking-[-0.06em] text-[#0cb78b]/30"
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="m-0 text-[0.9375rem] font-semibold text-[#161615]">{step.title}</p>
+                    <p className="mt-2 mb-0 text-[0.9063rem] leading-relaxed text-[#5c5a56]">
+                      {step.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </motion.section>
+
+          <motion.section className="mt-20" {...anim}>
+            <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#161615]">
+              Questions we get first
+            </h2>
+            <div className="mt-8">
+              <FaqGrid items={SERVICE_FAQS} />
+            </div>
+          </motion.section>
+
+          <motion.section className="mt-20" {...anim}>
+            <div
+              data-nav-contrast="dark"
+              className="flex flex-col items-center rounded-[1.5rem] px-7 py-14 text-center shadow-[0_1.125rem_2.75rem_rgba(6,20,18,0.35)] sm:px-9 sm:py-16"
+              style={{
+                background:
+                  'radial-gradient(120% 90% at 28% 18%, #2a4f47 0%, #152e2a 42%, #0a1916 78%, #061210 100%)',
+              }}
+            >
+              <h2 className="vaw-display m-0 text-[clamp(1.7rem,3.2vw,2.4rem)] tracking-[-0.03em] text-[#f5f3ee]">
+                Still stuck?
+              </h2>
+              <p className="mx-auto mt-4 mb-0 max-w-[42ch] text-[0.9375rem] leading-relaxed text-white">
+                Tell us what you are trying to get done. We will point you to the right service, or say
+                if it is not a fit.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b] px-6 py-3 text-[0.875rem] font-medium text-[#0b0d0c] hover:bg-[#0a9d77]"
+              >
+                Get in touch
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </motion.section>
+
+          {SHOW_GALLERY ? (
+            <Link
+              href="/gallery"
+              className="mt-14 inline-flex items-center gap-1.5 rounded-full bg-[#0cb78b]/15 px-5 py-2.5 text-[0.875rem] font-medium text-[#0cb78b] hover:bg-[#0cb78b]/20"
+            >
+              See gallery
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </CreamPage>
+  );
+}

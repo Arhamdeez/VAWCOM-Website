@@ -1,0 +1,363 @@
+/* Sticky / follow stroke need a visible overflow chain up to the viewport scroller */
+html:has(.vaw-home),
+body:has(.vaw-home) {
+  /* clip, not hidden: no scroll container (sticky still works) but nothing can widen the page sideways */
+  overflow-x: clip !important;
+}
+
+.vaw-home {
+  --vaw-bg: #0b0d0c;
+  --vaw-ink: #ece9e3;
+  --vaw-muted: rgba(236, 233, 227, 0.72);
+  --vaw-faint: rgba(236, 233, 227, 0.45);
+  --vaw-green: #429f7f;
+  --vaw-green-hover: #429f7f;
+  --vaw-mint: #429f7f;
+  --vaw-orange: #cf6a2c;
+  --vaw-panel: #131816;
+  --vaw-cream: #fbf6ec;
+  position: relative;
+  /* Must stay visible — overflow-x clip/hidden on an ancestor kills position:sticky */
+  overflow: visible;
+  background: #f5f3ee;
+  color: var(--vaw-ink);
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vaw-home a:hover {
+  color: var(--vaw-green);
+}
+
+/* Solid green controls: white type on hover so it doesn't vanish into the fill */
+.vaw-home :is(a, button)[class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover,
+.vaw-home :is(a, button)[class*='hover:bg-[#0cb78b]']:not([class*='hover:bg-[#0cb78b]/']):hover,
+.vaw-home :is(a, button)[class*='hover:bg-[#0a9d77]']:hover,
+.vaw-home a [class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover {
+  color: #fff !important;
+}
+
+/* Revamp palette — hero first; other sections keep the existing dark tokens */
+.vaw-hero {
+  --paper: #f5f3ee;
+  --ink: #161615;
+  --muted: #5c5a56;
+  --faint: #8a8882;
+  --brand: #0cb78b;
+  --lime: #b8d93c;
+  --coral: #e8674a;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.vaw-hero a:hover {
+  color: var(--brand);
+}
+
+.vaw-hero :is(a, button)[class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover,
+.vaw-hero :is(a, button)[class*='hover:bg-[#0cb78b]']:not([class*='hover:bg-[#0cb78b]/']):hover,
+.vaw-hero :is(a, button)[class*='hover:bg-[#0a9d77]']:hover,
+.vaw-hero a [class*='bg-[#0cb78b]']:not([class*='bg-[#0cb78b]/']):hover {
+  color: #fff !important;
+}
+
+.vaw-home ::selection {
+  background: var(--vaw-green);
+  color: var(--vaw-bg);
+}
+
+/* Single green for copy; use opacity modifiers when softer */
+.vaw-display {
+  font-family: 'Pangram', var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+}
+
+.vaw-follow-span,
+.vaw-hero {
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+}
+
+.vaw-follow-span .vaw-display,
+.vaw-hero .vaw-display {
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+}
+
+/* Paper lives on the follow wrapper so the stroke sits under text, above bg */
+.vaw-follow-span {
+  background: #f5f3ee;
+  color: #161615;
+}
+
+.vaw-follow-span > .vaw-hero {
+  background: transparent;
+}
+
+@keyframes vaw-globe-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  70% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+}
+
+.vaw-globe-twinkle {
+  animation: vaw-globe-twinkle 2.8s ease-in-out infinite;
+}
+
+@keyframes vaw-globe-pin {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+/* Pulse ring: scale + opacity (compositor) instead of animating box-shadow (repaint every frame).
+   Radius 4.5px → 9.5px matches the old 0 → 5px spread. */
+@keyframes vaw-globe-pin-ring {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(2.1111);
+    opacity: 0;
+  }
+}
+
+.vaw-globe-pin {
+  visibility: hidden;
+}
+
+.vaw-globe-pin-dot {
+  display: block;
+  position: relative;
+  width: 0.5625rem;
+  height: 0.5625rem;
+  border-radius: 999px;
+  background: #161615;
+  animation: vaw-globe-pin 2.2s ease-in-out infinite;
+}
+
+.vaw-globe-pin-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: #161615;
+  animation: vaw-globe-pin-ring 2.2s ease-in-out infinite;
+}
+
+/* Nothing to animate while the globe is offscreen. */
+[data-globe-root].is-offscreen .vaw-globe-pin-dot,
+[data-globe-root].is-offscreen .vaw-globe-pin-dot::before,
+[data-globe-root].is-offscreen .vaw-globe-twinkle {
+  animation-play-state: paused;
+}
+
+/* Transparent nav pill — clear center, glass only on the rim */
+.vaw-nav-glass {
+  position: relative;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 1px rgba(22, 22, 21, 0.06),
+    0 12px 36px rgba(22, 22, 21, 0.08);
+  backdrop-filter: blur(10px) saturate(1.25);
+  -webkit-backdrop-filter: blur(10px) saturate(1.25);
+}
+
+.vaw-nav-glass-on-dark {
+  background: rgba(11, 13, 12, 0.42);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 12px 36px rgba(0, 0, 0, 0.28);
+}
+
+/* Width grows with the box itself. `layout` scaled the pill and kicked it up under the social bar. */
+.vaw-nav-morph {
+  interpolate-size: allow-keywords;
+  transition:
+    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-nav-morph {
+    transition-duration: 0.01ms;
+  }
+}
+
+.vaw-nav-glass-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+/* Resting plate. Hover lens is LiquidLens — displacement, not a white fill. */
+.vaw-glass {
+  position: relative;
+  flex: none;
+  overflow: visible;
+}
+
+.vaw-glass-core {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 24px rgba(22, 22, 21, 0.04);
+  backdrop-filter: blur(8px) saturate(1.15);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  transition:
+    transform var(--vaw-dur-std) var(--vaw-ease),
+    background var(--vaw-dur-std) var(--vaw-ease),
+    border-color var(--vaw-dur-std) var(--vaw-ease),
+    box-shadow var(--vaw-dur-std) var(--vaw-ease);
+}
+
+.vaw-liquid-lens {
+  position: absolute;
+  inset: -20px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 2.4rem;
+  background: transparent;
+  box-shadow: 0 22px 48px rgba(22, 22, 21, 0.1);
+  opacity: 0;
+}
+
+.vaw-glass:hover > .vaw-liquid-lens,
+.vaw-glass.is-liquid-hot > .vaw-liquid-lens {
+  opacity: 1;
+}
+
+.vaw-liquid-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    transparent 38%
+  );
+  mix-blend-mode: overlay;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vaw-glass:has(> .vaw-liquid-lens) .vaw-glass-core {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    /* No colour fade on hover-in: the lens appears at once, so the border and fill must too.
+       (Fading back out on leave still uses the base .vaw-glass-core transitions.) */
+    transition: transform var(--vaw-dur-std) var(--vaw-ease);
+  }
+
+  .vawcom-marquee.is-svg-lens .vaw-glass:hover .vaw-glass-core,
+  .vawcom-marquee.is-svg-lens .vaw-glass.is-liquid-hot .vaw-glass-core {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Safari: no lens, and blur under a moving track is expensive / broken. */
+.vawcom-marquee:not(.is-svg-lens) .vaw-glass-core {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.vaw-hero .vawcom-marquee {
+  position: relative;
+  overflow: hidden;
+  padding-block: 1.375rem;
+  margin-block: -0.375rem;
+}
+
+.vaw-marquee-lens {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: 10rem;
+  height: 4rem;
+  pointer-events: none;
+  border-radius: 2rem;
+  transform: translate(-50%, -50%);
+  transition: width var(--vaw-dur-std) var(--vaw-ease),
+    height var(--vaw-dur-std) var(--vaw-ease);
+}
+
+.vaw-marquee-lens .vaw-liquid-lens {
+  inset: 0;
+  opacity: 1;
+}
+
+.vaw-tech-icon {
+  display: inline-block;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.vaw-tech-marquee-left {
+  animation: vawcom-marquee-left 42s linear infinite;
+}
+
+.vaw-tech-marquee-right {
+  animation: vawcom-marquee-right 48s linear infinite;
+}
+
+.vaw-hero.is-offscreen .vaw-tech-marquee-left,
+.vaw-hero.is-offscreen .vaw-tech-marquee-right {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaw-home [data-bar] {
+    animation: none !important;
+  }
+
+  .vaw-tech-marquee-left,
+  .vaw-tech-marquee-right {
+    animation: none;
+    transform: none;
+  }
+}

@@ -2,6 +2,24 @@
 
 export const CONTACT_EMAIL = 'vawcomtechnologies@gmail.com';
 
+/**
+ * TRY-OUT (reversible): centred hero, 3D bot hidden, softer scribble line. The bot, the chat box and
+ * the line code are all still there — set to false to get the original hero back.
+ */
+export const HERO_CENTERED_TRYOUT = true;
+
+/** Gallery is built but hidden for now: flip to true to bring back its route, nav, footer and CTAs. */
+export const SHOW_GALLERY = false;
+
+/** Pages the site assistant may link to. Keep hrefs exact — the model copies them. */
+export const CHAT_SITE_LINKS = [
+  { label: 'Services', href: '/services' },
+  ...(SHOW_GALLERY ? [{ label: 'Gallery', href: '/gallery' }] : []),
+  { label: 'Why us', href: '/#why' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+] as const;
+
 export const DEFAULT_MAIL_SUBJECT = 'Project inquiry from vawcom.com';
 
 /** Opens Gmail compose in the browser — use this for all “email us” links. */
@@ -13,11 +31,6 @@ export function getGmailComposeUrl(subject: string = DEFAULT_MAIL_SUBJECT) {
     su: subject,
   });
   return `https://mail.google.com/mail/?${q.toString()}`;
-}
-
-/** Optional mailto for non-web contexts (e.g. server email HTML). */
-export function getMailtoHref(subject: string = DEFAULT_MAIL_SUBJECT) {
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
 }
 
 export const SOCIAL = {

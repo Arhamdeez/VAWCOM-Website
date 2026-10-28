@@ -1,17 +1,27 @@
 'use client';
 
-import { useLayoutEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import BackgroundEffectWrapper from '@/components/BackgroundEffectWrapper';
+import { useEffect, useLayoutEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { MotionConfig } from 'framer-motion';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
-import PageTransition from '@/components/PageTransition';
-
-const STANDALONE_PREFIXES = ['/hisaab/'];
+import { ChatProvider } from '@/components/chat/SiteChat';
+import CursorGlow from '@/components/CursorGlow';
+import { SHOW_GALLERY } from '@/lib/site';
 
 function isStandalonePath(pathname: string) {
-  return STANDALONE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  return pathname.startsWith('/hisaab/');
+}
+
+function isCreamPath(pathname: string) {
+  return (
+    pathname === '/' ||
+    pathname === '/splash' ||
+    pathname === '/contact' ||
+    pathname === '/about' ||
+    pathname === '/partners' ||
+    pathname.startsWith('/services') ||
+    pathname.startsWith('/gallery')
+  );
 }
 
 function StandaloneShell({ children }: { children: React.ReactNode }) {
@@ -27,19 +37,57 @@ function StandaloneShell({ children }: { children: React.ReactNode }) {
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const routes = [
+      '/',
+      '/services',
+      '/services/web',
+      ...(SHOW_GALLERY ? ['/gallery'] : []),
+      '/about',
+      '/contact',
+    ];
+    // Idle, not +200ms: prefetching six routes mid-first-scroll competes with the main thread.
+    const run = () => {
+      for (const href of routes) router.prefetch(href);
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(run, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 1500);
+    return () => window.clearTimeout(id);
+  }, [router]);
 
   if (isStandalonePath(pathname)) {
-    return <StandaloneShell>{children}</StandaloneShell>;
+    return (
+      <MotionConfig reducedMotion="user">
+        <StandaloneShell>{children}</StandaloneShell>
+      </MotionConfig>
+    );
   }
 
+  const cream = isCreamPath(pathname);
+
+  // reducedMotion="user": people who ask their OS for less motion get no transform/layout animation
+  // from Framer anywhere on the site (opacity and colour still fade).
   return (
-    <SplashScreenWrapper>
-      <BackgroundEffectWrapper />
-      <Navbar />
-      <main className="relative min-h-0 w-full overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
-        <PageTransition>{children}</PageTransition>
-      </main>
-      <Footer />
-    </SplashScreenWrapper>
+    <MotionConfig reducedMotion="user">
+    <ChatProvider>
+      <CursorGlow />
+      <SplashScreenWrapper cream={cream}>
+        <main
+          className={`relative min-h-0 w-full ${
+            cream
+              ? 'bg-[#f5f3ee]'
+              : 'overflow-x-hidden bg-[#050a14] supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]'
+          }`}
+        >
+          {children}
+        </main>
+      </SplashScreenWrapper>
+    </ChatProvider>
+    </MotionConfig>
   );
 }

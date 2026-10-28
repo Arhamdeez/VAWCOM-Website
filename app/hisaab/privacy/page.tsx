@@ -67,7 +67,7 @@ export default function HisaabPrivacyPolicyPage() {
             <h2 id="privacy-summary" className="text-lg font-semibold text-white">
               1. Summary
             </h2>
-            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300 sm:text-[15px]">
+            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300 sm:text-[0.9375rem]">
               <li>
                 <strong className="font-medium text-white">Your spending data stays on your phone.</strong>
               </li>
@@ -81,7 +81,7 @@ export default function HisaabPrivacyPolicyPage() {
             </ul>
           </section>
 
-          <div className="space-y-6 text-sm leading-relaxed text-slate-400 sm:text-[15px] [&_a]:text-emerald-300 [&_a]:underline-offset-2 hover:[&_a]:text-emerald-200 hover:[&_a]:underline [&_code]:rounded [&_code]:bg-white/[0.06] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[0.92em] [&_ul]:marker:text-emerald-400/70 [&>section]:rounded-2xl [&>section]:border [&>section]:border-white/[0.1] [&>section]:bg-white/[0.02] [&>section]:px-5 [&>section]:py-6 [&>section]:shadow-[0_16px_40px_-28px_rgba(0,0,0,0.9)] sm:[&>section]:px-7 sm:[&>section]:py-7">
+          <div className="space-y-6 text-sm leading-relaxed text-slate-400 sm:text-[0.9375rem] [&_a]:text-emerald-300 [&_a]:underline-offset-2 hover:[&_a]:text-emerald-200 hover:[&_a]:underline [&_code]:rounded [&_code]:bg-white/[0.06] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[0.92em] [&_ul]:marker:text-emerald-400/70 [&>section]:rounded-2xl [&>section]:border [&>section]:border-white/[0.1] [&>section]:bg-white/[0.02] [&>section]:px-5 [&>section]:py-6 [&>section]:shadow-[0_1rem_2.5rem_-1.75rem_rgba(0,0,0,0.9)] sm:[&>section]:px-7 sm:[&>section]:py-7">
             <section aria-labelledby="section-introduction">
               <h2 id="section-introduction" className="text-xl font-semibold text-white">
                 2. Introduction

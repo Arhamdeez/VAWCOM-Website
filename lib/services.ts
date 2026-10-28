@@ -1,0 +1,334 @@
+export const SERVICES = [
+  {
+    id: 'web',
+    nav: 'Web',
+    title: 'Web Development',
+    lede: 'Marketing sites, dashboards, and web apps. Designed and built by the same team.',
+    hook: 'Stop handing design to one vendor and code to another.',
+    for: 'For founders and product teams who need a public site or web product without splitting the work across shops.',
+    help: 'We own structure, UI, and launch so what you ship matches what you promised.',
+    promise:
+      'We help with structure, a responsive UI, and getting the site online with hosting, domain, and the basics covered.',
+    outcomes: [
+      {
+        title: 'Intentional page structure',
+        body: 'Every page has a purpose before we draw a layout. Your team can explain the site in one pass.',
+      },
+      {
+        title: 'Design and development together',
+        body: 'Design and code move together. You review working screens as we build.',
+      },
+      {
+        title: 'Editable content',
+        body: 'We set up a CMS or admin where your team will update content regularly.',
+      },
+      {
+        title: 'Hosting and launch help',
+        body: 'We help with hosting, your domain, analytics, and basic SEO so the site is live for real visitors.',
+      },
+    ],
+    first: 'A site map and the first pages you can click through on your phone.',
+    bring: 'Your current URL if you have one, the pages you know you need, and brand files if they exist.',
+    span: 'Marketing sites: a few weeks. Product surfaces: longer. Dates go on the first delivery before we code.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Postgres'],
+    extras: ['CMS / admin', 'Auth and dashboards', 'Analytics and SEO', 'Custom APIs'],
+  },
+  {
+    id: 'apps',
+    nav: 'Apps',
+    title: 'App Development',
+    lede: 'We take your product from the first screens to a live listing on the App Store and Play Store.',
+    hook: 'If it has to live on a phone, we build the app.',
+    for: 'For teams that need a live app on iPhone, Android, or both.',
+    help: 'We lock what version one does, then ship both platforms from one codebase.',
+    promise: 'Main flow on a real phone first. Store listing and release after that.',
+    outcomes: [
+      {
+        title: 'Cross-platform app development',
+        body: 'We build one app that runs on iPhone and Android. React Native or Flutter for most projects. Native Swift or Kotlin when the platform needs it.',
+      },
+      {
+        title: 'A working first version',
+        body: 'The first release includes login, the data layer, and the main user path. You can open it on a phone and use it end to end.',
+      },
+      {
+        title: 'Test builds you can install',
+        body: 'TestFlight and Play internal builds, plus listing copy and screenshots.',
+      },
+      {
+        title: 'Code you keep',
+        body: 'You own the code. Full access to the repo when the project ships.',
+      },
+    ],
+    first: 'A test build on a real phone with the main flow working.',
+    bring: 'What version one must do, which phones you need, and any APIs to connect.',
+    span: 'A focused first version usually takes several weeks. Main flow before store work.',
+    stack: ['React Native', 'Flutter', 'Kotlin', 'Swift', 'Firebase'],
+    extras: ['Push notifications', 'Store listing', 'Offline-first data', 'Deep links'],
+  },
+  {
+    id: 'voice',
+    nav: 'Voice',
+    title: 'Voice Agents',
+    lede: 'Phone agents that answer, book, answer FAQs, and hand off to a person when it matters.',
+    hook: 'Your phone should finish work, not fill a voicemail box.',
+    for: 'For businesses that miss calls and want a number that completes tasks.',
+    help: 'The agent answers, checks tools like your calendar, and passes the call to a human when needed.',
+    promise:
+      'We set up the agent to handle your main call types, connect it to your tools, and define when a person should take over.',
+    outcomes: [
+      {
+        title: 'Call flows from real requests',
+        body: 'We map what callers ask most often and plan for the edge cases before go-live.',
+      },
+      {
+        title: 'Connected to your tools',
+        body: 'Calendar, CRM, docs, or a spreadsheet. The agent works with the tools your team already uses.',
+      },
+      {
+        title: 'Hand off to a person',
+        body: 'We set clear rules for when a human joins the call.',
+      },
+      {
+        title: 'Pilot on a test number',
+        body: 'You try the top call types on a test line before it sits on your public number.',
+      },
+    ],
+    first: 'A test number that handles your top three call types end to end.',
+    bring: 'The calls you miss or repeat, the hours the line should answer, and the tools to connect.',
+    span: 'A focused pilot can be ready in a few weeks once the call list is clear.',
+    stack: ['Twilio', 'OpenAI', 'n8n', 'Calendar APIs'],
+    extras: ['Booking and FAQs', 'CRM writeback', 'SMS confirmations', 'After-hours cover'],
+  },
+  {
+    id: 'ai',
+    nav: 'AI',
+    title: 'AI & Automation',
+    lede: 'Site chat, document Q&A, and automations that move work from message to record to reply.',
+    hook: 'Automate the hours you already waste every week.',
+    for: 'For teams stuck on repeat questions, or ops still living in inboxes and spreadsheets.',
+    help: 'We automate one workflow first, with logs, and a person in the loop where a wrong send hurts.',
+    promise:
+      'We automate the repeat work that eats your week, keep a log of what ran, and leave approval steps where a mistake would hurt.',
+    outcomes: [
+      {
+        title: 'Answers from your own sources',
+        body: 'Chat and doc Q&A grounded in material you control.',
+      },
+      {
+        title: 'Automate a repeat workflow',
+        body: 'We automate the job that takes the most hours, with retries and an audit trail.',
+      },
+      {
+        title: 'Integrations with your stack',
+        body: 'Email, Slack, sheets, CRM. The automation meets your team where they work.',
+      },
+      {
+        title: 'Approval where it matters',
+        body: 'Approval steps on anything that spends money or messages customers.',
+      },
+    ],
+    first: 'One workflow in production with a log you can open on Monday.',
+    bring: 'The repeat task to remove first, where the data lives, and who must approve sends.',
+    span: 'The first workflow often takes a few weeks. More follow once that pattern works.',
+    stack: ['OpenAI', 'Claude', 'n8n', 'Python', 'Node.js'],
+    extras: ['Site chat', 'Doc Q&A', 'Slack and email', 'Sheets to CRM'],
+  },
+  {
+    id: 'commerce',
+    nav: 'Commerce',
+    title: 'E-commerce',
+    lede: 'Catalog, cart, payments, and inventory that stay in sync when an order lands.',
+    hook: 'Stop reconciling orders that do not match the shelf.',
+    for: 'For brands selling online who need stock, money, and the storefront to agree.',
+    help: 'Storefront, payments, and inventory update together so ops is not cleaning mismatches by hand.',
+    promise:
+      'We help you sell online with a storefront, working checkout, and inventory that updates when orders come in.',
+    outcomes: [
+      {
+        title: 'Product pages and cart',
+        body: 'Product pages and cart flows shaped around how you sell.',
+      },
+      {
+        title: 'Checkout and payments',
+        body: 'Payment setup for how you get paid, including common failure cases.',
+      },
+      {
+        title: 'Inventory that stays in sync',
+        body: 'Stock updates when an order lands so you can see oversells early.',
+      },
+      {
+        title: 'Simple order ops',
+        body: 'Order email and a simple view for the people shipping boxes.',
+      },
+    ],
+    first: 'A catalog, checkout, and one real test order that completes cleanly.',
+    bring: 'How you fulfill today, a product list even if it is a spreadsheet, and how you get paid.',
+    span: 'A focused catalog can launch in a few weeks once fulfillment is clear.',
+    stack: ['WordPress', 'WooCommerce', 'Shopify', 'Next.js', 'Stripe', 'Postgres'],
+    extras: ['Catalog and cart', 'Inventory sync', 'Order email', 'Ops dashboard'],
+  },
+  {
+    id: 'care',
+    nav: 'Care',
+    title: 'Maintenance & Rescue',
+    lede: 'Updates, monitoring, backups, bug fixes, and cleanup so the next change is safer.',
+    hook: 'If touching production scares you, that is the problem we fix.',
+    for: 'For anyone with a live site or app that is unstable, slow, or hard to change.',
+    help: 'We find the root cause, put monitoring on a schedule, and leave the next change easier.',
+    promise:
+      'We stabilize what is live, fix the real bugs, and leave clear notes so the next change is easier.',
+    outcomes: [
+      {
+        title: 'Monitoring and updates',
+        body: 'Monitoring, updates, and backups on a cadence so issues show up before customers report them.',
+      },
+      {
+        title: 'Root-cause bug fixes',
+        body: 'We reproduce, rank, and fix the underlying bug, not only the symptom.',
+      },
+      {
+        title: 'Code cleanup',
+        body: 'Structure, types, and tests where they make changes safer.',
+      },
+      {
+        title: 'Written handoff notes',
+        body: 'Short notes on what changed and why.',
+      },
+    ],
+    first: 'The worst issue reproduced, ranked, and a fix date on the calendar.',
+    bring: 'Access or a walkthrough of what breaks, what hurts most, and any hard deadline.',
+    span: 'Stabilization often shows results in the first week. Deeper cleanup is paced to risk.',
+    stack: ['Docker', 'AWS', 'Postgres', 'TypeScript'],
+    extras: ['Uptime and backups', 'Bug hunts', 'Refactors', 'Handover notes'],
+  },
+  {
+    id: 'erp',
+    nav: 'ERP',
+    title: 'ERP Systems',
+    lede: 'Inventory, orders, finance, and ops in one system your team actually uses.',
+    hook: 'Stop running the company from five spreadsheets that disagree.',
+    for: 'For operators who need stock, orders, and money to share one source of truth.',
+    help: 'We map how work moves today, then build or connect an ERP that matches that flow.',
+    promise:
+      'We put inventory, orders, and core ops on one system with roles, reports, and a path your team can run without us.',
+    outcomes: [
+      {
+        title: 'Process mapped before software',
+        body: 'We document how stock, orders, and approvals move before we pick modules or custom screens.',
+      },
+      {
+        title: 'Core modules that fit',
+        body: 'Inventory, purchasing, sales, and basic finance wired to how you work — not a generic demo dataset.',
+      },
+      {
+        title: 'Integrations where it hurts',
+        body: 'Storefront, warehouse, or accounting tools connect so teams are not retyping the same order.',
+      },
+      {
+        title: 'Training and handoff',
+        body: 'Roles, permissions, and short guides so the first week live is usable.',
+      },
+    ],
+    first: 'A working core flow — stock in, order out — with your real sample data.',
+    bring: 'How you fulfill today, which sheets or tools you trust, and who owns each step.',
+    span: 'A focused first module set is usually weeks once the process map is clear.',
+    stack: ['Postgres', 'Python', 'Node.js', 'Docker', 'AWS'],
+    extras: ['Inventory and orders', 'Roles and approvals', 'Reports', 'Tool integrations'],
+  },
+  {
+    id: 'crm',
+    nav: 'CRM',
+    title: 'CRM Systems',
+    lede: 'Leads, pipeline, and follow-ups in one place so nothing falls through.',
+    hook: 'If the pipeline lives in inboxes, deals are already slipping.',
+    for: 'For sales and ops teams who need a clear view of every lead and next step.',
+    help: 'We set up the pipeline, automations, and handoffs so CRM matches how you sell.',
+    promise:
+      'We build a CRM your team will open daily — stages, owners, reminders, and clean handoffs to delivery.',
+    outcomes: [
+      {
+        title: 'Pipeline that matches reality',
+        body: 'Stages and fields shaped around how you actually close, not a template you ignore.',
+      },
+      {
+        title: 'Capture from every channel',
+        body: 'Forms, email, chat, or voice write into the same lead record.',
+      },
+      {
+        title: 'Reminders and automations',
+        body: 'Follow-ups, assignments, and status changes that do not depend on memory.',
+      },
+      {
+        title: 'Handoff to delivery',
+        body: 'Won deals land with the context the build or support team needs.',
+      },
+    ],
+    first: 'A live pipeline with your stages, owners, and one inbound source writing leads in.',
+    bring: 'How leads arrive, what “won” means, and who owns each stage.',
+    span: 'A focused CRM setup is usually a few weeks once stages and sources are clear.',
+    stack: ['Postgres', 'n8n', 'Node.js', 'OpenAI', 'Twilio'],
+    extras: ['Pipeline and stages', 'Lead capture', 'Automations', 'Team handoffs'],
+  },
+] as const;
+
+export type ServiceId = (typeof SERVICES)[number]['id'];
+export type Service = (typeof SERVICES)[number];
+
+/** Navbar services menu order (Voice kept last — not in the preferred marketing sequence). */
+export const SERVICE_NAV_ORDER: ServiceId[] = [
+  'web',
+  'apps',
+  'ai',
+  'commerce',
+  'erp',
+  'crm',
+  'care',
+  'voice',
+];
+
+export function servicesInNavOrder(): Service[] {
+  return SERVICE_NAV_ORDER.map((id) => SERVICES.find((s) => s.id === id)!).filter(Boolean);
+}
+
+const TRACK_COLOR: Record<ServiceId, string> = {
+  web: '#429f7f',
+  apps: '#63cbc0',
+  voice: '#1f7f9c',
+  ai: '#0cb78b',
+  commerce: '#cf6a2c',
+  care: '#d9a961',
+  erp: '#3d7a6a',
+  crm: '#e07a4a',
+};
+
+export const SERVICE_TRACK = SERVICES.map((s) => ({
+  title: s.title,
+  href: `/services/${s.id}`,
+  body: s.lede,
+  color: TRACK_COLOR[s.id],
+}));
+
+export function getService(id: string): Service | undefined {
+  return SERVICES.find((s) => s.id === id);
+}
+
+export const SERVICE_FAQS = [
+  {
+    q: 'How do we start?',
+    a: 'A short call or the contact form. We scope the first delivery, then build. You talk to the people doing the work.',
+  },
+  {
+    q: 'How long does a project take?',
+    a: 'It depends on your requirements. Get in touch for a consultation and we will map out a clear timeline for your project.',
+    link: { label: 'Book a consultation', href: '/contact' },
+  },
+  {
+    q: 'Do you take over existing code?',
+    a: 'Yes. Maintenance, bug hunts, and cleanup are a full service.',
+  },
+  {
+    q: 'Where are you based?',
+    a: 'VAWCOM is based in Lahore, Pakistan.',
+  },
+] as const;
