@@ -8,9 +8,10 @@ interface SplashScreenProps {
   onComplete: () => void;
 }
 
-/** Shared with the server-rendered boot plate. */
+/** Shared with the server-rendered boot plate. Mobile needs a wide mark — the old
+ *  `min(70vw,46vw)` always collapsed to 46vw (~11rem) and read as “no splash”. */
 export const SPLASH_LOGO_CLASS =
-  'h-auto w-[clamp(10rem,min(70vw,46vw),22rem)] max-w-full object-contain';
+  'h-auto w-[min(78vw,17.5rem)] sm:w-[min(56vw,20rem)] lg:w-[22rem] max-w-full object-contain';
 
 /**
  * Drives the server-rendered `.splash-boot` plate (globals.css owns the visuals): holds it
@@ -42,7 +43,9 @@ function pageReady(): Promise<void> {
 function logoSettled(): Promise<void> {
   const logo = document.querySelector('.splash-boot img');
   const running = (logo?.getAnimations?.() ?? []).filter((a) => a.playState === 'running');
-  return Promise.all(running.map((a) => a.finished.catch(() => undefined))).then(() => undefined);
+  const wait = Promise.all(running.map((a) => a.finished.catch(() => undefined))).then(() => undefined);
+  // Safari sometimes keeps a restarted entrance “running” at opacity 0 — don't block exit forever.
+  return Promise.race([wait, new Promise<void>((r) => window.setTimeout(r, 500))]);
 }
 
 export default function SplashScreen({ onExiting, onComplete }: SplashScreenProps) {

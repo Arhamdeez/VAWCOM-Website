@@ -48,12 +48,15 @@ export default function SplashScreenWrapper({
   const completedRef = useRef(false);
   const forcedRef = useRef(false);
   const activeRef = useRef(false);
+  /** Forced /splash → / : keep the plate up through the replace. */
+  const handingOffRef = useRef(false);
 
   const finishSplash = useCallback(() => {
     markSplashSeen();
     // Stay on cream overlay until home is mounted. Unmounting on /splash
-    // shows the navy html/body shell.
+    // shows the navy html/body shell (the exit fade already ran via onExiting).
     if (forcedRef.current && window.location.pathname === '/splash') {
+      handingOffRef.current = true;
       router.replace('/');
       return;
     }
@@ -63,6 +66,7 @@ export default function SplashScreenWrapper({
     }
     completedRef.current = true;
     activeRef.current = false;
+    handingOffRef.current = false;
     setShowSplash(false);
     setSplashComplete();
   }, [router]);
@@ -73,14 +77,26 @@ export default function SplashScreenWrapper({
 
     if (forced) {
       completedRef.current = false;
+      handingOffRef.current = false;
       setSplashPending(true, true);
       setShowSplash(true);
+      return;
+    }
+
+    // /splash → / handoff: cookie is set and the exit fade already played — settle once.
+    if (handingOffRef.current) {
+      handingOffRef.current = false;
+      completedRef.current = true;
+      activeRef.current = false;
+      setShowSplash(false);
+      setSplashComplete();
       return;
     }
 
     if (activeRef.current) return;
     if (hasSeenSplash() || completedRef.current) {
       completedRef.current = true;
+      setShowSplash(false);
       setSplashComplete();
       return;
     }
