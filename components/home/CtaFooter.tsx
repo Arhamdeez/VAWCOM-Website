@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { CONTACT_EMAIL, getGmailComposeUrl, SHOW_GALLERY, SOCIAL } from '@/lib/site';
 import { IconGitHub, IconInstagram, IconLinkedIn, IconMail } from './SocialIcons';
@@ -18,9 +19,30 @@ const iconClass =
 /** Compact footer — big faded mark, content above the wash. */
 export default function CtaFooter() {
   const year = new Date().getFullYear();
+  const footerRef = useRef<HTMLElement>(null);
+
+  // Paint html mint only while the footer is on screen — applying it whenever
+  // .vaw-footer existed made iOS flash green over the cream home after splash.
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        root.classList.toggle('vaw-at-footer', Boolean(entry?.isIntersecting));
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      root.classList.remove('vaw-at-footer');
+    };
+  }, []);
 
   return (
     <footer
+      ref={footerRef}
       className="vaw-footer relative overflow-hidden text-[#161615]"
       style={{
         background:

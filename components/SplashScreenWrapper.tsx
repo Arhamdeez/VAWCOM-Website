@@ -18,7 +18,9 @@ function setSplashPending(pending: boolean, forced = false) {
 }
 
 function setSplashExiting() {
-  document.documentElement.classList.remove('splash-pending', 'splash-locked');
+  // Keep splash-locked through the fade — unlocking mid-exit lets iOS
+  // rubber-band and flash the navy/root background behind the plate.
+  document.documentElement.classList.remove('splash-pending');
   document.documentElement.classList.add('splash-exiting');
 }
 

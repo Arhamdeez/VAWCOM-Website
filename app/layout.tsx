@@ -65,15 +65,18 @@ export default async function RootLayout({
   const forceSplash = hdrs.get('x-force-splash') === '1';
   const seenSplash = jar.get(SPLASH_COOKIE)?.value === '1';
   const splashClass = forceSplash || !seenSplash ? 'splash-pending' : 'splash-complete';
+  // Match the first paint to the splash plate — navy Tailwind classes flashed behind
+  // the cream overlay on mobile before CSS :has() / splash rules applied.
+  const bootBg = splashClass === 'splash-pending' ? 'bg-[#f5f3ee]' : 'bg-[#050a14]';
 
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} bg-[#050a14] ${splashClass}`}
+      className={`${jakarta.variable} ${bootBg} ${splashClass}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className={`${jakarta.className} bg-[#050a14]`} suppressHydrationWarning>
+      <body className={`${jakarta.className} ${bootBg}`} suppressHydrationWarning>
         {/* Runs before React. Clears a stuck splash-pending cream plate if hydration fails outright. */}
         <script
           dangerouslySetInnerHTML={{

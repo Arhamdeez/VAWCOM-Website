@@ -90,21 +90,25 @@ html.splash-complete:has(.vaw-hero) body {
   background-color: #f5f3ee !important;
 }
 
-/* iOS paints the area under Safari's bottom toolbar (and any bounce) with the root background:
-   match the footer's last colour there; body keeps the cream. */
+/* iOS paints overscroll with the root background. Keep cream on home after splash —
+   flipping html to the footer green as soon as .vaw-footer exists flashed mint over
+   the cream page on phones. Green only while the footer is on screen (.vaw-at-footer). */
 html:has(.vaw-footer) {
   overscroll-behavior-y: none;
 }
-html.splash-complete:has(.vaw-footer) {
+html.splash-complete.vaw-at-footer {
   background-color: #9fdfc4 !important;
 }
 
 /* Never lock scroll on splash-pending alone — a missed React mount left mobile
    users on a cream plate with overflow:hidden and no way to navigate. Scroll
-   locks only while the live React splash is showing (.splash-locked). */
+   locks while the live React splash is showing / exiting (.splash-locked). */
 html.splash-locked,
 html.splash-locked body {
   overflow: hidden !important;
+  /* Stop iOS rubber-band from sliding the fixed splash and revealing navy gaps. */
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 #vawcom-app {
@@ -128,12 +132,21 @@ html.splash-exiting .splash-boot {
   justify-content: center;
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
   z-index: 9998;
   padding-inline: 1.5rem;
   background: #f5f3ee;
   opacity: 1;
   pointer-events: auto;
   touch-action: none;
+  /* Promote a stable layer — stops Safari compositor flicker as the toolbar resizes. */
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 html.splash-pending:not(.splash-react-ready),
@@ -173,7 +186,9 @@ html.splash-pending:not(.splash-react-ready) body {
   animation-delay: 0.28s;
 }
 
-/* Logo leaves first, then the plate dissolves to reveal the page. */
+/* Logo leaves first, then the plate dissolves to reveal the page.
+   Dedicated out-keyframes (not animation:none) — killing a running anim mid-frame
+   flashed a blank cream plate on iOS. */
 html.splash-exiting .splash-boot {
   opacity: 0;
   pointer-events: none;
@@ -181,12 +196,10 @@ html.splash-exiting .splash-boot {
 }
 html.splash-exiting .splash-boot img,
 html.splash-exiting .splash-dots {
-  animation: none;
-  opacity: 0;
-  transition: opacity 300ms ease-in, transform 300ms ease-in;
+  animation: splash-logo-out 300ms ease-in forwards;
 }
-html.splash-exiting .splash-boot img {
-  transform: scale(0.94);
+html.splash-exiting .splash-dots span {
+  animation: none;
 }
 
 @keyframes splash-logo-in {
@@ -197,6 +210,17 @@ html.splash-exiting .splash-boot img {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes splash-logo-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94);
   }
 }
 
@@ -221,12 +245,14 @@ html.splash-exiting .splash-boot img {
     animation: none;
     opacity: 0.7;
   }
-  html.splash-exiting .splash-boot,
-  html.splash-exiting .splash-boot img,
-  html.splash-exiting .splash-dots {
-    transform: none;
+  html.splash-exiting .splash-boot {
     transition-duration: 200ms;
     transition-delay: 0ms;
+  }
+  html.splash-exiting .splash-boot img,
+  html.splash-exiting .splash-dots {
+    animation-duration: 200ms;
+    transform: none;
   }
 }
 

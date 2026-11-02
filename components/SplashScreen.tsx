@@ -76,15 +76,18 @@ export default function SplashScreen({ onExiting, onComplete }: SplashScreenProp
     }).then(() => {
       if (cancelled) return;
       onExiting();
-      document.body.style.overflow = '';
+      // Hold overflow lock until finishOnce — clearing here caused mobile reflow glitches.
       doneId = window.setTimeout(finishOnce, fadeOut);
     });
 
     return () => {
       cancelled = true;
       window.clearTimeout(doneId);
-      root.classList.remove('splash-locked');
-      document.body.style.overflow = '';
+      // Only release if we never finished — finishOnce / setSplashComplete own the unlock.
+      if (!finishedRef.current) {
+        root.classList.remove('splash-locked');
+        document.body.style.overflow = '';
+      }
     };
   }, [fadeOut, onExiting, finishOnce]);
 
