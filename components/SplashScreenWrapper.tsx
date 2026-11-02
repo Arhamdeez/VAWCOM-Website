@@ -3,7 +3,7 @@
 import { useState, useLayoutEffect, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import SplashScreen, { SPLASH_LOGO_CLASS } from './SplashScreen';
-import { hasSeenSplash, markSplashSeen } from '@/lib/splashBoot';
+import { clearSplashSeen, hasSeenSplash, markSplashSeen } from '@/lib/splashBoot';
 
 function wantsForcedSplash(pathname: string, search: string): boolean {
   if (pathname === '/splash') return true;
@@ -34,6 +34,9 @@ function setSplashComplete() {
     'splash-forced',
   );
   root.classList.add('splash-complete');
+  // Boot script may have inlined cream while forcing splash-pending.
+  root.style.backgroundColor = '';
+  document.body.style.backgroundColor = '';
   document.body.style.overflow = '';
 }
 
@@ -80,6 +83,8 @@ export default function SplashScreenWrapper({
     if (forced) {
       completedRef.current = false;
       handingOffRef.current = false;
+      activeRef.current = true;
+      clearSplashSeen();
       setSplashPending(true, true);
       setShowSplash(true);
       return;
@@ -96,6 +101,8 @@ export default function SplashScreenWrapper({
     }
 
     if (activeRef.current) return;
+
+    // Refresh in this tab → skip. First enter (even with a stale cookie) → play.
     if (hasSeenSplash() || completedRef.current) {
       completedRef.current = true;
       setShowSplash(false);

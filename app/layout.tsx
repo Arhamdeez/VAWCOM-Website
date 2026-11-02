@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
 import './globals.css';
 import SiteShell from '@/components/SiteShell';
-import { SPLASH_COOKIE } from '@/lib/splashBoot';
+import { SPLASH_BOOT_SCRIPT, SPLASH_COOKIE } from '@/lib/splashBoot';
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -77,12 +77,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${jakarta.className} ${bootBg}`} suppressHydrationWarning>
-        {/* Runs before React. Clears a stuck splash-pending cream plate if hydration fails outright. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var r=document.documentElement;setTimeout(function(){if(r.classList.contains("splash-pending")||r.classList.contains("splash-exiting")){r.classList.remove("splash-pending","splash-exiting","splash-react-ready","splash-locked");r.classList.add("splash-complete");if(document.body)document.body.style.overflow=""}},9000)}catch(e){}})();`,
-          }}
-        />
+        {/* Before React: sessionStorage decides first-enter vs refresh (cookie alone was wrong). */}
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_BOOT_SCRIPT }} />
         <noscript>
           <style>{`html.splash-pending,html.splash-pending body{overflow:auto!important}html.splash-pending .splash-boot{display:none!important}`}</style>
         </noscript>
