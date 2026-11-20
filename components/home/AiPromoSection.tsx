@@ -18,16 +18,26 @@ export default function AiPromoSection() {
   return (
     <section
       id="ai-promo"
-      className="vaw-hero relative z-[2] overflow-hidden border-t border-black/[0.06] py-16 sm:py-20 lg:py-24"
+      className="vaw-hero relative z-[2] overflow-x-clip border-t border-black/[0.06] py-16 sm:py-20 lg:py-24"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 70% 80% at 88% 40%, rgba(12,183,139,0.18), transparent 62%), radial-gradient(ellipse 50% 60% at 8% 80%, rgba(184,217,60,0.12), transparent 70%)',
-        }}
-      />
+      {/* Rem-capped orbs — %-based ellipses grew with the viewport and left a hard
+          vertical seam through the cards on ultrawide displays. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute right-[max(-4rem,-2%)] top-[8%] h-[min(28rem,70%)] w-[min(34rem,48%)] rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle at center, rgba(12,183,139,0.2) 0%, rgba(12,183,139,0.08) 42%, transparent 72%)',
+          }}
+        />
+        <div
+          className="absolute bottom-[-8%] left-[max(-3rem,-2%)] h-[min(22rem,60%)] w-[min(26rem,38%)] rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle at center, rgba(184,217,60,0.14) 0%, transparent 70%)',
+          }}
+        />
+      </div>
 
       <div className="relative mx-auto grid max-w-[90rem] items-center gap-10 px-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
         <motion.div
@@ -84,7 +94,7 @@ export default function AiPromoSection() {
                   i === 3 ? 'sm:-translate-y-4' : ''
                 }`}
               >
-                <div className="vaw-glass-core rounded-[1.35rem] px-6 py-6 sm:py-7">
+                <div className="vaw-glass-core rounded-[1.35rem] bg-white/55 px-6 py-6 sm:py-7">
                   <span
                     className="mb-3 block h-1.5 w-10 rounded-full bg-[#0cb78b]"
                     aria-hidden

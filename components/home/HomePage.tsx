@@ -50,8 +50,9 @@ function HomeChrome() {
         travel.current = 0;
       }
       travel.current += Math.abs(dy);
-      if (travel.current < 56) return;
+      if (travel.current < 48) return;
       travel.current = 0;
+      // Scroll up a bit → half-open links; scroll down → compact.
       apply(next < 0 ? 'half' : 'compact');
     };
     window.addEventListener('scroll', onScroll, { passive: true });

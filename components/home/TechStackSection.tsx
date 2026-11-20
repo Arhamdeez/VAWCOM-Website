@@ -104,16 +104,9 @@ export default function TechStackSection() {
       id="stack"
       ref={sectionRef}
       aria-label="Technologies we work with"
-      className="vaw-hero relative z-[2] overflow-hidden border-t border-black/[0.06] pb-12 pt-10 sm:pb-16 sm:pt-14"
+      className="vaw-hero relative z-[2] overflow-x-clip border-t border-black/[0.06] pb-12 pt-10 sm:pb-16 sm:pt-14"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 80% at 30% 50%, rgba(12,183,139,0.22), transparent 55%), radial-gradient(ellipse 50% 70% at 75% 40%, rgba(184,217,60,0.2), transparent 50%)',
-        }}
-      />
+      {/* Edge fades only — no green wash; the scribble stroke already carries the brand color. */}
       <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-16 bg-gradient-to-r from-[#f5f3ee] to-transparent sm:w-24" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-16 bg-gradient-to-l from-[#f5f3ee] to-transparent sm:w-24" />
 

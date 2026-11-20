@@ -71,6 +71,8 @@ body::-webkit-scrollbar {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+    /* Keep anchored jumps clear of the fixed pill nav. */
+    scroll-padding-top: 5.5rem;
   }
 }
 

@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { MotionConfig } from 'framer-motion';
 import PageTransition from '@/components/PageTransition';
+import SmoothScroll from '@/components/SmoothScroll';
 import SplashScreenWrapper from '@/components/SplashScreenWrapper';
 import { ChatProvider } from '@/components/chat/SiteChat';
 import { SHOW_GALLERY } from '@/lib/site';
@@ -97,6 +98,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
     <ChatProvider>
+      <SmoothScroll />
       <SplashScreenWrapper cream={cream}>
         <main
           className={`relative min-h-0 w-full ${
